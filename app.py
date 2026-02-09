@@ -46,6 +46,21 @@ with st.sidebar:
     else:
         date_range = None
 
+    st.markdown("---")
+    st.markdown(
+        "Tracks the percentage of US stocks in an uptrend "
+        "across the full market and 11 sectors. "
+        "Data is collected daily from Finviz Elite."
+    )
+
+    st.markdown("---")
+    st.markdown(
+        "Made in :flag-us: by [@tradermonty](https://github.com/tradermonty)"
+    )
+    st.markdown(
+        '[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/tradermonty)'
+    )
+
 # Main content
 all_data = load_data()
 df_all = all_data.get("all")
