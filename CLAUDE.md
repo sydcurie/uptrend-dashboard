@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-US Market Uptrend Dashboard — Streamlit ベースのセクター別上昇トレンド分析ダッシュボード。SQLite (DuckDB ではなく) をバックエンドに使用し、Excel からインポートした生データ (count, total) からインジケーターをオンザフライ計算する設計。
+US Market Uptrend Dashboard — A Streamlit-based sector-level uptrend analysis dashboard. Uses SQLite (not DuckDB) as the backend, computing indicators on-the-fly from raw data (count, total) imported from Excel.
 
 ## Commands
 
@@ -45,9 +45,9 @@ Storage (data/uptrend.db) — uptrend_raw table, PK: (date, worksheet)
 
 ### Key Design Decisions
 
-- **Single Source of Truth**: DB には生データ (count, total) のみ保存。ratio, MA, slope, trend はすべて読み込み時に `calculate_indicators()` で計算
-- **Caching**: `@st.cache_data(ttl=3600)` で1時間キャッシュ。サイドバーの Refresh ボタンで手動クリア
-- **UPSERT**: `INSERT OR REPLACE` による冪等なデータインポート
+- **Single Source of Truth**: Only raw data (count, total) is stored in the DB. ratio, MA, slope, and trend are all computed at read time by `calculate_indicators()`
+- **Caching**: `@st.cache_data(ttl=3600)` caches data for 1 hour. Manual clear via the sidebar Refresh button
+- **UPSERT**: Idempotent data import via `INSERT OR REPLACE`
 
 ### DB Schema
 
@@ -74,19 +74,19 @@ Streamlit auto-discovers `pages/` directory:
 
 ## Testing
 
-pytest + pytest-mock。テストは実 DB を使わず `tmp_path` ベースの一時 DB を使用。共通フィクスチャは `tests/conftest.py` に定義:
-- `tmp_db` / `db_client` — 一時 DB
-- `sample_raw_df` — 20行の合成データ
-- `sample_calculated_df` — インジケーター計算済みデータ
-- `sample_all_data` — 全12ワークシート分のデータ
+pytest + pytest-mock. Tests use `tmp_path`-based temporary DBs instead of the real DB. Shared fixtures are defined in `tests/conftest.py`:
+- `tmp_db` / `db_client` — temporary DB
+- `sample_raw_df` — 20-row synthetic data
+- `sample_calculated_df` — DataFrame with indicators pre-calculated
+- `sample_all_data` — data for all 12 worksheets
 
 ## Development Rules
 
-- **TDD**: コード実装時は `/tdd-developer` スキルを使用し、Red→Green→Refactor サイクルに従うこと
-- **設計書同期**: コード変更後は `docs/design.md` に変更内容を反映すること。設計書とコードの乖離を防ぐ
+- **TDD**: Use the `/tdd-developer` skill when implementing code, following the Red→Green→Refactor cycle
+- **Design Doc Sync**: After code changes, reflect the updates in `docs/design.md` to prevent drift between design docs and code
 
 ## Adding New Features
 
-**New indicator**: `indicator_calculator.py` に計算追加 → `calculate_indicators()` にカラム追加 → `chart_builder.py` で可視化 → テスト追加
+**New indicator**: Add calculation to `indicator_calculator.py` → add column to `calculate_indicators()` → visualize in `chart_builder.py` → add tests
 
-**New page**: `pages/N_Name.py` を作成、既存ページのパターンに従う (`load_data` キャッシュ、サイドバー日付フィルター)
+**New page**: Create `pages/N_Name.py`, following existing page patterns (`load_data` cache, sidebar date filter)
