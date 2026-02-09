@@ -1,11 +1,14 @@
 """Derived indicator calculations for uptrend dashboard."""
 
+import logging
 from dataclasses import dataclass
 from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
 from scipy.signal import find_peaks
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -20,9 +23,11 @@ class IndicatorConfig:
 
 
 def _calc_ratio(df: pd.DataFrame) -> pd.Series:
-    """Calculate ratio = count / total, handling zero total."""
+    """Calculate ratio = count / total, handling zero total and NaN values."""
+    count = df["count"].fillna(0)
+    total = df["total"].fillna(0)
     return pd.Series(
-        np.where(df["total"] == 0, 0.0, df["count"] / df["total"]),
+        np.where(total == 0, 0.0, count / total),
         index=df.index,
     )
 

@@ -1,26 +1,17 @@
 """SQLite data access layer for uptrend dashboard."""
 
+import logging
 import os
 import sqlite3
+from contextlib import contextmanager
 from typing import Dict, List, Tuple
 
 import pandas as pd
 
+from src.constants import VALID_WORKSHEETS
 
-VALID_WORKSHEETS = [
-    "all",
-    "sec_basicmaterials",
-    "sec_communicationservices",
-    "sec_consumercyclical",
-    "sec_consumerdefensive",
-    "sec_energy",
-    "sec_financial",
-    "sec_healthcare",
-    "sec_industrials",
-    "sec_realestate",
-    "sec_technology",
-    "sec_utilities",
-]
+
+logger = logging.getLogger(__name__)
 
 
 class DBClient:
@@ -30,54 +21,67 @@ class DBClient:
         self.db_path = db_path
         self._init_tables()
 
-    def _get_connection(self) -> sqlite3.Connection:
-        return sqlite3.connect(self.db_path)
+    @contextmanager
+    def _connection(self):
+        """Context manager for database connections with automatic cleanup."""
+        conn = sqlite3.connect(self.db_path)
+        try:
+            yield conn
+            conn.commit()
+        except Exception:
+            conn.rollback()
+            raise
+        finally:
+            conn.close()
 
     def _init_tables(self) -> None:
-        conn = self._get_connection()
-        conn.execute("""
-            CREATE TABLE IF NOT EXISTS uptrend_raw (
-                date      TEXT    NOT NULL,
-                worksheet TEXT    NOT NULL,
-                count     INTEGER NOT NULL,
-                total     INTEGER NOT NULL,
-                PRIMARY KEY (date, worksheet)
-            )
-        """)
-        conn.execute("""
-            CREATE INDEX IF NOT EXISTS idx_uptrend_raw_worksheet
-                ON uptrend_raw (worksheet, date)
-        """)
-        conn.commit()
-        conn.close()
+        with self._connection() as conn:
+            conn.execute("""
+                CREATE TABLE IF NOT EXISTS uptrend_raw (
+                    date      TEXT    NOT NULL,
+                    worksheet TEXT    NOT NULL,
+                    count     INTEGER NOT NULL,
+                    total     INTEGER NOT NULL,
+                    PRIMARY KEY (date, worksheet)
+                )
+            """)
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_uptrend_raw_worksheet
+                    ON uptrend_raw (worksheet, date)
+            """)
 
     def upsert_raw_data(self, date: str, worksheet: str, count: int, total: int) -> None:
-        conn = self._get_connection()
-        conn.execute(
-            "INSERT OR REPLACE INTO uptrend_raw (date, worksheet, count, total) VALUES (?, ?, ?, ?)",
-            (date, worksheet, count, total),
-        )
-        conn.commit()
-        conn.close()
-
-    def upsert_bulk(self, df: pd.DataFrame) -> None:
-        conn = self._get_connection()
-        for _, row in df.iterrows():
+        if worksheet not in VALID_WORKSHEETS:
+            raise ValueError(f"Invalid worksheet: '{worksheet}'. Must be one of {VALID_WORKSHEETS}")
+        with self._connection() as conn:
             conn.execute(
                 "INSERT OR REPLACE INTO uptrend_raw (date, worksheet, count, total) VALUES (?, ?, ?, ?)",
-                (str(row["date"]), str(row["worksheet"]), int(row["count"]), int(row["total"])),
+                (date, worksheet, count, total),
             )
-        conn.commit()
-        conn.close()
+        logger.debug("Upserted row: date=%s, worksheet=%s", date, worksheet)
+
+    def upsert_bulk(self, df: pd.DataFrame) -> None:
+        invalid = set(df["worksheet"].unique()) - set(VALID_WORKSHEETS)
+        if invalid:
+            raise ValueError(f"Invalid worksheet(s): {invalid}. Must be one of {VALID_WORKSHEETS}")
+        rows = [
+            (str(row["date"]), str(row["worksheet"]), int(row["count"]), int(row["total"]))
+            for _, row in df.iterrows()
+        ]
+        with self._connection() as conn:
+            conn.executemany(
+                "INSERT OR REPLACE INTO uptrend_raw (date, worksheet, count, total) VALUES (?, ?, ?, ?)",
+                rows,
+            )
+        logger.info("Bulk upserted %d rows", len(rows))
 
     def fetch_raw_data(self, worksheet: str) -> pd.DataFrame:
-        conn = self._get_connection()
-        df = pd.read_sql_query(
-            "SELECT date, count, total FROM uptrend_raw WHERE worksheet = ? ORDER BY date ASC",
-            conn,
-            params=(worksheet,),
-        )
-        conn.close()
+        with self._connection() as conn:
+            df = pd.read_sql_query(
+                "SELECT date, count, total FROM uptrend_raw WHERE worksheet = ? ORDER BY date ASC",
+                conn,
+                params=(worksheet,),
+            )
         if not df.empty:
             df["date"] = pd.to_datetime(df["date"])
         else:
@@ -89,20 +93,18 @@ class DBClient:
         return {ws: self.fetch_raw_data(ws) for ws in worksheets}
 
     def get_worksheets(self) -> List[str]:
-        conn = self._get_connection()
-        cursor = conn.execute("SELECT DISTINCT worksheet FROM uptrend_raw ORDER BY worksheet")
-        result = [row[0] for row in cursor.fetchall()]
-        conn.close()
+        with self._connection() as conn:
+            cursor = conn.execute("SELECT DISTINCT worksheet FROM uptrend_raw ORDER BY worksheet")
+            result = [row[0] for row in cursor.fetchall()]
         return result
 
     def get_date_range(self, worksheet: str) -> Tuple[str, str]:
-        conn = self._get_connection()
-        cursor = conn.execute(
-            "SELECT MIN(date), MAX(date) FROM uptrend_raw WHERE worksheet = ?",
-            (worksheet,),
-        )
-        row = cursor.fetchone()
-        conn.close()
+        with self._connection() as conn:
+            cursor = conn.execute(
+                "SELECT MIN(date), MAX(date) FROM uptrend_raw WHERE worksheet = ?",
+                (worksheet,),
+            )
+            row = cursor.fetchone()
         return (row[0], row[1])
 
 

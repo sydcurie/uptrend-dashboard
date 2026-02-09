@@ -6,24 +6,10 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 
+from src.constants import VALID_WORKSHEETS
 from src.db_client import DBClient
 
 logger = logging.getLogger(__name__)
-
-VALID_WORKSHEETS = [
-    "all",
-    "sec_basicmaterials",
-    "sec_communicationservices",
-    "sec_consumercyclical",
-    "sec_consumerdefensive",
-    "sec_energy",
-    "sec_financial",
-    "sec_healthcare",
-    "sec_industrials",
-    "sec_realestate",
-    "sec_technology",
-    "sec_utilities",
-]
 
 
 def import_excel(

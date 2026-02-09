@@ -109,3 +109,132 @@ class TestDBClient:
         min_date, max_date = db_client.get_date_range("all")
         assert min_date == "2024-01-02"
         assert max_date == "2024-01-10"
+
+
+class TestDBConnectionManagement:
+    """Tests for DB connection management and transaction safety."""
+
+    def test_connection_closed_after_upsert(self, tmp_db):
+        """Connection should be properly closed after upsert, even on success."""
+        client = DBClient(tmp_db)
+        client.upsert_raw_data("2024-01-02", "all", 150, 500)
+        # Verify data was written (connection was committed and closed)
+        conn = sqlite3.connect(tmp_db)
+        cursor = conn.execute("SELECT COUNT(*) FROM uptrend_raw")
+        assert cursor.fetchone()[0] == 1
+        conn.close()
+
+    def test_connection_closed_on_insert_error(self, tmp_db):
+        """Connection should be closed even when an error occurs during insert."""
+        client = DBClient(tmp_db)
+        # Insert valid data first
+        client.upsert_raw_data("2024-01-02", "all", 150, 500)
+        # Corrupt the table to force an error (drop it)
+        conn = sqlite3.connect(tmp_db)
+        conn.execute("DROP TABLE uptrend_raw")
+        conn.commit()
+        conn.close()
+        # Attempt insert should raise but not leak connection
+        with pytest.raises(Exception):
+            client.upsert_raw_data("2024-01-03", "all", 160, 500)
+        # DB file should still be accessible (no locks held)
+        conn = sqlite3.connect(tmp_db)
+        cursor = conn.execute("SELECT name FROM sqlite_master WHERE type='table'")
+        cursor.fetchall()
+        conn.close()
+
+    def test_bulk_upsert_atomicity(self, tmp_db):
+        """Bulk upsert with SQL-level error should roll back entirely."""
+        client = DBClient(tmp_db)
+        # Insert some valid data first
+        client.upsert_raw_data("2024-01-01", "all", 100, 500)
+        # Force a SQL-level error by inserting into a table that we'll corrupt
+        # First, add a UNIQUE constraint violation within a single batch
+        # by having a non-integer value that passes Python int() but fails SQL
+        # Instead, we manually test rollback by corrupting the table mid-transaction
+        conn = sqlite3.connect(tmp_db)
+        conn.execute("DROP TABLE uptrend_raw")
+        conn.commit()
+        conn.close()
+        # Re-create the table but with a CHECK constraint that will fail
+        conn = sqlite3.connect(tmp_db)
+        conn.execute("""
+            CREATE TABLE uptrend_raw (
+                date TEXT NOT NULL,
+                worksheet TEXT NOT NULL,
+                count INTEGER NOT NULL CHECK(count >= 0),
+                total INTEGER NOT NULL,
+                PRIMARY KEY (date, worksheet)
+            )
+        """)
+        conn.execute("INSERT INTO uptrend_raw VALUES ('2024-01-01', 'all', 100, 500)")
+        conn.commit()
+        conn.close()
+        # Re-create client pointing to this DB (skip _init_tables since table exists)
+        client2 = DBClient(tmp_db)
+        # Bulk insert with a negative count to trigger CHECK constraint failure
+        df = pd.DataFrame({
+            "date": ["2024-01-02", "2024-01-03"],
+            "worksheet": ["all", "all"],
+            "count": [150, -1],
+            "total": [500, 500],
+        })
+        with pytest.raises(Exception):
+            client2.upsert_bulk(df)
+        # Only the original row should exist (bulk was rolled back)
+        conn = sqlite3.connect(tmp_db)
+        cursor = conn.execute("SELECT COUNT(*) FROM uptrend_raw")
+        count = cursor.fetchone()[0]
+        conn.close()
+        assert count == 1
+
+    def test_bulk_upsert_executemany(self, tmp_db):
+        """Bulk upsert should use executemany for efficiency."""
+        client = DBClient(tmp_db)
+        df = pd.DataFrame({
+            "date": ["2024-01-02", "2024-01-03", "2024-01-04"],
+            "worksheet": ["all", "all", "all"],
+            "count": [150, 160, 170],
+            "total": [500, 500, 500],
+        })
+        client.upsert_bulk(df)
+        conn = sqlite3.connect(tmp_db)
+        cursor = conn.execute("SELECT COUNT(*) FROM uptrend_raw")
+        count = cursor.fetchone()[0]
+        conn.close()
+        assert count == 3
+
+    def test_context_manager_used(self, tmp_db):
+        """DBClient should have a _connection context manager."""
+        client = DBClient(tmp_db)
+        assert hasattr(client, '_connection')
+        # Verify it works as a context manager
+        with client._connection() as conn:
+            assert isinstance(conn, sqlite3.Connection)
+            cursor = conn.execute("SELECT COUNT(*) FROM uptrend_raw")
+            assert cursor.fetchone()[0] == 0
+
+
+class TestWorksheetValidation:
+    """Tests for worksheet name validation."""
+
+    def test_upsert_rejects_invalid_worksheet(self, db_client):
+        """upsert_raw_data should reject invalid worksheet names."""
+        with pytest.raises(ValueError, match="Invalid worksheet"):
+            db_client.upsert_raw_data("2024-01-02", "invalid_sheet", 150, 500)
+
+    def test_upsert_accepts_valid_worksheet(self, db_client):
+        """upsert_raw_data should accept valid worksheet names."""
+        db_client.upsert_raw_data("2024-01-02", "all", 150, 500)
+        db_client.upsert_raw_data("2024-01-02", "sec_technology", 50, 100)
+
+    def test_bulk_upsert_rejects_invalid_worksheet(self, db_client):
+        """upsert_bulk should reject DataFrames with invalid worksheet names."""
+        df = pd.DataFrame({
+            "date": ["2024-01-02"],
+            "worksheet": ["invalid_sheet"],
+            "count": [150],
+            "total": [500],
+        })
+        with pytest.raises(ValueError, match="Invalid worksheet"):
+            db_client.upsert_bulk(df)

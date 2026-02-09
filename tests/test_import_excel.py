@@ -5,7 +5,8 @@ import sqlite3
 import pandas as pd
 import pytest
 
-from import_excel import import_excel, VALID_WORKSHEETS
+from import_excel import import_excel
+from src.constants import VALID_WORKSHEETS
 
 
 @pytest.fixture

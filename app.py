@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.db_client import load_all_data
-from src.data_processor import get_current_status, build_sector_summary
+from src.data_processor import get_current_status, build_sector_summary, filter_by_date_range
 from src.chart_builder import build_ratio_chart, build_sector_summary_chart
 
 st.set_page_config(
@@ -56,10 +56,8 @@ if df_all is None or df_all.empty:
 
 # Apply date filter
 if date_range and len(date_range) == 2:
-    import pandas as pd
     start, end = date_range
-    mask = (df_all["date"].dt.date >= start) & (df_all["date"].dt.date <= end)
-    df_filtered = df_all[mask]
+    df_filtered = filter_by_date_range(df_all, start, end)
 else:
     df_filtered = df_all
 

@@ -5,26 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from src.constants import SECTORS
 from src.db_client import load_all_data
-from src.data_processor import _sector_display_name
+from src.data_processor import get_sector_display_name, filter_by_date_range
 from src.chart_builder import build_sector_comparison_chart
 
 st.set_page_config(page_title="Sector Comparison", page_icon="📊", layout="wide")
 st.title("Sector Comparison")
-
-SECTORS = [
-    "sec_basicmaterials",
-    "sec_communicationservices",
-    "sec_consumercyclical",
-    "sec_consumerdefensive",
-    "sec_energy",
-    "sec_financial",
-    "sec_healthcare",
-    "sec_industrials",
-    "sec_realestate",
-    "sec_technology",
-    "sec_utilities",
-]
 
 
 @st.cache_data(ttl=3600)
@@ -35,7 +22,7 @@ def load_data():
 all_data = load_data()
 
 # Multi-select sectors
-sector_names = {_sector_display_name(s): s for s in SECTORS}
+sector_names = {get_sector_display_name(s): s for s in SECTORS}
 selected_display = st.multiselect(
     "Select Sectors",
     options=list(sector_names.keys()),
@@ -66,13 +53,20 @@ if first_df is not None and not first_df.empty:
         for key in selected_keys:
             df = all_data.get(key)
             if df is not None:
-                mask = (df["date"].dt.date >= start) & (df["date"].dt.date <= end)
-                filtered_data[key] = df[mask]
+                filtered_data[key] = filter_by_date_range(df, start, end)
     else:
         filtered_data = {k: all_data[k] for k in selected_keys if k in all_data}
 else:
     filtered_data = {k: all_data[k] for k in selected_keys if k in all_data}
 
+# Display mode toggle
+display_mode = st.radio(
+    "Display Mode",
+    options=["Smoothed (10MA)", "Raw Ratio"],
+    horizontal=True,
+)
+use_ma = display_mode == "Smoothed (10MA)"
+
 # Chart
-fig = build_sector_comparison_chart(filtered_data, selected_sectors=selected_keys)
+fig = build_sector_comparison_chart(filtered_data, selected_sectors=selected_keys, use_ma=use_ma)
 st.plotly_chart(fig, use_container_width=True)

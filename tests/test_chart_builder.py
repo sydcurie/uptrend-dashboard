@@ -66,17 +66,70 @@ class TestBuildSectorComparisonChart:
     """Tests for build_sector_comparison_chart function."""
 
     def test_sector_comparison_chart(self, sample_all_data):
-        """Should produce an overlay chart for all sectors."""
+        """Should produce an overlay chart for all sectors plus threshold legend traces."""
         fig = build_sector_comparison_chart(sample_all_data)
         assert isinstance(fig, go.Figure)
-        # Should have one trace per sector (excluding "all")
-        assert len(fig.data) == 11
+        # 11 sector traces + 2 threshold legend traces (Upper, Lower)
+        assert len(fig.data) == 13
 
     def test_sector_comparison_selected(self, sample_all_data):
-        """Should filter to selected sectors only."""
+        """Should filter to selected sectors only (plus threshold traces)."""
         selected = ["sec_technology", "sec_healthcare"]
         fig = build_sector_comparison_chart(sample_all_data, selected_sectors=selected)
-        assert len(fig.data) == 2
+        # 2 sector traces + 2 threshold legend traces
+        assert len(fig.data) == 4
+
+    def test_sector_comparison_uses_ma_by_default(self, sample_all_data):
+        """Default mode should use ma_10 column."""
+        fig = build_sector_comparison_chart(sample_all_data, use_ma=True)
+        # Title should indicate 10MA mode
+        assert "10MA" in fig.layout.title.text
+
+    def test_sector_comparison_raw_ratio_mode(self, sample_all_data):
+        """Raw ratio mode should use ratio column."""
+        fig = build_sector_comparison_chart(sample_all_data, use_ma=False)
+        assert "Raw Ratio" in fig.layout.title.text
+
+    def test_sector_comparison_has_threshold_traces(self, sample_all_data):
+        """Should have Upper and Lower threshold legend entries."""
+        fig = build_sector_comparison_chart(sample_all_data)
+        trace_names = [t.name for t in fig.data]
+        assert "Upper" in trace_names
+        assert "Lower" in trace_names
+
+    def test_sector_comparison_y_axis_percent(self, sample_all_data):
+        """Y axis should use percent format."""
+        fig = build_sector_comparison_chart(sample_all_data)
+        assert fig.layout.yaxis.tickformat == ".0%"
+
+    def test_sector_comparison_annotations(self, sample_all_data):
+        """Should have annotations for latest values."""
+        fig = build_sector_comparison_chart(sample_all_data)
+        # Should have one annotation per sector
+        assert len(fig.layout.annotations) == 11
+
+    def test_sector_comparison_legend_sorted_by_latest_value(self, sample_all_data):
+        """Legend (trace order) should be sorted by latest value descending."""
+        fig = build_sector_comparison_chart(sample_all_data)
+        # Get sector traces only (exclude Upper/Lower)
+        sector_traces = [t for t in fig.data if t.name not in ("Upper", "Lower")]
+        # Extract latest ma_10 values from the traces
+        latest_values = []
+        for t in sector_traces:
+            y_vals = [v for v in t.y if v is not None and not pd.isna(v)]
+            latest_values.append(y_vals[-1] if y_vals else 0)
+        # Verify descending order
+        assert latest_values == sorted(latest_values, reverse=True)
+
+    def test_sector_comparison_custom_colors(self, sample_all_data):
+        """Each sector should have a distinct color from the palette."""
+        from src.chart_builder import SECTOR_PALETTE
+        fig = build_sector_comparison_chart(sample_all_data)
+        sector_traces = [t for t in fig.data if t.name not in ("Upper", "Lower")]
+        colors = [t.line.color for t in sector_traces]
+        # All colors should be from the palette
+        for color in colors:
+            assert color in SECTOR_PALETTE
 
 
 class TestRatioChartPeakTroughMarkers:

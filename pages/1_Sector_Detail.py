@@ -5,26 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from src.constants import SECTORS
 from src.db_client import load_all_data
-from src.data_processor import get_current_status, _sector_display_name
+from src.data_processor import get_current_status, get_sector_display_name, filter_by_date_range
 from src.chart_builder import build_ratio_chart
 
 st.set_page_config(page_title="Sector Detail", page_icon="🔍", layout="wide")
 st.title("Sector Detail")
-
-SECTORS = [
-    "sec_basicmaterials",
-    "sec_communicationservices",
-    "sec_consumercyclical",
-    "sec_consumerdefensive",
-    "sec_energy",
-    "sec_financial",
-    "sec_healthcare",
-    "sec_industrials",
-    "sec_realestate",
-    "sec_technology",
-    "sec_utilities",
-]
 
 
 @st.cache_data(ttl=3600)
@@ -35,7 +22,7 @@ def load_data():
 all_data = load_data()
 
 # Sector selector
-sector_names = {_sector_display_name(s): s for s in SECTORS}
+sector_names = {get_sector_display_name(s): s for s in SECTORS}
 selected_display = st.selectbox("Select Sector", list(sector_names.keys()))
 selected_key = sector_names[selected_display]
 
@@ -78,8 +65,7 @@ date_range = st.date_input(
 
 if date_range and len(date_range) == 2:
     start, end = date_range
-    mask = (df["date"].dt.date >= start) & (df["date"].dt.date <= end)
-    df_filtered = df[mask]
+    df_filtered = filter_by_date_range(df, start, end)
 else:
     df_filtered = df
 

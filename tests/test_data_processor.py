@@ -5,9 +5,10 @@ import numpy as np
 import pytest
 
 from src.data_processor import (
+    MarketStatus,
     get_current_status,
     build_sector_summary,
-    _sector_display_name,
+    get_sector_display_name,
 )
 
 
@@ -92,11 +93,52 @@ class TestBuildSectorSummary:
 
 
 class TestSectorDisplayName:
-    """Tests for _sector_display_name helper."""
+    """Tests for get_sector_display_name helper."""
 
-    def test_sector_display_name(self):
+    def testget_sector_display_name(self):
         """Should convert worksheet names to display names."""
-        assert _sector_display_name("sec_technology") == "Technology"
-        assert _sector_display_name("sec_basicmaterials") == "Basic Materials"
-        assert _sector_display_name("sec_communicationservices") == "Communication Services"
-        assert _sector_display_name("sec_realestate") == "Real Estate"
+        assert get_sector_display_name("sec_technology") == "Technology"
+        assert get_sector_display_name("sec_basicmaterials") == "Basic Materials"
+        assert get_sector_display_name("sec_communicationservices") == "Communication Services"
+        assert get_sector_display_name("sec_realestate") == "Real Estate"
+
+
+class TestEmptyDataFrameGuards:
+    """Tests for empty DataFrame handling."""
+
+    def test_get_current_status_empty_df(self):
+        """Empty DataFrame should return default status values."""
+        df = pd.DataFrame(columns=[
+            "date", "count", "total", "ratio", "ma_10", "slope",
+            "trend_up", "trend_down", "upper", "lower", "is_peak", "is_trough",
+        ])
+        status = get_current_status(df)
+        expected_keys = {
+            "date", "ratio", "ratio_10ma", "trend",
+            "slope", "is_overbought", "is_oversold",
+        }
+        assert set(status.keys()) == expected_keys
+        assert status["ratio"] == 0.0
+        assert status["ratio_10ma"] is None
+        assert status["trend"] == "down"
+        assert status["slope"] == 0.0
+        assert status["is_overbought"] is False
+        assert status["is_oversold"] is False
+
+    def test_build_sector_summary_empty(self):
+        """Empty data dict should return DataFrame with correct columns."""
+        summary = build_sector_summary({})
+        expected_columns = {"Sector", "Ratio", "10MA", "Trend", "Slope", "Status"}
+        assert set(summary.columns) == expected_columns
+        assert len(summary) == 0
+
+    def test_build_sector_summary_all_empty_dfs(self):
+        """Data dict with only empty DataFrames should return empty summary."""
+        data = {
+            "sec_technology": pd.DataFrame(columns=[
+                "date", "count", "total", "ratio", "ma_10", "slope",
+                "trend_up", "trend_down", "upper", "lower",
+            ]),
+        }
+        summary = build_sector_summary(data)
+        assert len(summary) == 0

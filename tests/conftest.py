@@ -4,22 +4,7 @@ import pytest
 import pandas as pd
 import numpy as np
 
-
-SECTORS = [
-    "sec_basicmaterials",
-    "sec_communicationservices",
-    "sec_consumercyclical",
-    "sec_consumerdefensive",
-    "sec_energy",
-    "sec_financial",
-    "sec_healthcare",
-    "sec_industrials",
-    "sec_realestate",
-    "sec_technology",
-    "sec_utilities",
-]
-
-ALL_WORKSHEET_NAMES = ["all"] + SECTORS
+from src.constants import SECTORS, VALID_WORKSHEETS as ALL_WORKSHEET_NAMES
 
 
 @pytest.fixture

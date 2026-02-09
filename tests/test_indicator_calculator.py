@@ -7,94 +7,89 @@ import pytest
 from src.indicator_calculator import (
     IndicatorConfig,
     calculate_indicators,
-    _calc_ratio,
-    _calc_ma,
-    _calc_slope,
-    _calc_trend,
-    _detect_peaks_troughs,
 )
 
 
-class TestCalcRatio:
-    """Tests for ratio calculation."""
+class TestRatioCalculation:
+    """Tests for ratio calculation via public API."""
 
-    def test_calc_ratio(self):
-        """count/total should produce correct ratio."""
-        df = pd.DataFrame({"count": [150, 200, 250], "total": [500, 500, 500]})
-        result = _calc_ratio(df)
-        assert list(result) == [0.3, 0.4, 0.5]
+    def test_ratio_values(self):
+        """count/total should produce correct ratio via calculate_indicators."""
+        df = pd.DataFrame({
+            "date": pd.bdate_range("2024-01-01", periods=3, freq="B"),
+            "count": [150, 200, 250],
+            "total": [500, 500, 500],
+        })
+        result = calculate_indicators(df)
+        assert list(result["ratio"]) == [0.3, 0.4, 0.5]
 
-    def test_calc_ratio_zero_total(self):
-        """total=0 should produce 0.0, not raise ZeroDivisionError."""
-        df = pd.DataFrame({"count": [100, 0], "total": [0, 0]})
-        result = _calc_ratio(df)
-        assert list(result) == [0.0, 0.0]
-
-
-class TestCalcMA:
-    """Tests for moving average calculation."""
-
-    def test_calc_ma_10(self, sample_raw_df):
-        """10-day MA should have valid values from row 10 onwards."""
-        ratio = _calc_ratio(sample_raw_df)
-        ma = _calc_ma(ratio, period=10)
-        # First 9 values should be NaN
-        assert all(pd.isna(ma.iloc[:9]))
-        # 10th value onwards should be valid
-        assert pd.notna(ma.iloc[9])
-        # Verify 10th value is mean of first 10 ratios
-        expected = ratio.iloc[:10].mean()
-        assert abs(ma.iloc[9] - expected) < 1e-10
-
-    def test_calc_ma_insufficient_data(self):
-        """With fewer than period rows, all values should be NaN."""
-        ratio = pd.Series([0.3, 0.4, 0.5])
-        ma = _calc_ma(ratio, period=10)
-        assert all(pd.isna(ma))
+    def test_ratio_zero_total(self):
+        """total=0 should produce ratio=0.0, not raise ZeroDivisionError."""
+        df = pd.DataFrame({
+            "date": pd.bdate_range("2024-01-01", periods=2, freq="B"),
+            "count": [100, 0],
+            "total": [0, 0],
+        })
+        result = calculate_indicators(df)
+        assert list(result["ratio"]) == [0.0, 0.0]
 
 
-class TestCalcSlope:
-    """Tests for slope calculation."""
+class TestMovingAverage:
+    """Tests for moving average via public API."""
 
-    def test_calc_slope(self, sample_raw_df):
-        """Slope should be diff of MA."""
-        ratio = _calc_ratio(sample_raw_df)
-        ma = _calc_ma(ratio, period=10)
-        slope = _calc_slope(ma)
-        # First value of slope (where MA starts) should be NaN
-        assert pd.isna(slope.iloc[9])
+    def test_ma_10_leading_nans(self, sample_raw_df):
+        """10-day MA should have NaN for first 9 rows, valid from row 10."""
+        result = calculate_indicators(sample_raw_df)
+        assert all(pd.isna(result["ma_10"].iloc[:9]))
+        assert pd.notna(result["ma_10"].iloc[9])
+
+    def test_ma_10_value(self, sample_raw_df):
+        """10th MA value should be mean of first 10 ratios."""
+        result = calculate_indicators(sample_raw_df)
+        expected = result["ratio"].iloc[:10].mean()
+        assert abs(result["ma_10"].iloc[9] - expected) < 1e-10
+
+    def test_ma_insufficient_data(self):
+        """With fewer than 10 rows, all MA values should be NaN."""
+        df = pd.DataFrame({
+            "date": pd.bdate_range("2024-01-01", periods=3, freq="B"),
+            "count": [150, 200, 250],
+            "total": [500, 500, 500],
+        })
+        result = calculate_indicators(df)
+        assert all(pd.isna(result["ma_10"]))
+
+
+class TestSlope:
+    """Tests for slope calculation via public API."""
+
+    def test_slope_is_ma_diff(self, sample_raw_df):
+        """Slope should be the 1-day diff of MA."""
+        result = calculate_indicators(sample_raw_df)
+        # First valid MA slope should be NaN (diff of first MA value)
+        assert pd.isna(result["slope"].iloc[9])
         # 11th value should be diff of 10th and 11th MA
-        if pd.notna(ma.iloc[10]) and pd.notna(ma.iloc[9]):
-            expected = ma.iloc[10] - ma.iloc[9]
-            assert abs(slope.iloc[10] - expected) < 1e-10
+        if pd.notna(result["ma_10"].iloc[10]) and pd.notna(result["ma_10"].iloc[9]):
+            expected = result["ma_10"].iloc[10] - result["ma_10"].iloc[9]
+            assert abs(result["slope"].iloc[10] - expected) < 1e-10
 
 
-class TestCalcTrend:
-    """Tests for trend calculation."""
+class TestTrend:
+    """Tests for trend calculation via public API."""
 
-    def test_calc_trend_up(self, sample_raw_df):
+    def test_trend_up_matches_positive_slope(self, sample_raw_df):
         """When slope > 0, trend_up should have the ratio value."""
-        ratio = _calc_ratio(sample_raw_df)
-        ma = _calc_ma(ratio, period=10)
-        slope = _calc_slope(ma)
-        trend_up, trend_down = _calc_trend(ratio, slope)
+        result = calculate_indicators(sample_raw_df)
+        for i in range(len(result)):
+            if pd.notna(result["slope"].iloc[i]) and result["slope"].iloc[i] > 0:
+                assert result["trend_up"].iloc[i] == result["ratio"].iloc[i]
 
-        # Where slope > 0, trend_up should equal ratio
-        for i in range(len(slope)):
-            if pd.notna(slope.iloc[i]) and slope.iloc[i] > 0:
-                assert trend_up.iloc[i] == ratio.iloc[i]
-
-    def test_calc_trend_down(self, sample_raw_df):
+    def test_trend_down_matches_nonpositive_slope(self, sample_raw_df):
         """When slope <= 0, trend_down should have the ratio value."""
-        ratio = _calc_ratio(sample_raw_df)
-        ma = _calc_ma(ratio, period=10)
-        slope = _calc_slope(ma)
-        trend_up, trend_down = _calc_trend(ratio, slope)
-
-        # Where slope <= 0 and not NaN, trend_down should equal ratio
-        for i in range(len(slope)):
-            if pd.notna(slope.iloc[i]) and slope.iloc[i] <= 0:
-                assert trend_down.iloc[i] == ratio.iloc[i]
+        result = calculate_indicators(sample_raw_df)
+        for i in range(len(result)):
+            if pd.notna(result["slope"].iloc[i]) and result["slope"].iloc[i] <= 0:
+                assert result["trend_down"].iloc[i] == result["ratio"].iloc[i]
 
 
 class TestCalculateIndicators:
@@ -138,46 +133,35 @@ def _make_sine_raw_df(n: int = 200, period: int = 40, amplitude: float = 0.1,
     return pd.DataFrame({"date": dates, "count": counts, "total": [total] * n})
 
 
-class TestDetectPeaksTroughs:
-    """Unit tests for _detect_peaks_troughs helper and integration."""
+class TestPeaksAndTroughs:
+    """Tests for peak/trough detection via public API."""
 
-    def test_detect_peaks_returns_indices(self):
-        """Peaks are detected at the tops of a sine wave."""
+    def test_peaks_detected_in_sine_wave(self):
+        """Peaks should be detected at the tops of a sine wave."""
         df = _make_sine_raw_df(n=200, period=40, amplitude=0.1)
-        ratio = _calc_ratio(df)
-        ma = _calc_ma(ratio, period=10)
-        peaks, _ = _detect_peaks_troughs(ma, distance=20, prominence=0.01)
+        result = calculate_indicators(df)
+        assert result["is_peak"].sum() > 0
+        # All peak indices should be within bounds
+        peak_indices = result.index[result["is_peak"]]
+        assert all(0 <= idx < len(result) for idx in peak_indices)
 
-        assert len(peaks) > 0, "At least one peak should be detected"
-        for idx in peaks:
-            assert 0 <= idx < len(ma)
-
-    def test_detect_troughs_returns_indices(self):
-        """Troughs are detected at the bottoms of a sine wave."""
+    def test_troughs_detected_in_sine_wave(self):
+        """Troughs should be detected at the bottoms of a sine wave."""
         df = _make_sine_raw_df(n=200, period=40, amplitude=0.1)
-        ratio = _calc_ratio(df)
-        ma = _calc_ma(ratio, period=10)
-        _, troughs = _detect_peaks_troughs(ma, distance=20, prominence=0.01)
+        result = calculate_indicators(df)
+        assert result["is_trough"].sum() > 0
+        trough_indices = result.index[result["is_trough"]]
+        assert all(0 <= idx < len(result) for idx in trough_indices)
 
-        assert len(troughs) > 0, "At least one trough should be detected"
-        for idx in troughs:
-            assert 0 <= idx < len(ma)
-
-    def test_peaks_troughs_in_calculate_indicators(self):
+    def test_peaks_troughs_boolean_columns(self):
         """calculate_indicators adds is_peak / is_trough boolean columns."""
         df = _make_sine_raw_df(n=200, period=40, amplitude=0.1)
-        config = IndicatorConfig()
-        result = calculate_indicators(df, config)
-
-        assert "is_peak" in result.columns
-        assert "is_trough" in result.columns
+        result = calculate_indicators(df)
         assert result["is_peak"].dtype == bool
         assert result["is_trough"].dtype == bool
-        assert result["is_peak"].sum() > 0
-        assert result["is_trough"].sum() > 0
 
-    def test_custom_peak_config(self):
-        """distance / prominence parameters influence detection count."""
+    def test_strict_config_fewer_detections(self):
+        """Stricter distance/prominence should detect fewer peaks/troughs."""
         df = _make_sine_raw_df(n=300, period=40, amplitude=0.1)
         config_default = IndicatorConfig()
         config_strict = IndicatorConfig(peak_distance=60, peak_prominence=0.05)
@@ -187,3 +171,48 @@ class TestDetectPeaksTroughs:
 
         assert result_strict["is_peak"].sum() <= result_default["is_peak"].sum()
         assert result_strict["is_trough"].sum() <= result_default["is_trough"].sum()
+
+
+class TestEmptyDataFrame:
+    """Tests for empty DataFrame handling."""
+
+    def test_calculate_indicators_empty_df(self):
+        """Empty DataFrame should return empty DataFrame with all expected columns."""
+        df = pd.DataFrame(columns=["date", "count", "total"])
+        result = calculate_indicators(df)
+        expected_columns = {
+            "date", "count", "total",
+            "ratio", "ma_10", "slope",
+            "trend_up", "trend_down",
+            "upper", "lower",
+            "is_peak", "is_trough",
+        }
+        assert set(result.columns) == expected_columns
+        assert len(result) == 0
+
+
+class TestNaNHandling:
+    """Tests for NaN value handling in calculations."""
+
+    def test_ratio_with_nan_count(self):
+        """NaN count values should be treated as 0."""
+        df = pd.DataFrame({
+            "date": pd.bdate_range("2024-01-01", periods=3, freq="B"),
+            "count": [100, np.nan, 200],
+            "total": [500, 500, 500],
+        })
+        result = calculate_indicators(df)
+        assert result["ratio"].iloc[0] == 0.2
+        assert result["ratio"].iloc[1] == 0.0  # NaN count -> 0
+        assert result["ratio"].iloc[2] == 0.4
+
+    def test_ratio_with_nan_total(self):
+        """NaN total values should be treated as 0 total (ratio = 0)."""
+        df = pd.DataFrame({
+            "date": pd.bdate_range("2024-01-01", periods=2, freq="B"),
+            "count": [100, 200],
+            "total": [500, np.nan],
+        })
+        result = calculate_indicators(df)
+        assert result["ratio"].iloc[0] == 0.2
+        assert result["ratio"].iloc[1] == 0.0  # NaN total -> 0
