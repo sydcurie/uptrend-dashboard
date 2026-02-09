@@ -112,8 +112,15 @@ with col_chart:
     fig_summary = build_sector_summary_chart(summary)
     st.plotly_chart(fig_summary, use_container_width=True)
 with col_table:
+
+    def color_trend(row):
+        color = "color: #00cc96" if row["Trend"] == "Up" else "color: #ef553b"
+        return ["" if col != "Trend" else color for col in row.index]
+
     st.dataframe(
-        summary.style.format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"}),
+        summary.style
+        .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"})
+        .apply(color_trend, axis=1),
         use_container_width=True,
         hide_index=True,
     )
