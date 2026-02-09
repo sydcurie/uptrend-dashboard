@@ -13,6 +13,23 @@ from src.chart_builder import build_ratio_chart
 st.set_page_config(page_title="Sector Detail", page_icon="🔍", layout="wide")
 st.title("Sector Detail")
 
+with st.sidebar:
+    st.markdown("---")
+    st.markdown(
+        "Deep dive into individual sector uptrend ratios "
+        "with trend direction, 10-day moving average, "
+        "and overbought/oversold indicators."
+    )
+
+    st.markdown("---")
+    st.markdown(
+        'Made with <img src="https://streamlit.io/images/brand/streamlit-mark-color.png" alt="Streamlit" height="16"> by <a href="https://github.com/tradermonty">@tradermonty</a>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/tradermonty)'
+    )
+
 
 @st.cache_data(ttl=3600)
 def load_data():

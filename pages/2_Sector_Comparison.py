@@ -13,6 +13,22 @@ from src.chart_builder import build_sector_comparison_chart
 st.set_page_config(page_title="Sector Comparison", page_icon="📊", layout="wide")
 st.title("Sector Comparison")
 
+with st.sidebar:
+    st.markdown("---")
+    st.markdown(
+        "Compare uptrend ratios across multiple sectors side by side. "
+        "Identify which sectors are leading or lagging the market."
+    )
+
+    st.markdown("---")
+    st.markdown(
+        'Made with <img src="https://streamlit.io/images/brand/streamlit-mark-color.png" alt="Streamlit" height="16"> by <a href="https://github.com/tradermonty">@tradermonty</a>',
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        '[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/tradermonty)'
+    )
+
 
 @st.cache_data(ttl=3600)
 def load_data():
