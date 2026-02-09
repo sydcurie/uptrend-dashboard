@@ -107,33 +107,32 @@ st.plotly_chart(fig, use_container_width=True)
 st.subheader("Sector Summary")
 summary = build_sector_summary(all_data)
 
-col_chart, col_table = st.columns([2, 1])
-with col_chart:
-    fig_summary = build_sector_summary_chart(summary)
-    st.plotly_chart(fig_summary, use_container_width=True)
-with col_table:
+fig_summary = build_sector_summary_chart(summary)
+st.plotly_chart(fig_summary, use_container_width=True)
 
-    STATUS_STYLES = {
-        "Overbought": "color: #d62728",
-        "Oversold": "color: #2ca02c",
-        "Normal": "color: #1f77b4",
-    }
+STATUS_STYLES = {
+    "Overbought": "color: #d62728",
+    "Oversold": "color: #2ca02c",
+    "Normal": "color: #1f77b4",
+}
 
-    def color_row(row):
-        styles = []
-        for col in row.index:
-            if col == "Trend":
-                styles.append("color: #00cc96" if row["Trend"] == "Up" else "color: #ef553b")
-            elif col == "Status":
-                styles.append(STATUS_STYLES.get(row["Status"], ""))
-            else:
-                styles.append("")
-        return styles
 
-    st.dataframe(
-        summary.style
-        .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"})
-        .apply(color_row, axis=1),
-        use_container_width=True,
-        hide_index=True,
-    )
+def color_row(row):
+    styles = []
+    for col in row.index:
+        if col == "Trend":
+            styles.append("color: #00cc96" if row["Trend"] == "Up" else "color: #ef553b")
+        elif col == "Status":
+            styles.append(STATUS_STYLES.get(row["Status"], ""))
+        else:
+            styles.append("")
+    return styles
+
+
+st.dataframe(
+    summary.style
+    .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"})
+    .apply(color_row, axis=1),
+    use_container_width=True,
+    hide_index=True,
+)
