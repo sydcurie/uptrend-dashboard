@@ -38,5 +38,6 @@ jobs:
             echo "No data changes to commit"
           else
             git commit -m "Update uptrend data $(date -u +%Y-%m-%d)"
+            git pull --rebase
             git push
           fi
