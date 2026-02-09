@@ -55,7 +55,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(
-        "Made in :flag-us: by [@tradermonty](https://github.com/tradermonty)"
+        "Made in \U0001f1fa\U0001f1f8 by [@tradermonty](https://github.com/tradermonty)"
     )
     st.markdown(
         '[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/tradermonty)'
