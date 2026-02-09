@@ -4,6 +4,7 @@ import argparse
 import logging
 import os
 import sys
+from datetime import date
 
 from dotenv import load_dotenv
 
@@ -27,7 +28,7 @@ def main():
 
     logging.basicConfig(
         level=logging.DEBUG if args.verbose else logging.INFO,
-        format="%(levelname)s: %(message)s",
+        format="%(asctime)s %(levelname)s: %(message)s",
     )
 
     api_key = os.environ.get("FINVIZ_API_KEY")
@@ -35,37 +36,53 @@ def main():
         logger.error("FINVIZ_API_KEY environment variable is not set")
         sys.exit(1)
 
+    # Date validation
+    if args.date:
+        try:
+            date.fromisoformat(args.date)
+        except ValueError:
+            logger.error("Invalid date format: '%s'. Use YYYY-MM-DD.", args.date)
+            sys.exit(1)
+
     config = CollectorConfig(finviz_api_key=api_key)
     db_client = DBClient(args.db)
     collector = DataCollector(db_client=db_client, config=config)
 
-    if args.dry_run:
-        # Fetch counts without writing to DB
-        from src.constants import SECTORS
-        worksheets = [args.worksheet] if args.worksheet else VALID_WORKSHEETS
-        results = {}
-        for ws in worksheets:
+    try:
+        if args.dry_run:
+            if args.worksheet:
+                results = {args.worksheet: collector.collect_worksheet(
+                    args.worksheet, date=args.date, dry_run=True,
+                )}
+            else:
+                results = collector.collect_all(date=args.date, dry_run=True)
+        elif args.worksheet:
             try:
-                sector = ws if ws != "all" else None
-                count, total = collector._fetch_stock_count(sector)
-                results[ws] = (count, total)
-                logger.info("%s: count=%d, total=%d (dry run)", ws, count, total)
+                count, total = collector.collect_worksheet(args.worksheet, date=args.date)
+                results = {args.worksheet: (count, total)}
             except Exception as exc:
-                logger.error("Failed to fetch %s: %s", ws, exc)
-    elif args.worksheet:
-        count, total = collector.collect_worksheet(args.worksheet, date=args.date)
-        results = {args.worksheet: (count, total)}
-    else:
-        results = collector.collect_all(date=args.date)
+                logger.error("Failed to collect %s: %s", args.worksheet, exc)
+                sys.exit(1)
+        else:
+            results = collector.collect_all(date=args.date)
 
-    # Summary
-    print("\nCollection Summary:")
-    for ws, (count, total) in results.items():
-        ratio = f"{count / total:.1%}" if total > 0 else "N/A"
-        print(f"  {ws}: {count}/{total} ({ratio})")
-    print(f"  Worksheets collected: {len(results)}")
-    if args.dry_run:
-        print("  (Dry run - no data written)")
+        # Summary
+        print("\nCollection Summary:")
+        for ws, (count, total) in results.items():
+            ratio = f"{count / total:.1%}" if total > 0 else "N/A"
+            print(f"  {ws}: {count}/{total} ({ratio})")
+        print(f"  Worksheets collected: {len(results)}")
+        if args.dry_run:
+            print("  (Dry run - no data written)")
+
+        # Exit code based on results (skip for dry-run and single worksheet)
+        if not args.dry_run and not args.worksheet:
+            if len(results) == 0:
+                sys.exit(1)
+            elif len(results) < len(VALID_WORKSHEETS):
+                sys.exit(2)
+    finally:
+        collector.close()
 
 
 if __name__ == "__main__":

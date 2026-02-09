@@ -1,7 +1,8 @@
 """Tests for DataCollector — Finviz Elite CSV-based data collection."""
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call
 
+import pandas as pd
 import pytest
 import requests
 
@@ -155,6 +156,54 @@ class TestFetchStockCount:
         assert count == 3
         assert total == 3
 
+    def test_make_request_empty_csv_body(self, collector, mocker):
+        """Fix 2: 200 + empty body should return empty DataFrame."""
+        resp = MagicMock(spec=requests.Response)
+        resp.status_code = 200
+        resp.content = b""
+        resp.raise_for_status = MagicMock()
+        mocker.patch.object(collector._session, "get", return_value=resp)
+        result = collector._make_request("http://example.com")
+        assert isinstance(result, pd.DataFrame)
+        assert len(result) == 0
+
+    def test_make_request_retries_on_500(self, collector, mocker):
+        """Fix 3: 5xx errors should trigger retry."""
+        resp_500 = _csv_response("", status_code=500)
+        resp_ok = _csv_response(SAMPLE_CSV)
+        mocker.patch.object(
+            collector._session, "get",
+            side_effect=[resp_500, resp_ok],
+        )
+        mocker.patch("time.sleep")
+        result = collector._make_request("http://example.com")
+        assert len(result) == 3
+
+    def test_make_request_jitter_applied(self, collector, mocker):
+        """Fix 3: Sleep delay should include jitter (not exact delay)."""
+        resp_429 = _csv_response("", status_code=429)
+        resp_ok = _csv_response(SAMPLE_CSV)
+        mocker.patch.object(
+            collector._session, "get",
+            side_effect=[resp_429, resp_ok],
+        )
+        mock_sleep = mocker.patch("time.sleep")
+        mocker.patch("random.uniform", return_value=0.001)
+        collector._make_request("http://example.com")
+        # With jitter, sleep value should be delay + jitter, not exact delay
+        actual_sleep = mock_sleep.call_args[0][0]
+        assert actual_sleep != collector._config.retry_delay
+        assert actual_sleep > collector._config.retry_delay
+
+    def test_session_closed(self, db_client):
+        """Fix 8: close() should close the underlying Session."""
+        config = CollectorConfig(finviz_api_key="test_key")
+        collector = DataCollector(db_client=db_client, config=config)
+        mock_session = MagicMock()
+        collector._session = mock_session
+        collector.close()
+        mock_session.close.assert_called_once()
+
 
 class TestCollectWorkflow:
     """Test collection workflow with DB integration."""
@@ -228,16 +277,57 @@ class TestCollectWorkflow:
         with pytest.raises(ValueError, match="Invalid worksheet"):
             collector.collect_worksheet("invalid_sheet")
 
+    def test_validate_counts_negative(self, collector, mocker):
+        """Fix 4: Negative count/total should raise ValueError."""
+        mocker.patch.object(
+            collector, "_fetch_stock_count", return_value=(-1, 100),
+        )
+        with pytest.raises(ValueError, match="negative"):
+            collector.collect_worksheet("all", date="2026-02-07")
+
+    def test_validate_counts_count_exceeds_total(self, collector, mocker):
+        """Fix 4: count > total should raise ValueError."""
+        mocker.patch.object(
+            collector, "_fetch_stock_count", return_value=(200, 100),
+        )
+        with pytest.raises(ValueError, match="exceeds total"):
+            collector.collect_worksheet("all", date="2026-02-07")
+
+    def test_collect_worksheet_dry_run(self, collector, db_client, mocker):
+        """Fix 7: dry_run=True should skip DB write but run validation."""
+        mocker.patch.object(
+            collector._session, "get",
+            side_effect=[_csv_response(SAMPLE_CSV), _csv_response(SAMPLE_CSV)],
+        )
+        count, total = collector.collect_worksheet("all", date="2026-02-07", dry_run=True)
+        assert count == 3
+        assert total == 3
+        # No data written to DB
+        df = db_client.fetch_raw_data("all")
+        assert len(df) == 0
+
+    def test_collect_all_dry_run(self, collector, mocker):
+        """Fix 7: collect_all dry_run=True should skip DB writes."""
+        mocker.patch.object(
+            collector._session, "get",
+            return_value=_csv_response(SAMPLE_CSV),
+        )
+        mock_upsert = mocker.patch.object(collector._db, "upsert_raw_data")
+        results = collector.collect_all(date="2026-02-07", dry_run=True)
+        assert len(results) == 12
+        mock_upsert.assert_not_called()
+
 
 class TestCLI:
     """Test collect.py CLI entrypoint."""
 
     def test_cli_default_collect_all(self, tmp_db, mocker):
+        from src.constants import VALID_WORKSHEETS as ws_list
         mocker.patch("sys.argv", ["collect.py", "--db", tmp_db])
         mocker.patch.dict("os.environ", {"FINVIZ_API_KEY": "test_key"})
         mock_collect_all = mocker.patch(
             "src.data_collector.DataCollector.collect_all",
-            return_value={"all": (100, 500)},
+            return_value={ws: (100, 500) for ws in ws_list},
         )
         from collect import main
         main()
@@ -255,13 +345,62 @@ class TestCLI:
     def test_cli_dry_run(self, tmp_db, mocker):
         mocker.patch("sys.argv", ["collect.py", "--db", tmp_db, "--dry-run"])
         mocker.patch.dict("os.environ", {"FINVIZ_API_KEY": "test_key"})
-        mock_fetch = mocker.patch(
-            "src.data_collector.DataCollector._fetch_stock_count",
-            return_value=(100, 500),
+        mock_collect_all = mocker.patch(
+            "src.data_collector.DataCollector.collect_all",
+            return_value={"all": (100, 500)},
         )
         mock_upsert = mocker.patch("src.db_client.DBClient.upsert_raw_data")
         from collect import main
         main()
-        # _fetch_stock_count was called but upsert_raw_data was NOT
-        assert mock_fetch.call_count > 0
+        # collect_all called with dry_run=True
+        mock_collect_all.assert_called_once_with(date=None, dry_run=True)
         mock_upsert.assert_not_called()
+
+    def test_cli_exit_code_complete_failure(self, tmp_db, mocker):
+        mocker.patch("sys.argv", ["collect.py", "--db", tmp_db])
+        mocker.patch.dict("os.environ", {"FINVIZ_API_KEY": "test_key"})
+        mocker.patch(
+            "src.data_collector.DataCollector.collect_all",
+            return_value={},
+        )
+        from collect import main
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 1
+
+    def test_cli_exit_code_partial_failure(self, tmp_db, mocker):
+        mocker.patch("sys.argv", ["collect.py", "--db", tmp_db])
+        mocker.patch.dict("os.environ", {"FINVIZ_API_KEY": "test_key"})
+        mocker.patch(
+            "src.data_collector.DataCollector.collect_all",
+            return_value={"all": (100, 500), "sec_technology": (50, 200)},
+        )
+        from collect import main
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 2
+
+    def test_cli_worksheet_error_exit_code(self, tmp_db, mocker):
+        mocker.patch("sys.argv", [
+            "collect.py", "--db", tmp_db, "--worksheet", "all",
+        ])
+        mocker.patch.dict("os.environ", {"FINVIZ_API_KEY": "test_key"})
+        mocker.patch(
+            "src.data_collector.DataCollector.collect_worksheet",
+            side_effect=requests.ConnectionError("network down"),
+        )
+        from collect import main
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 1
+
+    def test_cli_invalid_date_format(self, tmp_db, mocker):
+        """Fix 5: Invalid date format should exit 1."""
+        mocker.patch("sys.argv", [
+            "collect.py", "--db", tmp_db, "--date", "2026-99-99",
+        ])
+        mocker.patch.dict("os.environ", {"FINVIZ_API_KEY": "test_key"})
+        from collect import main
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 1

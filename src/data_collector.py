@@ -2,6 +2,7 @@
 
 import io
 import logging
+import random
 import time
 from dataclasses import dataclass
 from datetime import date
@@ -65,28 +66,37 @@ class DataCollector:
     def _build_total_url(self, sector: str = None) -> str:
         return self._build_url(uptrend=False, sector=sector)
 
+    _RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
+
     def _make_request(self, url: str) -> pd.DataFrame:
-        """Fetch CSV from Finviz with exponential backoff retry."""
+        """Fetch CSV from Finviz with exponential backoff retry + jitter."""
         delay = self._config.retry_delay
         for attempt in range(1, self._config.max_retries + 1):
             try:
                 resp = self._session.get(url, timeout=self._config.http_timeout)
                 resp.raise_for_status()
-                return pd.read_csv(io.BytesIO(resp.content))
+                try:
+                    return pd.read_csv(io.BytesIO(resp.content))
+                except pd.errors.EmptyDataError:
+                    logger.warning("Empty CSV body received")
+                    return pd.DataFrame()
             except (requests.ConnectionError, requests.Timeout) as exc:
                 logger.warning("Request failed (attempt %d/%d): %s",
                                attempt, self._config.max_retries, exc)
                 if attempt == self._config.max_retries:
                     raise
-                time.sleep(delay)
+                jitter = random.uniform(0, delay * 0.25)
+                time.sleep(delay + jitter)
                 delay *= 2
             except requests.HTTPError as exc:
-                if exc.response is not None and exc.response.status_code == 429:
-                    logger.warning("Rate limited (attempt %d/%d), backing off %.1fs",
-                                   attempt, self._config.max_retries, delay)
+                status = exc.response.status_code if exc.response is not None else None
+                if status in self._RETRYABLE_STATUS_CODES:
+                    logger.warning("HTTP %s (attempt %d/%d), backing off %.1fs",
+                                   status, attempt, self._config.max_retries, delay)
                     if attempt == self._config.max_retries:
                         raise
-                    time.sleep(delay)
+                    jitter = random.uniform(0, delay * 0.25)
+                    time.sleep(delay + jitter)
                     delay *= 2
                 else:
                     raise
@@ -102,8 +112,21 @@ class DataCollector:
 
         return len(uptrend_df), len(total_df)
 
+    def _validate_counts(self, worksheet: str, count: int, total: int) -> None:
+        """Validate count and total values before DB write."""
+        if count < 0 or total < 0:
+            raise ValueError(
+                f"Invalid negative value for {worksheet}: "
+                f"count={count}, total={total}"
+            )
+        if count > total:
+            raise ValueError(
+                f"count exceeds total for {worksheet}: "
+                f"count={count}, total={total}"
+            )
+
     def collect_worksheet(
-        self, worksheet: str, date: Optional[str] = None
+        self, worksheet: str, date: Optional[str] = None, dry_run: bool = False
     ) -> Tuple[int, int]:
         """Collect data for a single worksheet and write to DB."""
         if worksheet not in VALID_WORKSHEETS:
@@ -117,8 +140,11 @@ class DataCollector:
 
         sector = worksheet if worksheet != "all" else None
         count, total = self._fetch_stock_count(sector)
+        self._validate_counts(worksheet, count, total)
 
-        if total > 0:
+        if dry_run:
+            logger.info("Dry run %s: count=%d, total=%d", worksheet, count, total)
+        elif total > 0:
             self._db.upsert_raw_data(date, worksheet, count, total)
             logger.info("Collected %s: count=%d, total=%d", worksheet, count, total)
         else:
@@ -127,7 +153,7 @@ class DataCollector:
         return count, total
 
     def collect_all(
-        self, date: Optional[str] = None
+        self, date: Optional[str] = None, dry_run: bool = False
     ) -> Dict[str, Tuple[int, int]]:
         """Collect data for all 12 worksheets."""
         if date is None:
@@ -137,7 +163,13 @@ class DataCollector:
         results = {}
         for worksheet in VALID_WORKSHEETS:
             try:
-                results[worksheet] = self.collect_worksheet(worksheet, date)
-            except Exception as exc:
-                logger.error("Failed to collect %s: %s", worksheet, exc)
+                results[worksheet] = self.collect_worksheet(
+                    worksheet, date, dry_run=dry_run,
+                )
+            except (requests.RequestException, ValueError, pd.errors.EmptyDataError) as exc:
+                logger.error("Failed to collect %s: %s", worksheet, exc, exc_info=True)
         return results
+
+    def close(self) -> None:
+        """Close the underlying HTTP session."""
+        self._session.close()
