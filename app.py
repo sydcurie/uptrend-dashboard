@@ -55,7 +55,8 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(
-        "Made in \U0001f1fa\U0001f1f8 by [@tradermonty](https://github.com/tradermonty)"
+        'Made with <img src="https://streamlit.io/images/brand/streamlit-mark-color.png" alt="Streamlit" height="16"> by <a href="https://github.com/tradermonty">@tradermonty</a>',
+        unsafe_allow_html=True,
     )
     st.markdown(
         '[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/tradermonty)'
