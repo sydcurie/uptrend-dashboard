@@ -27,6 +27,8 @@ htmlcov/
 
 .streamlit/secrets.toml
 
+# Ignore DB backups, but track the main DB for Streamlit Cloud deployment
 data/*.db
+!data/uptrend.db
 
 review/
