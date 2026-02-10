@@ -50,7 +50,8 @@ with st.sidebar:
     st.markdown(
         "Tracks the percentage of US stocks in an uptrend "
         "across the full market and 11 sectors. "
-        "Data is collected daily from Finviz Elite."
+        'Data is collected daily from <a href="https://finviz.com/?affilId=279192576" target="_blank">Finviz</a>.',
+        unsafe_allow_html=True,
     )
 
     st.markdown("---")
