@@ -83,7 +83,7 @@ pytest + pytest-mock. Tests use `tmp_path`-based temporary DBs instead of the re
 ## Development Rules
 
 - **TDD**: Use the `/tdd-developer` skill when implementing code, following the Red→Green→Refactor cycle
-- **Design Doc Sync**: After code changes, reflect the updates in `docs/design.md` to prevent drift between design docs and code
+- **Design Doc Sync (MANDATORY)**: Every code change must be reflected in `docs/design.md` within the same commit or session. This includes revision history, module signatures, column definitions, screen layouts, test lists, and dependency versions. Never leave design docs out of sync with code
 
 ## Adding New Features
 
