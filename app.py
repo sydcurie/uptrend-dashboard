@@ -137,10 +137,19 @@ def color_row(row):
     return styles
 
 
-st.dataframe(
+table_event = st.dataframe(
     summary.drop(columns=["_key"]).style
     .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"})
     .apply(color_row, axis=1),
     use_container_width=True,
     hide_index=True,
+    on_select="rerun",
+    selection_mode="single-row",
+    key="sector_table",
 )
+
+if table_event and table_event.selection and table_event.selection.rows:
+    selected_row = table_event.selection.rows[0]
+    selected_key = summary.iloc[selected_row]["_key"]
+    st.session_state["selected_sector"] = selected_key
+    st.switch_page("pages/1_Sector_Detail.py")
