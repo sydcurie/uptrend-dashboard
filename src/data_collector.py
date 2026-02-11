@@ -3,6 +3,7 @@
 import io
 import logging
 import random
+import re
 import time
 from dataclasses import dataclass
 from datetime import date
@@ -25,6 +26,13 @@ _UPTREND_FILTERS = _BASE_FILTERS + [
     "ta_sma200_pa",
     "ta_sma50_sa200",
 ]
+
+
+def mask_secrets(text: str) -> str:
+    """Mask known secrets from URLs and exception messages."""
+    if not text:
+        return text
+    return re.sub(r"(auth=)[^&\s]+", r"\1***", text)
 
 
 @dataclass
@@ -68,6 +76,12 @@ class DataCollector:
 
     _RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 
+    @staticmethod
+    def _safe_http_error(exc: requests.HTTPError) -> requests.HTTPError:
+        """Create an HTTPError with a sanitized message."""
+        status = exc.response.status_code if exc.response is not None else "unknown"
+        return requests.HTTPError(f"HTTP {status} from Finviz export API")
+
     def _make_request(self, url: str) -> pd.DataFrame:
         """Fetch CSV from Finviz with exponential backoff retry + jitter."""
         delay = self._config.retry_delay
@@ -81,8 +95,12 @@ class DataCollector:
                     logger.warning("Empty CSV body received")
                     return pd.DataFrame()
             except (requests.ConnectionError, requests.Timeout) as exc:
-                logger.warning("Request failed (attempt %d/%d): %s",
-                               attempt, self._config.max_retries, exc)
+                logger.warning(
+                    "Request failed (attempt %d/%d): %s",
+                    attempt,
+                    self._config.max_retries,
+                    mask_secrets(str(exc)),
+                )
                 if attempt == self._config.max_retries:
                     raise
                 jitter = random.uniform(0, delay * 0.25)
@@ -94,12 +112,12 @@ class DataCollector:
                     logger.warning("HTTP %s (attempt %d/%d), backing off %.1fs",
                                    status, attempt, self._config.max_retries, delay)
                     if attempt == self._config.max_retries:
-                        raise
+                        raise self._safe_http_error(exc) from exc
                     jitter = random.uniform(0, delay * 0.25)
                     time.sleep(delay + jitter)
                     delay *= 2
                 else:
-                    raise
+                    raise self._safe_http_error(exc) from exc
 
     def _fetch_stock_count(self, sector: str = None) -> Tuple[int, int]:
         """Fetch uptrend count and total count for a sector (or all)."""
@@ -167,7 +185,7 @@ class DataCollector:
                     worksheet, date, dry_run=dry_run,
                 )
             except (requests.RequestException, ValueError, pd.errors.EmptyDataError) as exc:
-                logger.error("Failed to collect %s: %s", worksheet, exc, exc_info=True)
+                logger.error("Failed to collect %s: %s", worksheet, mask_secrets(str(exc)))
         return results
 
     def close(self) -> None:

@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 import requests
 
-from src.data_collector import CollectorConfig, DataCollector
+from src.data_collector import CollectorConfig, DataCollector, mask_secrets
 
 
 class TestCollectorConfig:
@@ -19,6 +19,25 @@ class TestCollectorConfig:
         assert config.retry_delay == 2.0
         assert config.request_interval == 2.0
         assert config.http_timeout == 30.0
+
+
+class TestSecretMasking:
+    """Tests for secret masking utility."""
+
+    def test_mask_secrets_hides_auth_query_value(self):
+        message = "401 for url: https://elite.finviz.com/export.ashx?v=151&auth=abc123&ft=4"
+        assert "auth=abc123" not in mask_secrets(message)
+        assert "auth=***" in mask_secrets(message)
+
+    def test_mask_secrets_empty_string(self):
+        assert mask_secrets("") == ""
+
+    def test_mask_secrets_none(self):
+        assert mask_secrets(None) is None
+
+    def test_mask_secrets_no_auth(self):
+        message = "Connection refused: https://elite.finviz.com/export.ashx"
+        assert mask_secrets(message) == message
 
 
 class TestBuildUrl:

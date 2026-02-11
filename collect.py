@@ -9,7 +9,7 @@ from datetime import date
 from dotenv import load_dotenv
 
 from src.constants import VALID_WORKSHEETS
-from src.data_collector import CollectorConfig, DataCollector
+from src.data_collector import CollectorConfig, DataCollector, mask_secrets
 from src.db_client import DBClient
 
 logger = logging.getLogger(__name__)
@@ -61,7 +61,7 @@ def main():
                 count, total = collector.collect_worksheet(args.worksheet, date=args.date)
                 results = {args.worksheet: (count, total)}
             except Exception as exc:
-                logger.error("Failed to collect %s: %s", args.worksheet, exc)
+                logger.error("Failed to collect %s: %s", args.worksheet, mask_secrets(str(exc)))
                 sys.exit(1)
         else:
             results = collector.collect_all(date=args.date)

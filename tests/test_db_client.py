@@ -238,3 +238,67 @@ class TestWorksheetValidation:
         })
         with pytest.raises(ValueError, match="Invalid worksheet"):
             db_client.upsert_bulk(df)
+
+
+class TestCountTotalValidation:
+    """Tests for count/total validation rules."""
+
+    def test_upsert_rejects_negative_count(self, db_client):
+        with pytest.raises(ValueError, match="non-negative"):
+            db_client.upsert_raw_data("2024-01-02", "all", -1, 100)
+
+    def test_upsert_rejects_count_exceeding_total(self, db_client):
+        with pytest.raises(ValueError, match="cannot exceed total"):
+            db_client.upsert_raw_data("2024-01-02", "all", 101, 100)
+
+    def test_bulk_upsert_rejects_non_integer_values(self, db_client):
+        df = pd.DataFrame({
+            "date": ["2024-01-02"],
+            "worksheet": ["all"],
+            "count": [10.5],
+            "total": [100],
+        })
+        with pytest.raises(ValueError, match="must be integers"):
+            db_client.upsert_bulk(df)
+
+    def test_upsert_rejects_bool_value(self, db_client):
+        with pytest.raises(ValueError, match="got bool"):
+            db_client.upsert_raw_data("2024-01-02", "all", True, 100)
+
+    def test_upsert_accepts_float_whole_number(self, db_client, tmp_db):
+        """150.0 should be coerced to int 150."""
+        db_client.upsert_raw_data("2024-01-02", "all", 150.0, 500.0)
+        import sqlite3
+        conn = sqlite3.connect(tmp_db)
+        row = conn.execute("SELECT count, total FROM uptrend_raw").fetchone()
+        conn.close()
+        assert row == (150, 500)
+
+    def test_bulk_upsert_rejects_missing_columns(self, db_client):
+        df = pd.DataFrame({
+            "date": ["2024-01-02"],
+            "worksheet": ["all"],
+            "count": [150],
+        })
+        with pytest.raises(ValueError, match="missing required columns"):
+            db_client.upsert_bulk(df)
+
+    def test_bulk_upsert_rejects_negative_values(self, db_client):
+        df = pd.DataFrame({
+            "date": ["2024-01-02"],
+            "worksheet": ["all"],
+            "count": [-1],
+            "total": [100],
+        })
+        with pytest.raises(ValueError, match="non-negative"):
+            db_client.upsert_bulk(df)
+
+    def test_bulk_upsert_rejects_count_exceeding_total(self, db_client):
+        df = pd.DataFrame({
+            "date": ["2024-01-02"],
+            "worksheet": ["all"],
+            "count": [200],
+            "total": [100],
+        })
+        with pytest.raises(ValueError, match="count cannot exceed total"):
+            db_client.upsert_bulk(df)

@@ -56,7 +56,7 @@ col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
     st.metric("Ratio", f"{status['ratio']:.1%}")
 with col2:
-    st.metric("10MA", f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] else "N/A")
+    st.metric("10MA", f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] is not None else "N/A")
 with col3:
     trend_icon = "🔼" if status["trend"] == "up" else "🔽"
     st.metric("Trend", f"{trend_icon} {status['trend'].title()}")

@@ -50,7 +50,7 @@ with st.sidebar:
     st.markdown(
         "Tracks the percentage of US stocks in an uptrend "
         "across the full market and 11 sectors. "
-        'Data is collected daily from <a href="https://finviz.com/?affilId=279192576" target="_blank">Finviz</a>.',
+        'Data is collected daily from <a href="https://finviz.com/?affilId=279192576" target="_blank" rel="noopener noreferrer">Finviz</a>.',
         unsafe_allow_html=True,
     )
 
@@ -85,7 +85,7 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric("Current Ratio", f"{status['ratio']:.1%}")
 with col2:
-    st.metric("10MA", f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] else "N/A")
+    st.metric("10MA", f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] is not None else "N/A")
 with col3:
     trend_icon = "🔼" if status["trend"] == "up" else "🔽"
     st.metric("Trend", f"{trend_icon} {status['trend'].title()}")

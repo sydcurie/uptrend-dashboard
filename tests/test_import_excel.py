@@ -63,6 +63,20 @@ def excel_with_empty_dates(tmp_path):
     return str(filepath)
 
 
+@pytest.fixture
+def excel_with_invalid_counts(tmp_path):
+    """Create an Excel file containing invalid Count/Total rows."""
+    filepath = tmp_path / "invalid_counts.xlsx"
+    with pd.ExcelWriter(filepath, engine="openpyxl") as writer:
+        df = pd.DataFrame({
+            "Date": ["1/2/2024", "1/3/2024", "1/4/2024", "1/5/2024"],
+            "Count": [150.5, -1, 600, 80],
+            "Total": [500, 500, 500, 100],
+        })
+        df.to_excel(writer, sheet_name="all", index=False)
+    return str(filepath)
+
+
 class TestImportExcel:
     """Tests for import_excel function."""
 
@@ -115,3 +129,16 @@ class TestImportExcel:
         count = cursor.fetchone()[0]
         conn.close()
         assert count == 0
+
+    def test_invalid_count_total_rows_are_dropped(self, excel_with_invalid_counts, tmp_db):
+        """Non-integer/negative/count>total rows should be excluded from import."""
+        result = import_excel(excel_with_invalid_counts, db_path=tmp_db)
+        assert result["all"] == 1
+
+        conn = sqlite3.connect(tmp_db)
+        cursor = conn.execute(
+            "SELECT date, count, total FROM uptrend_raw WHERE worksheet='all' ORDER BY date"
+        )
+        rows = cursor.fetchall()
+        conn.close()
+        assert rows == [("2024-01-05", 80, 100)]

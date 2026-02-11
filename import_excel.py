@@ -61,6 +61,26 @@ def import_excel(
         df["Total"] = pd.to_numeric(df["Total"], errors="coerce")
         df = df.dropna(subset=["Count", "Total"])
 
+        # Reject non-integer values (e.g., 1.5) instead of silently truncating via astype(int)
+        non_integer_mask = (df["Count"] % 1 != 0) | (df["Total"] % 1 != 0)
+        if non_integer_mask.any():
+            logger.warning(
+                "Sheet %s: dropping %d rows with non-integer Count/Total",
+                sheet_name,
+                int(non_integer_mask.sum()),
+            )
+            df = df.loc[~non_integer_mask].copy()
+
+        # Reject logically invalid rows
+        invalid_logic_mask = (df["Count"] < 0) | (df["Total"] < 0) | (df["Count"] > df["Total"])
+        if invalid_logic_mask.any():
+            logger.warning(
+                "Sheet %s: dropping %d rows with invalid Count/Total relationship",
+                sheet_name,
+                int(invalid_logic_mask.sum()),
+            )
+            df = df.loc[~invalid_logic_mask].copy()
+
         row_count = len(df)
         result[sheet_name] = row_count
 
