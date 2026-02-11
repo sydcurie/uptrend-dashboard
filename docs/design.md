@@ -24,10 +24,10 @@
 
 ### v3.3 Key Changes (Sector Summary Click Navigation)
 
-- **Click-to-navigate**: Clicking a bar in the Sector Summary horizontal bar chart navigates to the Sector Detail page with that sector pre-selected
+- **Click-to-navigate**: Clicking a bar in the Sector Summary horizontal bar chart **or a row in the summary table** navigates to the Sector Detail page with that sector pre-selected
 - **`_key` column**: Added internal worksheet key column to `build_sector_summary()` output for chart `customdata` mapping (hidden from `st.dataframe` display)
 - **`customdata` on bar trace**: `build_sector_summary_chart()` passes `_key` values as `customdata` on the `go.Bar` trace
-- **`on_select` event**: `app.py` uses `st.plotly_chart(on_select="rerun")` to capture click events, sets `st.session_state["selected_sector"]`, and calls `st.switch_page()`
+- **`on_select` event**: `app.py` uses `st.plotly_chart(on_select="rerun")` and `st.dataframe(on_select="rerun", selection_mode="single-row")` to capture click events, sets `st.session_state["selected_sector"]`, and calls `st.switch_page()`
 - **Sector Detail pre-selection**: `pages/1_Sector_Detail.py` reads `st.session_state.pop("selected_sector")` to set `st.selectbox` default index
 - **Streamlit version**: Bumped minimum to `>=1.35.0` for `on_select` parameter support
 - **Tests**: 114 tests (added `test_sector_summary_chart_customdata`)
@@ -673,7 +673,7 @@ Screen layout is unchanged from v1. Only the data source changes; UI remains the
 │                        │ ┌───────────────────┐┌────────────┐│
 │                        │ │ [Horizontal Bar]  ││ [Table]    ││
 │                        │ │  Chart            ││ Sector ... ││
-│                        │ │ (clickable→Detail)││            ││
+│                        │ │ (clickable→Detail)││(click→Detail)│
 │                        │ └───────────────────┘└────────────┘│
 └─────────────────────────────────────────────────────────────┘
 ```
