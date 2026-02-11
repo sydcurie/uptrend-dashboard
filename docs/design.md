@@ -5,8 +5,8 @@
 | Document Type | Software Design Document |
 | Project Name | uptrend-dashboard |
 | Created | 2026-02-08 |
-| Revised | 2026-02-08 |
-| Status | v2.3 Sector Comparison chart improvements |
+| Revised | 2026-02-11 |
+| Status | v3.2 Data validation, secret masking, CI |
 
 ---
 
@@ -19,6 +19,19 @@
 | 2026-02-08 | v2.1 | Removed signal logic (Long/Short Entry/Exit). Changed chart trend display to green/red/gray color coding |
 | 2026-02-08 | v2.2 | Code review fixes. Improved DB connection management, centralized constants, empty data handling, added logging, test improvements |
 | 2026-02-08 | v2.3 | Sector Comparison chart improvements. 10MA display, threshold lines, custom palette, latest value annotations, Y-axis % format, legend sorting |
+| 2026-02-11 | v3.2 | Data validation hardening, secret masking, CI test workflow. DB CHECK constraints, Python-level count/total validation, import_excel row filtering, mask_secrets/safe_http_error, GitHub Actions pytest |
+
+### v3.2 Key Changes (Data Validation, Secret Masking, CI)
+
+- **DB CHECK constraints**: Added `CHECK (count >= 0)`, `CHECK (total >= 0)`, `CHECK (count <= total)` to `uptrend_raw` table definition
+- **Python-level validation**: Added `_coerce_whole_number()` (type coercion with bool rejection), `_validate_counts()` (non-negative, count <= total) to `DBClient`
+- **Bulk validation**: `upsert_bulk()` now validates missing columns, non-numeric, non-integer, negative, and count > total before DB write
+- **Import filtering**: `import_excel.py` drops non-integer and logically invalid (negative, count > total) rows with warnings instead of silently truncating
+- **Secret masking**: Added `mask_secrets()` function to sanitize `auth=` query params from logs/exceptions. Added `_safe_http_error()` to create sanitized HTTPError without URL leakage
+- **10MA display fix**: Changed `if status["ratio_10ma"]` to `if status["ratio_10ma"] is not None` to correctly display 0.0% instead of "N/A"
+- **External link security**: Added `rel="noopener noreferrer"` to Finviz link
+- **CI**: Added `.github/workflows/test.yml` for automated pytest on push/PR
+- **Tests**: 105 → 113 tests (secret masking edge cases, bool rejection, float coercion, bulk validation)
 
 ### v2.3 Key Changes (Sector Comparison Chart Improvements)
 
@@ -206,8 +219,9 @@ SQLite uptrend_raw table
 CREATE TABLE IF NOT EXISTS uptrend_raw (
     date      TEXT    NOT NULL,   -- 'YYYY-MM-DD' (ISO 8601)
     worksheet TEXT    NOT NULL,   -- 'all', 'sec_technology', etc.
-    count     INTEGER NOT NULL,   -- uptrend stock count
-    total     INTEGER NOT NULL,   -- total stock count
+    count     INTEGER NOT NULL CHECK (count >= 0),   -- uptrend stock count
+    total     INTEGER NOT NULL CHECK (total >= 0),   -- total stock count
+    CHECK (count <= total),
     PRIMARY KEY (date, worksheet)
 );
 
@@ -221,8 +235,12 @@ CREATE INDEX IF NOT EXISTS idx_uptrend_raw_worksheet
 |--------|------|-------------|-------------|
 | date | TEXT | NOT NULL, PK | Date (YYYY-MM-DD) |
 | worksheet | TEXT | NOT NULL, PK | Category name |
-| count | INTEGER | NOT NULL | Uptrend stock count |
-| total | INTEGER | NOT NULL | Total stock count |
+| count | INTEGER | NOT NULL, CHECK >= 0 | Uptrend stock count |
+| total | INTEGER | NOT NULL, CHECK >= 0 | Total stock count |
+
+**Table-level CHECK constraint:** `count <= total`
+
+> **Note (v3.2):** CHECK constraints are enforced only for newly created databases. Existing databases retain the original schema since `CREATE TABLE IF NOT EXISTS` skips table creation when the table already exists. Python-level validation in `_validate_counts()` and `upsert_bulk()` provides equivalent enforcement regardless of DB schema version.
 
 **Composite primary key:** `(date, worksheet)` — Prevents duplicates for the same date and category
 **Index:** `(worksheet, date)` — Optimizes time-series queries by category
@@ -321,12 +339,27 @@ Centrally manages constants used across all modules.
 | `__init__` | `(db_path: str = "data/uptrend.db")` | DB connection, automatic table creation |
 | `_connection` | `() -> ContextManager` | DB connection context manager (auto commit/rollback/close) |
 | `_init_tables` | `() -> None` | Execute CREATE TABLE IF NOT EXISTS |
-| `upsert_raw_data` | `(date, worksheet, count, total) -> None` | Single row UPSERT (INSERT OR REPLACE), with worksheet validation |
-| `upsert_bulk` | `(df: DataFrame) -> None` | DataFrame bulk UPSERT (executemany + single transaction) |
+| `_coerce_whole_number` | `(value, field_name) -> int` | Static. Coerce int-like values to int; reject bool, non-integer float (v3.2) |
+| `_validate_counts` | `(count, total) -> Tuple[int, int]` | Coerce + validate non-negative, count <= total (v3.2) |
+| `upsert_raw_data` | `(date, worksheet, count, total) -> None` | Single row UPSERT with worksheet + count/total validation |
+| `upsert_bulk` | `(df: DataFrame) -> None` | DataFrame bulk UPSERT with comprehensive validation (v3.2) |
 | `fetch_raw_data` | `(worksheet: str) -> DataFrame` | Fetch all data for specified category |
 | `fetch_all_raw_data` | `() -> Dict[str, DataFrame]` | Fetch all 12 categories at once |
 | `get_worksheets` | `() -> List[str]` | List of registered category names |
 | `get_date_range` | `(worksheet: str) -> Tuple[str, str]` | Date range for specified category |
+
+**Count/Total Validation (v3.2):**
+
+`upsert_raw_data` applies `_validate_counts()` which coerces types via `_coerce_whole_number()` and validates business rules. `upsert_bulk` performs equivalent validation at the DataFrame level before DB write:
+
+| Check | `upsert_raw_data` | `upsert_bulk` |
+|-------|-------------------|---------------|
+| Missing columns | N/A | `required_columns - set(df.columns)` |
+| Bool rejection | `isinstance(value, bool)` → ValueError | N/A (pandas converts) |
+| Non-numeric | `_coerce_whole_number` type check | `pd.to_numeric(errors="coerce")` + NaN check |
+| Non-integer | `float.is_integer()` check | `counts % 1 != 0` mask |
+| Negative | `count_i < 0` check | `counts < 0` mask |
+| count > total | `count_i > total_i` check | `counts > totals` mask |
 
 **DB Connection Management Pattern (v2.2):**
 
@@ -577,7 +610,9 @@ python import_excel.py data/export.xlsx --dry-run
    a. Validate that sheet name is a valid worksheet value
    b. Extract Date, Count, Total columns
    c. Convert Date to YYYY-MM-DD format
-   d. Remove empty/invalid rows
+   d. Remove empty/invalid rows (null dates, non-numeric values)
+   e. Drop non-integer Count/Total rows (e.g., 1.5) with warning (v3.2)
+   f. Drop logically invalid rows (negative, count > total) with warning (v3.2)
 
 3. Bulk write to SQLite with db_client.upsert_bulk(df)
    → INSERT OR REPLACE overwrites existing data
@@ -725,6 +760,10 @@ v2.3 revision: Display mode radio buttons, 10MA/Raw toggle, threshold dashed lin
 
 ```
 uptrend-dashboard/
+├── .github/
+│   └── workflows/
+│       ├── collect-data.yml           # Daily data collection (cron)
+│       └── test.yml                   # CI: pytest on push/PR (v3.2)
 ├── .streamlit/
 │   └── config.toml                    # Streamlit theme settings
 ├── data/
@@ -832,6 +871,14 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_upsert_rejects_invalid_worksheet | Reject invalid worksheet |
 | test_upsert_accepts_valid_worksheet | Accept valid worksheet |
 | test_bulk_upsert_rejects_invalid_worksheet | Reject invalid worksheet in bulk insert |
+| test_upsert_rejects_negative_count | Negative count → ValueError (v3.2) |
+| test_upsert_rejects_count_exceeding_total | count > total → ValueError (v3.2) |
+| test_bulk_upsert_rejects_non_integer_values | Non-integer float → ValueError (v3.2) |
+| test_upsert_rejects_bool_value | bool → ValueError (v3.2) |
+| test_upsert_accepts_float_whole_number | 150.0 coerced to int 150 (v3.2) |
+| test_bulk_upsert_rejects_missing_columns | Missing required columns → ValueError (v3.2) |
+| test_bulk_upsert_rejects_negative_values | Negative values in bulk → ValueError (v3.2) |
+| test_bulk_upsert_rejects_count_exceeding_total | count > total in bulk → ValueError (v3.2) |
 
 **test_indicator_calculator.py:**
 
@@ -889,6 +936,18 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_sector_comparison_legend_sorted_by_latest_value | Legend sorted by latest value descending |
 | test_sector_comparison_custom_colors | Custom palette usage verification |
 
+**test_import_excel.py:**
+
+| Test | Description |
+|------|-------------|
+| test_import_single_sheet | Import a single specified sheet |
+| test_import_all_sheets | Import all valid sheets |
+| test_skip_unknown_sheet | Skip sheets with unrecognized names |
+| test_skip_empty_date_rows | Skip rows where Date is empty |
+| test_date_format_conversion | Dates stored as YYYY-MM-DD |
+| test_dry_run | Dry run does not write to DB |
+| test_invalid_count_total_rows_are_dropped | Non-integer/negative/count>total rows excluded (v3.2) |
+
 **test_integration.py (new in v2.2):**
 
 | Test | Description |
@@ -897,10 +956,14 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_multi_sector_pipeline | Multiple sectors → DB → calculation → summary → summary chart |
 | test_empty_db_pipeline | Graceful handling of full pipeline with empty DB |
 
-**test_data_collector.py (Phase 3 + v3.1 code review fixes):**
+**test_data_collector.py (Phase 3 + v3.1 code review fixes + v3.2 secret masking):**
 
 | Test | Description |
 |------|-------------|
+| test_mask_secrets_hides_auth_query_value | auth= param masked in URL (v3.2) |
+| test_mask_secrets_empty_string | Empty string passthrough (v3.2) |
+| test_mask_secrets_none | None passthrough (v3.2) |
+| test_mask_secrets_no_auth | String without auth unchanged (v3.2) |
 | test_build_uptrend_url | Uptrend screener URL construction |
 | test_build_uptrend_url_with_sector | URL construction with sector filter |
 | test_build_total_url | Total screener URL construction |
@@ -1018,6 +1081,10 @@ Dashboard data is updated in SQLite by one of the following methods:
 #### data_collector.py Design
 
 ```python
+def mask_secrets(text: str) -> str:
+    """Mask known secrets (auth= query params) from URLs and exception messages (v3.2)"""
+    ...
+
 class DataCollector:
     """Fetches uptrend stock counts from Finviz screener and saves to SQLite"""
 
@@ -1036,6 +1103,11 @@ class DataCollector:
 
     def close(self) -> None:
         """Close the HTTP Session"""
+        ...
+
+    @staticmethod
+    def _safe_http_error(exc) -> requests.HTTPError:
+        """Create HTTPError with sanitized message (no URL leakage) (v3.2)"""
         ...
 
     def _validate_counts(self, worksheet, count, total) -> None:
@@ -1168,9 +1240,11 @@ stocktrading uses Alpaca API's calendar, but to avoid Alpaca dependency in uptre
 | EmptyDataError | 200 + empty body → return empty DataFrame (prevent crash) |
 | Data validation | `_validate_counts()`: validates negative values, count > total |
 | Exception scope | `collect_all()` catches only `RequestException`, `ValueError`, `EmptyDataError` |
+| Secret masking | `mask_secrets()` sanitizes `auth=` params in all logged exceptions (v3.2) |
+| HTTP error sanitization | `_safe_http_error()` replaces HTTPError with URL-free message (v3.2) |
 | Session management | `close()` method ensures `requests.Session` is properly closed |
 
-**Test Plan (32 tests: Phase 3 initial 20 + v3.1 additional 12):**
+**Test Plan (36 tests: Phase 3 initial 20 + v3.1 additional 12 + v3.2 additional 4):**
 
 See test_data_collector.py section in "9.2 Test List" above.
 
@@ -1246,6 +1320,9 @@ Sheets whose names don't match a worksheet value are skipped (warning logged).
 |------|----------|
 | Row with empty Date | Skip (warning logged) |
 | Non-numeric Count/Total | Skip (warning logged) |
+| Non-integer Count/Total (e.g., 1.5) | Drop row with warning (v3.2) |
+| Negative Count/Total | Drop row with warning (v3.2) |
+| Count > Total | Drop row with warning (v3.2) |
 | Unknown sheet name | Skip (warning logged) |
 | File not found | Exit with error |
 | DB write failure | Transaction ROLLBACK, display error |
