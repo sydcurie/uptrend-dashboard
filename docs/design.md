@@ -6,7 +6,7 @@
 | Project Name | uptrend-dashboard |
 | Created | 2026-02-08 |
 | Revised | 2026-02-11 |
-| Status | v3.2 Data validation, secret masking, CI |
+| Status | v3.3 Sector summary click navigation |
 
 ---
 
@@ -19,7 +19,18 @@
 | 2026-02-08 | v2.1 | Removed signal logic (Long/Short Entry/Exit). Changed chart trend display to green/red/gray color coding |
 | 2026-02-08 | v2.2 | Code review fixes. Improved DB connection management, centralized constants, empty data handling, added logging, test improvements |
 | 2026-02-08 | v2.3 | Sector Comparison chart improvements. 10MA display, threshold lines, custom palette, latest value annotations, Y-axis % format, legend sorting |
+| 2026-02-11 | v3.3 | Sector summary bar chart click → Sector Detail page navigation |
 | 2026-02-11 | v3.2 | Data validation hardening, secret masking, CI test workflow. DB CHECK constraints, Python-level count/total validation, import_excel row filtering, mask_secrets/safe_http_error, GitHub Actions pytest |
+
+### v3.3 Key Changes (Sector Summary Click Navigation)
+
+- **Click-to-navigate**: Clicking a bar in the Sector Summary horizontal bar chart navigates to the Sector Detail page with that sector pre-selected
+- **`_key` column**: Added internal worksheet key column to `build_sector_summary()` output for chart `customdata` mapping (hidden from `st.dataframe` display)
+- **`customdata` on bar trace**: `build_sector_summary_chart()` passes `_key` values as `customdata` on the `go.Bar` trace
+- **`on_select` event**: `app.py` uses `st.plotly_chart(on_select="rerun")` to capture click events, sets `st.session_state["selected_sector"]`, and calls `st.switch_page()`
+- **Sector Detail pre-selection**: `pages/1_Sector_Detail.py` reads `st.session_state.pop("selected_sector")` to set `st.selectbox` default index
+- **Streamlit version**: Bumped minimum to `>=1.35.0` for `on_select` parameter support
+- **Tests**: 114 tests (added `test_sector_summary_chart_customdata`)
 
 ### v3.2 Key Changes (Data Validation, Secret Masking, CI)
 
@@ -509,6 +520,7 @@ Provides dict-compatible `__getitem__`, `__contains__`, `keys()` methods. Improv
 | Trend | str | "Up" / "Down" |
 | Slope | float | Latest slope |
 | Status | str | "Overbought" / "Oversold" / "Normal" |
+| _key | str | Internal worksheet key (e.g., "sec_technology"). Used for chart `customdata`; excluded from `st.dataframe` display (v3.3) |
 
 ### 4.4 chart_builder.py — Chart Generation Layer
 
@@ -519,7 +531,7 @@ v2.1 removed signal markers and switched to Ratio line color coding. v2.2 split 
 | Function | Signature | Description |
 |----------|-----------|-------------|
 | `build_ratio_chart` | `(df, title) -> go.Figure` | Ratio time series chart (calls helpers below) |
-| `build_sector_summary_chart` | `(summary_df) -> go.Figure` | Sector horizontal bar chart |
+| `build_sector_summary_chart` | `(summary_df) -> go.Figure` | Sector horizontal bar chart (with `customdata` for click navigation, v3.3) |
 | `build_sector_comparison_chart` | `(all_data, selected, use_ma=True) -> go.Figure` | Sector comparison overlay (v2.3 revision) |
 
 **build_ratio_chart Internal Helpers (v2.2 decomposition):**
@@ -661,6 +673,7 @@ Screen layout is unchanged from v1. Only the data source changes; UI remains the
 │                        │ ┌───────────────────┐┌────────────┐│
 │                        │ │ [Horizontal Bar]  ││ [Table]    ││
 │                        │ │  Chart            ││ Sector ... ││
+│                        │ │ (clickable→Detail)││            ││
 │                        │ └───────────────────┘└────────────┘│
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -827,7 +840,7 @@ uptrend-dashboard/
 
 | Package | Version | Purpose | v1→v2 |
 |---------|---------|---------|-------|
-| streamlit | >= 1.30.0 | Web framework | Retained |
+| streamlit | >= 1.35.0 | Web framework (`on_select` requires >=1.35.0, v3.3) | Retained |
 | plotly | >= 5.18.0 | Interactive charts | Retained |
 | pandas | >= 2.0.0 | Data manipulation | Retained |
 | openpyxl | >= 3.1.0 | Excel file reading | **New** |
@@ -926,6 +939,7 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_ratio_chart_traces | Trace structure |
 | test_ratio_chart_color_segments | Trend color segments (green/red/gray) |
 | test_sector_summary_chart | Summary chart |
+| test_sector_summary_chart_customdata | Bar trace has customdata with sector keys (v3.3) |
 | test_sector_comparison_chart | Comparison chart (11 sectors + 2 thresholds = 13 traces) |
 | test_sector_comparison_selected | Filtered comparison (selected sectors + 2 thresholds) |
 | test_sector_comparison_uses_ma_by_default | Default 10MA display |

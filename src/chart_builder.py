@@ -221,6 +221,7 @@ def build_sector_summary_chart(summary_df: pd.DataFrame) -> go.Figure:
             marker_color=colors,
             text=summary_df["Ratio"].apply(lambda x: f"{x:.1%}"),
             textposition="auto",
+            customdata=summary_df["_key"].values if "_key" in summary_df.columns else None,
         )
     )
 

@@ -82,7 +82,7 @@ class TestBuildSectorSummary:
     def test_build_sector_summary(self, sample_all_data):
         """Should produce summary with correct columns for all sectors."""
         summary = build_sector_summary(sample_all_data)
-        expected_columns = {"Sector", "Ratio", "10MA", "Trend", "Slope", "Status"}
+        expected_columns = {"Sector", "Ratio", "10MA", "Trend", "Slope", "Status", "_key"}
         assert set(summary.columns) == expected_columns
         assert len(summary) == 11
 
@@ -128,7 +128,7 @@ class TestEmptyDataFrameGuards:
     def test_build_sector_summary_empty(self):
         """Empty data dict should return DataFrame with correct columns."""
         summary = build_sector_summary({})
-        expected_columns = {"Sector", "Ratio", "10MA", "Trend", "Slope", "Status"}
+        expected_columns = {"Sector", "Ratio", "10MA", "Trend", "Slope", "Status", "_key"}
         assert set(summary.columns) == expected_columns
         assert len(summary) == 0
 

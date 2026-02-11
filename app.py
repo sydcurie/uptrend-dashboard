@@ -109,7 +109,14 @@ st.subheader("Sector Summary")
 summary = build_sector_summary(all_data)
 
 fig_summary = build_sector_summary_chart(summary)
-st.plotly_chart(fig_summary, use_container_width=True)
+event = st.plotly_chart(fig_summary, use_container_width=True, on_select="rerun", key="sector_summary")
+
+if event and event.selection and event.selection.points:
+    point = event.selection.points[0]
+    customdata = point.get("customdata")
+    if customdata:
+        st.session_state["selected_sector"] = customdata
+        st.switch_page("pages/1_Sector_Detail.py")
 
 STATUS_STYLES = {
     "Overbought": "color: #d62728",
@@ -131,7 +138,7 @@ def color_row(row):
 
 
 st.dataframe(
-    summary.style
+    summary.drop(columns=["_key"]).style
     .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"})
     .apply(color_row, axis=1),
     use_container_width=True,

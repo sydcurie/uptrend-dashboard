@@ -95,11 +95,12 @@ def build_sector_summary(all_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
                 "Trend": "Up" if status["trend"] == "up" else "Down",
                 "Slope": status["slope"],
                 "Status": market_status,
+                "_key": name,
             }
         )
 
     if not rows:
-        return pd.DataFrame(columns=["Sector", "Ratio", "10MA", "Trend", "Slope", "Status"])
+        return pd.DataFrame(columns=["Sector", "Ratio", "10MA", "Trend", "Slope", "Status", "_key"])
 
     summary = pd.DataFrame(rows)
     summary = summary.sort_values("Ratio", ascending=False).reset_index(drop=True)

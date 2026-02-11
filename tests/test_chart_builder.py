@@ -62,6 +62,22 @@ class TestBuildSectorSummaryChart:
         assert len(bar_traces) >= 1
 
 
+    def test_sector_summary_chart_customdata(self, sample_all_data):
+        """Bar trace should have customdata with sector keys for click navigation."""
+        from src.data_processor import build_sector_summary
+
+        summary = build_sector_summary(sample_all_data)
+        fig = build_sector_summary_chart(summary)
+        bar_traces = [t for t in fig.data if isinstance(t, go.Bar)]
+        assert len(bar_traces) >= 1
+        bar = bar_traces[0]
+        assert bar.customdata is not None
+        assert len(bar.customdata) == len(summary)
+        # All customdata values should be sector keys (start with "sec_")
+        for key in bar.customdata:
+            assert key.startswith("sec_"), f"Unexpected key: {key}"
+
+
 class TestBuildSectorComparisonChart:
     """Tests for build_sector_comparison_chart function."""
 

@@ -40,7 +40,17 @@ all_data = load_data()
 
 # Sector selector
 sector_names = {get_sector_display_name(s): s for s in SECTORS}
-selected_display = st.selectbox("Select Sector", list(sector_names.keys()))
+display_names = list(sector_names.keys())
+
+# If navigated from main page sector summary chart, pre-select that sector
+preselected_key = st.session_state.pop("selected_sector", None)
+default_index = 0
+if preselected_key:
+    preselected_display = get_sector_display_name(preselected_key)
+    if preselected_display in display_names:
+        default_index = display_names.index(preselected_display)
+
+selected_display = st.selectbox("Select Sector", display_names, index=default_index)
 selected_key = sector_names[selected_display]
 
 df = all_data.get(selected_key)
