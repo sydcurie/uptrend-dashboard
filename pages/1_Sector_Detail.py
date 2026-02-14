@@ -7,7 +7,7 @@ load_dotenv()
 
 from src.constants import SECTORS
 from src.db_client import load_all_data
-from src.data_processor import get_current_status, get_sector_display_name, filter_by_date_range
+from src.data_processor import get_current_status, get_sector_display_name, filter_by_date_range, prepare_timeseries_csv
 from src.chart_builder import build_ratio_chart
 
 st.set_page_config(page_title="Sector Detail", page_icon="🔍", layout="wide")
@@ -99,3 +99,14 @@ else:
 # Chart
 fig = build_ratio_chart(df_filtered, title=f"{selected_display} Uptrend Ratio")
 st.plotly_chart(fig, use_container_width=True)
+
+# Data Download
+st.markdown("---")
+st.subheader("Data Download")
+ts_csv = prepare_timeseries_csv(df_filtered)
+st.download_button(
+    f"Download {selected_display} Time Series",
+    ts_csv.to_csv(index=False),
+    f"{selected_key}_timeseries.csv",
+    "text/csv",
+)
