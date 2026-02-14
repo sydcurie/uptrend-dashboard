@@ -11,6 +11,7 @@ Streamlit + Plotly dashboard for visualizing US market uptrend stock ratios. Dat
 - **Sector Comparison**: Overlay multiple sector ratios (10MA smoothed) with threshold annotations
 - **Auto-refresh**: 1-hour cache with manual refresh button
 - **Self-Contained Data Collection**: Finviz Elite CSV scraper with cron-ready CLI
+- **CSV Export for LLM Access**: Automated CSV generation via GitHub Actions, accessible via raw URL
 
 ## Setup
 
@@ -51,6 +52,9 @@ python collect.py --worksheet sec_technology
 
 # Import from Excel (legacy data migration)
 python import_excel.py path/to/export.xlsx
+
+# Export CSV files (auto-runs in GitHub Actions after collection)
+python export_csv.py --verbose
 ```
 
 ### Run Dashboard
@@ -84,6 +88,7 @@ uptrend-dashboard/
 │   ├── test_data_processor.py
 │   ├── test_chart_builder.py
 │   ├── test_data_collector.py
+│   ├── test_export_csv.py
 │   ├── test_import_excel.py
 │   └── test_integration.py
 ├── pages/
@@ -91,8 +96,12 @@ uptrend-dashboard/
 │   └── 2_Sector_Comparison.py      # Sector comparison page
 ├── app.py                          # Main page
 ├── collect.py                      # Data collection CLI (cron-ready)
+├── export_csv.py                   # CSV export CLI (auto-runs in CI)
 ├── import_excel.py                 # Excel import tool
-├── data/uptrend.db                 # SQLite database
+├── data/
+│   ├── uptrend.db                  # SQLite database
+│   ├── uptrend_ratio_timeseries.csv # All worksheets timeseries (auto-generated)
+│   └── sector_summary.csv          # Sector summary snapshot (auto-generated)
 └── docs/design.md                  # Design document
 ```
 
@@ -120,3 +129,16 @@ Finviz Elite CSV export API. Collects uptrend count and total count for:
 - `sec_*` -- 11 sector worksheets (Basic Materials, Technology, Financial, etc.)
 
 Data is stored in SQLite (`data/uptrend.db`) with raw counts (count, total). Indicators (ratio, 10MA, slope, trend) are calculated on-the-fly at read time.
+
+## CSV Access (for LLM / Programmatic Use)
+
+After each data collection, CSV files are auto-generated and committed to git. Access via GitHub raw URL:
+
+| File | URL | Description |
+|------|-----|-------------|
+| Timeseries | `https://raw.githubusercontent.com/tradermonty/uptrend-dashboard/main/data/uptrend_ratio_timeseries.csv` | All 12 worksheets with `worksheet, date, count, total, ratio, ma_10, slope, trend` |
+| Sector Summary | `https://raw.githubusercontent.com/tradermonty/uptrend-dashboard/main/data/sector_summary.csv` | Latest snapshot: `Sector, Ratio, 10MA, Trend, Slope, Status` |
+
+- Values are raw decimals (0.29, not 29%)
+- Dates formatted as `YYYY-MM-DD`
+- NaN exported as empty string
