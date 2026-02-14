@@ -10,7 +10,6 @@ from src.data_processor import (
     build_sector_summary,
     get_sector_display_name,
     prepare_timeseries_csv,
-    prepare_market_status_csv,
 )
 
 
@@ -188,33 +187,3 @@ class TestPrepareTimeseriesCsv:
         assert excluded.isdisjoint(set(result.columns))
 
 
-class TestPrepareMarketStatusCsv:
-    """Tests for prepare_market_status_csv function."""
-
-    def test_prepare_market_status_csv_uptrend(self):
-        """trend=='up' should produce 'Uptrend' in CSV."""
-        status = MarketStatus(
-            date="2024-01-08", ratio=0.29, ratio_10ma=0.288,
-            trend="up", slope=0.001, is_overbought=False, is_oversold=False,
-        )
-        result = prepare_market_status_csv(status)
-        assert result.iloc[0]["trend"] == "Uptrend"
-
-    def test_prepare_market_status_csv_downtrend(self):
-        """trend=='down' should produce 'Downtrend' in CSV."""
-        status = MarketStatus(
-            date="2024-01-08", ratio=0.15, ratio_10ma=0.18,
-            trend="down", slope=-0.003, is_overbought=False, is_oversold=False,
-        )
-        result = prepare_market_status_csv(status)
-        assert result.iloc[0]["trend"] == "Downtrend"
-
-    def test_prepare_market_status_csv_columns(self):
-        """Output should have exactly date, ratio, trend columns."""
-        status = MarketStatus(
-            date="2024-01-08", ratio=0.29, ratio_10ma=0.288,
-            trend="up", slope=0.001, is_overbought=False, is_oversold=False,
-        )
-        result = prepare_market_status_csv(status)
-        assert list(result.columns) == ["date", "ratio", "trend"]
-        assert len(result) == 1

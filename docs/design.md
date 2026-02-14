@@ -25,13 +25,12 @@
 
 ### v3.4 Key Changes (CSV Download)
 
-- **CSV download buttons**: Added 3 download buttons at the bottom of the main page for LLM-friendly data export
+- **CSV download buttons**: Added 2 download buttons at the bottom of the main page for LLM-friendly data export
   - **Ratio Time Series**: `date, count, total, ratio, ma_10, slope, trend` — date-filtered `calculate_indicators()` output with string trend column ("up"/"down"), excluding chart-only columns
   - **Sector Summary**: `Sector, Ratio, 10MA, Trend, Slope, Status` — `build_sector_summary()` output minus internal `_key` column
-  - **Market Status Latest**: `date, ratio, trend` — single-row CSV from `MarketStatus` with "Uptrend"/"Downtrend" labels
-- **New functions in `data_processor.py`**: `prepare_timeseries_csv()`, `prepare_market_status_csv()`
+- **New function in `data_processor.py`**: `prepare_timeseries_csv()`
 - **Values exported as raw decimals** (e.g., 0.29 not 29%) for machine readability
-- **Tests**: 114 → 120 tests (added 6 CSV export tests)
+- **Tests**: 114 → 117 tests (added 3 CSV export tests)
 
 ### v3.3 Key Changes (Sector Summary Click Navigation)
 
@@ -489,7 +488,6 @@ Responsibility changes from v1:
 | `get_sector_display_name` | `(name: str) -> str` | Category name → display name conversion (public API) |
 | `filter_by_date_range` | `(df, start, end) -> DataFrame` | Date range filter |
 | `prepare_timeseries_csv` | `(df: DataFrame) -> DataFrame` | Select/format columns for time series CSV export (v3.4) |
-| `prepare_market_status_csv` | `(status: MarketStatus) -> DataFrame` | Convert MarketStatus to single-row CSV DataFrame (v3.4) |
 
 **MarketStatus dataclass (new in v2.2):**
 
@@ -691,11 +689,10 @@ Screen layout is unchanged from v1. Only the data source changes; UI remains the
 │                        │                                     │
 │                        │ ─────────────────────────────────── │
 │                        │ Data Download                       │
-│                        │ ┌──────────┐┌──────────┐┌─────────┐│
-│                        │ │ Download ││ Download ││Download ││
-│                        │ │ Ratio    ││ Sector   ││Market   ││
-│                        │ │TimeSeries││ Summary  ││ Status  ││
-│                        │ └──────────┘└──────────┘└─────────┘│
+│                        │ ┌────────────────┐┌────────────────┐│
+│                        │ │ Download Ratio ││ Download       ││
+│                        │ │ Time Series    ││ Sector Summary ││
+│                        │ └────────────────┘└────────────────┘│
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -953,9 +950,6 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_prepare_timeseries_csv_columns | Output columns: date, count, total, ratio, ma_10, slope, trend (v3.4) |
 | test_prepare_timeseries_csv_trend_column | slope > 0 → "up", <= 0 → "down" (v3.4) |
 | test_prepare_timeseries_csv_excludes_chart_columns | Excludes trend_up/trend_down/upper/lower/is_peak/is_trough (v3.4) |
-| test_prepare_market_status_csv_uptrend | trend=="up" → "Uptrend" (v3.4) |
-| test_prepare_market_status_csv_downtrend | trend=="down" → "Downtrend" (v3.4) |
-| test_prepare_market_status_csv_columns | Output columns: date, ratio, trend; 1 row (v3.4) |
 
 **test_chart_builder.py (continued from v1):**
 

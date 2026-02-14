@@ -11,7 +11,6 @@ from src.data_processor import (
     build_sector_summary,
     filter_by_date_range,
     prepare_timeseries_csv,
-    prepare_market_status_csv,
 )
 from src.chart_builder import build_ratio_chart, build_sector_summary_chart
 
@@ -164,7 +163,7 @@ if table_event and table_event.selection and table_event.selection.rows:
 st.markdown("---")
 st.subheader("Data Download")
 
-col_dl1, col_dl2, col_dl3 = st.columns(3)
+col_dl1, col_dl2 = st.columns(2)
 with col_dl1:
     ts_csv = prepare_timeseries_csv(df_filtered)
     st.download_button(
@@ -178,13 +177,5 @@ with col_dl2:
         "Download Sector Summary",
         summary.drop(columns=["_key"]).to_csv(index=False),
         "sector_summary.csv",
-        "text/csv",
-    )
-with col_dl3:
-    ms_csv = prepare_market_status_csv(status)
-    st.download_button(
-        "Download Market Status",
-        ms_csv.to_csv(index=False),
-        "market_status_latest.csv",
         "text/csv",
     )

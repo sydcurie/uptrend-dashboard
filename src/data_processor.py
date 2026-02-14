@@ -114,16 +114,6 @@ def prepare_timeseries_csv(df: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
-def prepare_market_status_csv(status: MarketStatus) -> pd.DataFrame:
-    """Convert MarketStatus to a single-row DataFrame for CSV export."""
-    trend_label = "Uptrend" if status.trend == "up" else "Downtrend"
-    return pd.DataFrame([{
-        "date": status.date,
-        "ratio": status.ratio,
-        "trend": trend_label,
-    }])
-
-
 def filter_by_date_range(df: pd.DataFrame, start, end) -> pd.DataFrame:
     """Filter a DataFrame by date range (inclusive).
 
