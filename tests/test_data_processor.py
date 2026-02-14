@@ -10,6 +10,7 @@ from src.data_processor import (
     build_sector_summary,
     get_sector_display_name,
     prepare_timeseries_csv,
+    prepare_all_timeseries_csv,
 )
 
 
@@ -148,6 +149,11 @@ class TestEmptyDataFrameGuards:
 class TestPrepareTimeseriesCsv:
     """Tests for prepare_timeseries_csv function."""
 
+    CALCULATED_DF_COLUMNS = [
+        "date", "count", "total", "ratio", "ma_10", "slope",
+        "trend_up", "trend_down", "upper", "lower", "is_peak", "is_trough",
+    ]
+
     def _make_df(self):
         """Create a minimal calculated DataFrame for testing."""
         return pd.DataFrame({
@@ -187,3 +193,92 @@ class TestPrepareTimeseriesCsv:
         assert excluded.isdisjoint(set(result.columns))
 
 
+class TestPrepareAllTimeseriesCsv:
+    """Tests for prepare_all_timeseries_csv function."""
+
+    EXPECTED_COLUMNS = ["worksheet", "date", "count", "total", "ratio", "ma_10", "slope", "trend"]
+
+    def _make_calculated_df(self, n_rows=3, base_count=100):
+        """Create a minimal calculated DataFrame for testing."""
+        return pd.DataFrame({
+            "date": pd.to_datetime([f"2024-01-0{i+1}" for i in range(n_rows)]),
+            "count": [base_count + i * 10 for i in range(n_rows)],
+            "total": [500] * n_rows,
+            "ratio": [(base_count + i * 10) / 500 for i in range(n_rows)],
+            "ma_10": [0.19 + i * 0.01 for i in range(n_rows)],
+            "slope": [0.01] * n_rows,
+            "trend_up": [(base_count + i * 10) / 500 for i in range(n_rows)],
+            "trend_down": [np.nan] * n_rows,
+            "upper": [0.37] * n_rows,
+            "lower": [0.097] * n_rows,
+            "is_peak": [False] * n_rows,
+            "is_trough": [False] * n_rows,
+        })
+
+    def _make_all_data(self):
+        """Create sample all_data dict with all 12 worksheets."""
+        from src.constants import SECTORS
+        data = {"all": self._make_calculated_df(3, 150)}
+        for i, sector in enumerate(SECTORS):
+            data[sector] = self._make_calculated_df(3, 100 + i * 5)
+        return data
+
+    def test_columns(self):
+        """Output should have worksheet, date, count, total, ratio, ma_10, slope, trend."""
+        data = self._make_all_data()
+        result = prepare_all_timeseries_csv(data)
+        assert list(result.columns) == self.EXPECTED_COLUMNS
+
+    def test_includes_all_worksheets(self):
+        """All 12 worksheets from input dict should appear in output."""
+        data = self._make_all_data()
+        result = prepare_all_timeseries_csv(data)
+        assert set(result["worksheet"].unique()) == set(data.keys())
+
+    def test_sorted_by_worksheet(self):
+        """'all' should come first, followed by sec_* in alphabetical order."""
+        data = self._make_all_data()
+        result = prepare_all_timeseries_csv(data)
+        worksheets_in_order = result["worksheet"].unique().tolist()
+        assert worksheets_in_order[0] == "all"
+        assert worksheets_in_order[1:] == sorted(worksheets_in_order[1:])
+
+    def test_row_count(self):
+        """Total rows should equal sum of rows in each worksheet."""
+        data = self._make_all_data()
+        expected_rows = sum(len(df) for df in data.values())
+        result = prepare_all_timeseries_csv(data)
+        assert len(result) == expected_rows
+
+    def test_empty_data(self):
+        """Empty dict should return 0-row DataFrame with correct columns."""
+        result = prepare_all_timeseries_csv({})
+        assert list(result.columns) == self.EXPECTED_COLUMNS
+        assert len(result) == 0
+
+    def test_skips_empty_dataframes(self):
+        """Worksheets with empty DataFrames should be skipped."""
+        data = {
+            "all": self._make_calculated_df(3, 150),
+            "sec_technology": pd.DataFrame(columns=[
+                "date", "count", "total", "ratio", "ma_10", "slope",
+                "trend_up", "trend_down", "upper", "lower", "is_peak", "is_trough",
+            ]),
+        }
+        result = prepare_all_timeseries_csv(data)
+        assert set(result["worksheet"].unique()) == {"all"}
+        assert len(result) == 3
+
+    def test_date_format(self):
+        """date column should be YYYY-MM-DD strings."""
+        data = {"all": self._make_calculated_df(3, 150)}
+        result = prepare_all_timeseries_csv(data)
+        for d in result["date"]:
+            assert isinstance(d, str)
+            assert len(d) == 10
+            # Verify YYYY-MM-DD pattern
+            parts = d.split("-")
+            assert len(parts) == 3
+            assert len(parts[0]) == 4
+            assert len(parts[1]) == 2
+            assert len(parts[2]) == 2

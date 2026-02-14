@@ -114,6 +114,34 @@ def prepare_timeseries_csv(df: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
+def prepare_all_timeseries_csv(all_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+    """Combine all worksheets into a single timeseries DataFrame for CSV export.
+
+    Args:
+        all_data: Dict mapping worksheet name to calculated DataFrame.
+
+    Returns:
+        DataFrame with columns: worksheet, date, count, total, ratio, ma_10, slope, trend.
+        Empty dict returns 0-row DataFrame with correct columns.
+    """
+    expected_columns = ["worksheet", "date", "count", "total", "ratio", "ma_10", "slope", "trend"]
+
+    frames = []
+    for name in sorted(all_data.keys()):
+        df = all_data[name]
+        if df.empty:
+            continue
+        csv_df = prepare_timeseries_csv(df)
+        csv_df.insert(0, "worksheet", name)
+        csv_df["date"] = csv_df["date"].dt.strftime("%Y-%m-%d")
+        frames.append(csv_df)
+
+    if not frames:
+        return pd.DataFrame(columns=expected_columns)
+
+    return pd.concat(frames, ignore_index=True)
+
+
 def filter_by_date_range(df: pd.DataFrame, start, end) -> pd.DataFrame:
     """Filter a DataFrame by date range (inclusive).
 

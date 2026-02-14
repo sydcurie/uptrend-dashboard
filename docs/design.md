@@ -6,7 +6,7 @@
 | Project Name | uptrend-dashboard |
 | Created | 2026-02-08 |
 | Revised | 2026-02-14 |
-| Status | v3.4 CSV download on main page |
+| Status | v3.5 Automated CSV export via GitHub Actions |
 
 ---
 
@@ -19,9 +19,22 @@
 | 2026-02-08 | v2.1 | Removed signal logic (Long/Short Entry/Exit). Changed chart trend display to green/red/gray color coding |
 | 2026-02-08 | v2.2 | Code review fixes. Improved DB connection management, centralized constants, empty data handling, added logging, test improvements |
 | 2026-02-08 | v2.3 | Sector Comparison chart improvements. 10MA display, threshold lines, custom palette, latest value annotations, Y-axis % format, legend sorting |
+| 2026-02-14 | v3.5 | Automated CSV export via GitHub Actions for LLM data access via raw URL |
 | 2026-02-14 | v3.4 | CSV download buttons on main page for LLM data analysis |
 | 2026-02-11 | v3.3 | Sector summary bar chart click → Sector Detail page navigation |
 | 2026-02-11 | v3.2 | Data validation hardening, secret masking, CI test workflow. DB CHECK constraints, Python-level count/total validation, import_excel row filtering, mask_secrets/safe_http_error, GitHub Actions pytest |
+
+### v3.5 Key Changes (Automated CSV Export)
+
+- **Automated CSV export**: `export_csv.py` CLI generates 2 CSV files after data collection, committed to git for raw URL access
+  - **Timeseries**: `data/uptrend_ratio_timeseries.csv` — all 12 worksheets combined with `worksheet` column, sorted by `sorted(keys())` (`all` first, then `sec_*` alphabetical)
+  - **Sector Summary**: `data/sector_summary.csv` — `build_sector_summary()` output minus internal `_key` column
+- **New function in `data_processor.py`**: `prepare_all_timeseries_csv(all_data: Dict[str, DataFrame]) -> DataFrame` — combines all worksheets via `prepare_timeseries_csv()`, adds `worksheet` column, formats dates as `YYYY-MM-DD` strings
+- **New CLI**: `export_csv.py` — `--db`, `--output-dir`, `--verbose` options. Exit code 1 on DB not found, output dir not found, or empty DB
+- **GitHub Actions**: Added "Export CSV files" step after data collection; `git add` includes `data/*.csv`
+- **CSV format**: UTF-8, header row, no index, raw decimals (0.29 not 29%), NaN as empty string, dates as `YYYY-MM-DD`
+- **Error handling**: `export_csv.py` failure stops workflow before commit step, preventing DB/CSV inconsistency
+- **Tests**: 117 → 132 tests (+7 `prepare_all_timeseries_csv`, +8 `export_csv`)
 
 ### v3.4 Key Changes (CSV Download)
 
@@ -175,6 +188,7 @@ Data is read from raw data (Count, Total) stored in SQLite, derived indicators (
 | Calculation | `src/indicator_calculator.py` | Derived indicator calculation (Ratio, 10MA, Slope, Trend) |
 | Data Access | `src/db_client.py` | SQLite read/write, table initialization |
 | CLI Tools | `import_excel.py` | Historical data import from Excel |
+| CLI Tools | `export_csv.py` | CSV export for LLM access (v3.5) |
 
 ### 2.3 Data Flow
 
@@ -488,6 +502,7 @@ Responsibility changes from v1:
 | `get_sector_display_name` | `(name: str) -> str` | Category name → display name conversion (public API) |
 | `filter_by_date_range` | `(df, start, end) -> DataFrame` | Date range filter |
 | `prepare_timeseries_csv` | `(df: DataFrame) -> DataFrame` | Select/format columns for time series CSV export (v3.4) |
+| `prepare_all_timeseries_csv` | `(all_data: Dict[str, DataFrame]) -> DataFrame` | Combine all worksheets into single timeseries CSV with `worksheet` column (v3.5) |
 
 **MarketStatus dataclass (new in v2.2):**
 
@@ -713,6 +728,12 @@ Screen layout is unchanged from v1. Only the data source changes; UI remains the
 │ ┌─────────────────────────────────────────────────────────┐ │
 │ │    [Ratio Chart — green/red/gray trend colors]          │ │
 │ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ─────────────────────────────────────────────────────────── │
+│ Data Download                                               │
+│ ┌───────────────────────────────────┐                       │
+│ │ Download {Sector} Time Series     │                       │
+│ └───────────────────────────────────┘                       │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -798,7 +819,9 @@ uptrend-dashboard/
 ├── .streamlit/
 │   └── config.toml                    # Streamlit theme settings
 ├── data/
-│   └── uptrend.db                     # SQLite DB (gitignored)
+│   ├── uptrend.db                     # SQLite DB
+│   ├── uptrend_ratio_timeseries.csv   # All worksheets timeseries (v3.5, auto-generated)
+│   └── sector_summary.csv            # Sector summary snapshot (v3.5, auto-generated)
 ├── docs/
 │   └── design.md                      # This design document
 ├── src/
@@ -815,6 +838,7 @@ uptrend-dashboard/
 │   ├── test_db_client.py             # db_client tests
 │   ├── test_indicator_calculator.py  # Derived indicator calculation tests
 │   ├── test_data_processor.py        # data_processor tests
+│   ├── test_export_csv.py            # export_csv tests (v3.5)
 │   ├── test_chart_builder.py         # chart_builder tests
 │   ├── test_integration.py          # Integration tests (new in v2.2)
 │   └── test_data_collector.py        # data_collector tests (Phase 3)
@@ -824,6 +848,7 @@ uptrend-dashboard/
 ├── app.py                            # Main page
 ├── import_excel.py                   # Excel import CLI tool (Phase 1)
 ├── collect.py                        # Finviz data collection CLI tool (Phase 3)
+├── export_csv.py                     # CSV export CLI tool (v3.5)
 ├── requirements.txt
 ├── .env.sample
 ├── .gitignore
@@ -950,6 +975,26 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_prepare_timeseries_csv_columns | Output columns: date, count, total, ratio, ma_10, slope, trend (v3.4) |
 | test_prepare_timeseries_csv_trend_column | slope > 0 → "up", <= 0 → "down" (v3.4) |
 | test_prepare_timeseries_csv_excludes_chart_columns | Excludes trend_up/trend_down/upper/lower/is_peak/is_trough (v3.4) |
+| test_columns | Output columns: worksheet, date, count, total, ratio, ma_10, slope, trend (v3.5) |
+| test_includes_all_worksheets | All 12 worksheets from input dict appear in output (v3.5) |
+| test_sorted_by_worksheet | "all" first, then sec_* alphabetical (v3.5) |
+| test_row_count | Total rows = sum of rows in each worksheet (v3.5) |
+| test_empty_data | Empty dict → 0-row DataFrame with correct columns (v3.5) |
+| test_skips_empty_dataframes | Empty DataFrame worksheets are skipped (v3.5) |
+| test_date_format | date column is YYYY-MM-DD string (v3.5) |
+
+**test_export_csv.py (v3.5):**
+
+| Test | Description |
+|------|-------------|
+| test_creates_timeseries_file | CSV timeseries file is created (v3.5) |
+| test_creates_summary_file | CSV summary file is created (v3.5) |
+| test_timeseries_has_worksheet_column | Generated CSV has worksheet column (v3.5) |
+| test_summary_excludes_key_column | Generated CSV excludes _key column (v3.5) |
+| test_returns_results | Return value has timeseries/summary with path and rows (v3.5) |
+| test_empty_db | Empty DB returns empty dict (v3.5) |
+| test_cli_db_not_found | Non-existent DB → exit code 1 (v3.5) |
+| test_cli_output_dir_not_found | Non-existent output dir → exit code 1 (v3.5) |
 
 **test_chart_builder.py (continued from v1):**
 
