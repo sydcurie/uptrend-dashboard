@@ -6,7 +6,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.db_client import load_all_data
-from src.data_processor import get_current_status, build_sector_summary, filter_by_date_range
+from src.data_processor import (
+    get_current_status,
+    build_sector_summary,
+    filter_by_date_range,
+    prepare_timeseries_csv,
+    prepare_market_status_csv,
+)
 from src.chart_builder import build_ratio_chart, build_sector_summary_chart
 
 st.set_page_config(
@@ -153,3 +159,32 @@ if table_event and table_event.selection and table_event.selection.rows:
     selected_key = summary.iloc[selected_row]["_key"]
     st.session_state["selected_sector"] = selected_key
     st.switch_page("pages/1_Sector_Detail.py")
+
+# Data Download
+st.markdown("---")
+st.subheader("Data Download")
+
+col_dl1, col_dl2, col_dl3 = st.columns(3)
+with col_dl1:
+    ts_csv = prepare_timeseries_csv(df_filtered)
+    st.download_button(
+        "Download Ratio Time Series",
+        ts_csv.to_csv(index=False),
+        "uptrend_ratio_timeseries.csv",
+        "text/csv",
+    )
+with col_dl2:
+    st.download_button(
+        "Download Sector Summary",
+        summary.drop(columns=["_key"]).to_csv(index=False),
+        "sector_summary.csv",
+        "text/csv",
+    )
+with col_dl3:
+    ms_csv = prepare_market_status_csv(status)
+    st.download_button(
+        "Download Market Status",
+        ms_csv.to_csv(index=False),
+        "market_status_latest.csv",
+        "text/csv",
+    )

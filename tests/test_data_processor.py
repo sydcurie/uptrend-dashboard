@@ -9,6 +9,8 @@ from src.data_processor import (
     get_current_status,
     build_sector_summary,
     get_sector_display_name,
+    prepare_timeseries_csv,
+    prepare_market_status_csv,
 )
 
 
@@ -142,3 +144,77 @@ class TestEmptyDataFrameGuards:
         }
         summary = build_sector_summary(data)
         assert len(summary) == 0
+
+
+class TestPrepareTimeseriesCsv:
+    """Tests for prepare_timeseries_csv function."""
+
+    def _make_df(self):
+        """Create a minimal calculated DataFrame for testing."""
+        return pd.DataFrame({
+            "date": pd.to_datetime(["2024-01-01", "2024-01-02", "2024-01-03"]),
+            "count": [100, 120, 110],
+            "total": [500, 500, 500],
+            "ratio": [0.20, 0.24, 0.22],
+            "ma_10": [0.19, 0.21, 0.215],
+            "slope": [0.01, 0.02, -0.005],
+            "trend_up": [0.20, 0.24, np.nan],
+            "trend_down": [np.nan, np.nan, 0.22],
+            "upper": [0.37, 0.37, 0.37],
+            "lower": [0.097, 0.097, 0.097],
+            "is_peak": [False, False, False],
+            "is_trough": [False, False, False],
+        })
+
+    def test_prepare_timeseries_csv_columns(self):
+        """Output should have exactly date, count, total, ratio, ma_10, slope, trend."""
+        df = self._make_df()
+        result = prepare_timeseries_csv(df)
+        assert list(result.columns) == ["date", "count", "total", "ratio", "ma_10", "slope", "trend"]
+
+    def test_prepare_timeseries_csv_trend_column(self):
+        """slope > 0 → 'up', slope <= 0 → 'down'."""
+        df = self._make_df()
+        result = prepare_timeseries_csv(df)
+        assert result.iloc[0]["trend"] == "up"    # slope = 0.01
+        assert result.iloc[1]["trend"] == "up"    # slope = 0.02
+        assert result.iloc[2]["trend"] == "down"  # slope = -0.005
+
+    def test_prepare_timeseries_csv_excludes_chart_columns(self):
+        """trend_up, trend_down, upper, lower, is_peak, is_trough should be excluded."""
+        df = self._make_df()
+        result = prepare_timeseries_csv(df)
+        excluded = {"trend_up", "trend_down", "upper", "lower", "is_peak", "is_trough"}
+        assert excluded.isdisjoint(set(result.columns))
+
+
+class TestPrepareMarketStatusCsv:
+    """Tests for prepare_market_status_csv function."""
+
+    def test_prepare_market_status_csv_uptrend(self):
+        """trend=='up' should produce 'Uptrend' in CSV."""
+        status = MarketStatus(
+            date="2024-01-08", ratio=0.29, ratio_10ma=0.288,
+            trend="up", slope=0.001, is_overbought=False, is_oversold=False,
+        )
+        result = prepare_market_status_csv(status)
+        assert result.iloc[0]["trend"] == "Uptrend"
+
+    def test_prepare_market_status_csv_downtrend(self):
+        """trend=='down' should produce 'Downtrend' in CSV."""
+        status = MarketStatus(
+            date="2024-01-08", ratio=0.15, ratio_10ma=0.18,
+            trend="down", slope=-0.003, is_overbought=False, is_oversold=False,
+        )
+        result = prepare_market_status_csv(status)
+        assert result.iloc[0]["trend"] == "Downtrend"
+
+    def test_prepare_market_status_csv_columns(self):
+        """Output should have exactly date, ratio, trend columns."""
+        status = MarketStatus(
+            date="2024-01-08", ratio=0.29, ratio_10ma=0.288,
+            trend="up", slope=0.001, is_overbought=False, is_oversold=False,
+        )
+        result = prepare_market_status_csv(status)
+        assert list(result.columns) == ["date", "ratio", "trend"]
+        assert len(result) == 1
