@@ -8,7 +8,6 @@ import numpy as np
 import plotly.graph_objects as go
 
 from src.constants import (
-    SECTOR_DISPLAY_NAMES,
     UPPER_THRESHOLD,
     LOWER_THRESHOLD,
     CHART_HEIGHT_RATIO,
@@ -17,6 +16,7 @@ from src.constants import (
     CHART_Y_MAX_MIN,
     CHART_Y_MAX_MULTIPLIER,
 )
+from src.data_processor import get_sector_display_name, get_industry_display_name
 
 logger = logging.getLogger(__name__)
 
@@ -39,6 +39,30 @@ SECTOR_PALETTE = [
     "#bcbd22",  # olive
     "#17becf",  # cyan
     "#ff6600",  # dark orange
+]
+
+# 20-color palette for industry comparison (maximally distinguishable)
+INDUSTRY_PALETTE = [
+    "#1f77b4",  # blue
+    "#ff7f0e",  # orange
+    "#2ca02c",  # green
+    "#d62728",  # red
+    "#9467bd",  # purple
+    "#8c564b",  # brown
+    "#e377c2",  # pink
+    "#7f7f7f",  # gray
+    "#bcbd22",  # olive
+    "#17becf",  # cyan
+    "#ff6600",  # dark orange
+    "#1a9850",  # forest green
+    "#fdae61",  # light orange
+    "#abd9e9",  # light blue
+    "#d73027",  # crimson
+    "#4575b4",  # steel blue
+    "#fee090",  # gold
+    "#91bfdb",  # sky blue
+    "#fc8d59",  # salmon
+    "#313695",  # navy
 ]
 
 COLOR_MA = "rgba(148, 103, 189, 0.8)"
@@ -239,44 +263,89 @@ def build_sector_summary_chart(summary_df: pd.DataFrame) -> go.Figure:
     return fig
 
 
-def build_sector_comparison_chart(
-    all_data: Dict[str, pd.DataFrame],
-    selected_sectors: Optional[List[str]] = None,
-    use_ma: bool = True,
+def build_industry_summary_chart(
+    summary_df: pd.DataFrame, sector_name: str = ""
 ) -> go.Figure:
-    """Build an overlay chart comparing sector ratios over time.
+    """Build a horizontal bar chart of industry ratios.
 
     Args:
-        all_data: Dict of worksheet name -> calculated DataFrame.
-        selected_sectors: List of sector keys to display.
-        use_ma: If True, plot ma_10 (smoothed). If False, plot raw ratio.
+        summary_df: DataFrame from build_industry_summary().
+        sector_name: Optional sector name for the chart title.
     """
     fig = go.Figure()
 
-    sectors = selected_sectors or [k for k in all_data if k != "all"]
+    colors = [STATUS_COLORS.get(s, "#1f77b4") for s in summary_df["Status"]]
+
+    fig.add_trace(
+        go.Bar(
+            y=summary_df["Industry"],
+            x=summary_df["Ratio"],
+            orientation="h",
+            marker_color=colors,
+            text=summary_df["Ratio"].apply(lambda x: f"{x:.1%}"),
+            textposition="auto",
+            customdata=summary_df["_key"].values if "_key" in summary_df.columns else None,
+        )
+    )
+
+    fig.add_vline(x=UPPER_THRESHOLD, line_dash="dash", line_color=COLOR_UPPER, annotation_text="Upper")
+    fig.add_vline(x=LOWER_THRESHOLD, line_dash="dash", line_color=COLOR_LOWER, annotation_text="Lower")
+
+    title = f"Industry Ratio Summary — {sector_name}" if sector_name else "Industry Ratio Summary"
+    height = max(300, len(summary_df) * 35 + 100)
+
+    fig.update_layout(
+        title=title,
+        template="plotly_white",
+        height=height,
+        xaxis_title="Ratio",
+        yaxis=dict(autorange="reversed"),
+    )
+
+    return fig
+
+
+def _build_comparison_chart(
+    all_data: Dict[str, pd.DataFrame],
+    selected_keys: List[str],
+    display_name_fn,
+    palette: List[str],
+    use_ma: bool,
+    title_prefix: str,
+) -> go.Figure:
+    """Build an overlay chart comparing ratios over time (shared logic).
+
+    Args:
+        all_data: Dict of worksheet name -> calculated DataFrame.
+        selected_keys: List of worksheet keys to display.
+        display_name_fn: Callable(key) -> display name string.
+        palette: Color palette list.
+        use_ma: If True, plot ma_10. If False, plot raw ratio.
+        title_prefix: Title prefix (e.g. "Sector Comparison").
+    """
+    fig = go.Figure()
 
     y_col = "ma_10" if use_ma else "ratio"
 
     # Collect latest values for sorting legend by descending value
-    sector_latest = []
-    for sector in sectors:
-        if sector not in all_data:
+    key_latest = []
+    for key in selected_keys:
+        if key not in all_data:
             continue
-        df = all_data[sector]
+        df = all_data[key]
         if df.empty or y_col not in df.columns:
             continue
         valid = df[y_col].dropna()
         latest_val = valid.iloc[-1] if len(valid) > 0 else 0.0
-        suffix = sector.replace("sec_", "", 1)
-        display_name = SECTOR_DISPLAY_NAMES.get(suffix, sector)
-        sector_latest.append((sector, display_name, latest_val))
+        display_name = display_name_fn(key)
+        key_latest.append((key, display_name, latest_val))
 
     # Sort by latest value descending
-    sector_latest.sort(key=lambda x: x[2], reverse=True)
+    key_latest.sort(key=lambda x: x[2], reverse=True)
 
-    for idx, (sector, display_name, latest_val) in enumerate(sector_latest):
-        df = all_data[sector]
-        color = SECTOR_PALETTE[idx % len(SECTOR_PALETTE)]
+    for idx, (key, display_name, latest_val) in enumerate(key_latest):
+        df = all_data[key]
+        color = palette[idx % len(palette)]
         fig.add_trace(
             go.Scatter(
                 x=df["date"],
@@ -338,7 +407,7 @@ def build_sector_comparison_chart(
 
     title_suffix = " (10MA)" if use_ma else " (Raw Ratio)"
     fig.update_layout(
-        title="Sector Comparison" + title_suffix,
+        title=title_prefix + title_suffix,
         xaxis_title="Date",
         yaxis_title="Ratio",
         yaxis=dict(tickformat=".0%"),
@@ -349,3 +418,49 @@ def build_sector_comparison_chart(
     )
 
     return fig
+
+
+def build_sector_comparison_chart(
+    all_data: Dict[str, pd.DataFrame],
+    selected_sectors: Optional[List[str]] = None,
+    use_ma: bool = True,
+) -> go.Figure:
+    """Build an overlay chart comparing sector ratios over time.
+
+    Args:
+        all_data: Dict of worksheet name -> calculated DataFrame.
+        selected_sectors: List of sector keys to display.
+        use_ma: If True, plot ma_10 (smoothed). If False, plot raw ratio.
+    """
+    sectors = selected_sectors or [k for k in all_data if k.startswith("sec_")]
+    return _build_comparison_chart(
+        all_data=all_data,
+        selected_keys=sectors,
+        display_name_fn=get_sector_display_name,
+        palette=SECTOR_PALETTE,
+        use_ma=use_ma,
+        title_prefix="Sector Comparison",
+    )
+
+
+def build_industry_comparison_chart(
+    all_data: Dict[str, pd.DataFrame],
+    selected_industries: Optional[List[str]] = None,
+    use_ma: bool = True,
+) -> go.Figure:
+    """Build an overlay chart comparing industry ratios over time.
+
+    Args:
+        all_data: Dict of worksheet name -> calculated DataFrame.
+        selected_industries: List of industry keys to display.
+        use_ma: If True, plot ma_10 (smoothed). If False, plot raw ratio.
+    """
+    industries = selected_industries or [k for k in all_data if k.startswith("ind_")]
+    return _build_comparison_chart(
+        all_data=all_data,
+        selected_keys=industries,
+        display_name_fn=get_industry_display_name,
+        palette=INDUSTRY_PALETTE,
+        use_ma=use_ma,
+        title_prefix="Industry Comparison",
+    )

@@ -302,3 +302,73 @@ class TestCountTotalValidation:
         })
         with pytest.raises(ValueError, match="count cannot exceed total"):
             db_client.upsert_bulk(df)
+
+
+class TestIndustryWorksheets:
+    """Tests for industry worksheet support in DB layer."""
+
+    def test_upsert_accepts_industry_worksheet(self, db_client):
+        db_client.upsert_raw_data("2024-01-02", "ind_semiconductors", 50, 100)
+        df = db_client.fetch_raw_data("ind_semiconductors")
+        assert len(df) == 1
+        assert df.iloc[0]["count"] == 50
+
+    def test_bulk_upsert_accepts_industry_worksheets(self, db_client):
+        df = pd.DataFrame({
+            "date": ["2024-01-02", "2024-01-02"],
+            "worksheet": ["ind_semiconductors", "ind_softwareapplication"],
+            "count": [50, 80],
+            "total": [100, 200],
+        })
+        db_client.upsert_bulk(df)
+        result = db_client.fetch_raw_data("ind_semiconductors")
+        assert len(result) == 1
+
+    def test_fetch_all_raw_data_with_worksheets_filter(self, db_client):
+        db_client.upsert_raw_data("2024-01-02", "all", 150, 500)
+        db_client.upsert_raw_data("2024-01-02", "sec_technology", 50, 100)
+        db_client.upsert_raw_data("2024-01-02", "ind_semiconductors", 30, 60)
+        result = db_client.fetch_all_raw_data(worksheets=["all", "sec_technology"])
+        assert set(result.keys()) == {"all", "sec_technology"}
+
+    def test_fetch_all_raw_data_none_returns_all(self, db_client):
+        db_client.upsert_raw_data("2024-01-02", "all", 150, 500)
+        db_client.upsert_raw_data("2024-01-02", "ind_semiconductors", 30, 60)
+        result = db_client.fetch_all_raw_data(worksheets=None)
+        assert "all" in result
+        assert "ind_semiconductors" in result
+
+
+class TestLoadFunctions:
+    """Tests for module-level load functions."""
+
+    def test_load_sector_data(self, tmp_db):
+        from src.db_client import load_sector_data
+        client = DBClient(tmp_db)
+        client.upsert_raw_data("2024-01-02", "all", 150, 500)
+        client.upsert_raw_data("2024-01-02", "sec_technology", 50, 100)
+        client.upsert_raw_data("2024-01-02", "ind_semiconductors", 30, 60)
+        result = load_sector_data(db_path=tmp_db)
+        assert "all" in result
+        assert "sec_technology" in result
+        assert "ind_semiconductors" not in result
+
+    def test_load_industry_data_all(self, tmp_db):
+        from src.db_client import load_industry_data
+        client = DBClient(tmp_db)
+        client.upsert_raw_data("2024-01-02", "ind_semiconductors", 30, 60)
+        client.upsert_raw_data("2024-01-02", "ind_banksregional", 20, 50)
+        client.upsert_raw_data("2024-01-02", "all", 150, 500)
+        result = load_industry_data(db_path=tmp_db)
+        assert "ind_semiconductors" in result
+        assert "ind_banksregional" in result
+        assert "all" not in result
+
+    def test_load_industry_data_sector_filter(self, tmp_db):
+        from src.db_client import load_industry_data
+        client = DBClient(tmp_db)
+        client.upsert_raw_data("2024-01-02", "ind_semiconductors", 30, 60)
+        client.upsert_raw_data("2024-01-02", "ind_banksregional", 20, 50)
+        result = load_industry_data(db_path=tmp_db, sector="sec_technology")
+        assert "ind_semiconductors" in result
+        assert "ind_banksregional" not in result

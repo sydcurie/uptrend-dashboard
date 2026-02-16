@@ -5,10 +5,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.constants import SECTORS
-from src.db_client import load_all_data
-from src.data_processor import get_current_status, get_sector_display_name, filter_by_date_range, prepare_timeseries_csv
-from src.chart_builder import build_ratio_chart
+from src.constants import SECTORS, SECTOR_INDUSTRIES
+from src.db_client import cached_load_all_data
+from src.data_processor import (
+    get_current_status,
+    get_sector_display_name,
+    filter_by_date_range,
+    prepare_timeseries_csv,
+    build_industry_summary,
+    style_status_row,
+)
+from src.chart_builder import build_ratio_chart, build_industry_summary_chart
 
 st.set_page_config(page_title="Sector Detail", page_icon="🔍", layout="wide")
 st.title("Sector Detail")
@@ -31,9 +38,8 @@ with st.sidebar:
     )
 
 
-@st.cache_data(ttl=3600)
 def load_data():
-    return load_all_data()
+    return cached_load_all_data()
 
 
 all_data = load_data()
@@ -99,6 +105,49 @@ else:
 # Chart
 fig = build_ratio_chart(df_filtered, title=f"{selected_display} Uptrend Ratio")
 st.plotly_chart(fig, use_container_width=True)
+
+# Industries in this Sector
+st.markdown("---")
+st.subheader(f"Industries in {selected_display}")
+
+industry_keys = SECTOR_INDUSTRIES.get(selected_key, [])
+has_industry_data = any(
+    k in all_data and not all_data[k].empty for k in industry_keys
+)
+
+if has_industry_data:
+    ind_summary = build_industry_summary(all_data, sector_key=selected_key)
+    if not ind_summary.empty:
+        fig_ind = build_industry_summary_chart(ind_summary, sector_name=selected_display)
+        ind_chart_event = st.plotly_chart(
+            fig_ind, use_container_width=True, on_select="rerun", key="industry_summary_chart",
+        )
+
+        if ind_chart_event and ind_chart_event.selection and ind_chart_event.selection.points:
+            point = ind_chart_event.selection.points[0]
+            customdata = point.get("customdata")
+            if customdata:
+                st.session_state["selected_industry"] = customdata
+                st.switch_page("pages/3_Industry_Detail.py")
+
+        ind_table_event = st.dataframe(
+            ind_summary.drop(columns=["_key"]).style
+            .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"})
+            .apply(style_status_row, axis=1),
+            use_container_width=True,
+            hide_index=True,
+            on_select="rerun",
+            selection_mode="single-row",
+            key="industry_table",
+        )
+
+        if ind_table_event and ind_table_event.selection and ind_table_event.selection.rows:
+            selected_ind_row = ind_table_event.selection.rows[0]
+            selected_ind_key = ind_summary.iloc[selected_ind_row]["_key"]
+            st.session_state["selected_industry"] = selected_ind_key
+            st.switch_page("pages/3_Industry_Detail.py")
+else:
+    st.info("No industry data available for this sector yet.")
 
 # Data Download
 st.markdown("---")

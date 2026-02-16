@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.constants import SECTORS
-from src.db_client import load_all_data
+from src.db_client import cached_load_sector_data
 from src.data_processor import get_sector_display_name, filter_by_date_range
 from src.chart_builder import build_sector_comparison_chart
 
@@ -30,9 +30,8 @@ with st.sidebar:
     )
 
 
-@st.cache_data(ttl=3600)
 def load_data():
-    return load_all_data()
+    return cached_load_sector_data()
 
 
 all_data = load_data()

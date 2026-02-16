@@ -8,7 +8,11 @@ from src.data_processor import (
     MarketStatus,
     get_current_status,
     build_sector_summary,
+    build_industry_summary,
     get_sector_display_name,
+    get_industry_display_name,
+    get_sector_for_industry,
+    style_status_row,
     prepare_timeseries_csv,
     prepare_all_timeseries_csv,
 )
@@ -282,3 +286,100 @@ class TestPrepareAllTimeseriesCsv:
             assert len(parts[0]) == 4
             assert len(parts[1]) == 2
             assert len(parts[2]) == 2
+
+
+class TestIndustryDisplayName:
+    """Tests for get_industry_display_name helper."""
+
+    def test_get_industry_display_name(self):
+        assert get_industry_display_name("ind_semiconductors") == "Semiconductors"
+        assert get_industry_display_name("ind_oilgasep") == "Oil & Gas E&P"
+        assert get_industry_display_name("ind_softwareapplication") == "Software - Application"
+
+    def test_get_industry_display_name_unknown_fallback(self):
+        result = get_industry_display_name("ind_unknownindustry")
+        assert result == "Unknownindustry"
+
+
+class TestGetSectorForIndustry:
+    """Tests for get_sector_for_industry helper."""
+
+    def test_get_sector_for_industry(self):
+        assert get_sector_for_industry("ind_semiconductors") == "sec_technology"
+        assert get_sector_for_industry("ind_banksregional") == "sec_financial"
+
+    def test_get_sector_for_industry_unknown(self):
+        assert get_sector_for_industry("ind_nonexistent") is None
+
+
+class TestBuildIndustrySummary:
+    """Tests for build_industry_summary function."""
+
+    def _make_industry_data(self):
+        """Create sample data with industry entries."""
+        from src.indicator_calculator import calculate_indicators
+        dates = pd.bdate_range("2024-01-02", periods=20, freq="B")
+        counts = [150, 170, 190, 200, 210, 220, 230, 240, 250, 245,
+                  230, 210, 195, 180, 170, 175, 185, 195, 210, 220]
+        base_df = pd.DataFrame({"date": dates, "count": counts, "total": [500] * 20})
+        data = {}
+        data["all"] = calculate_indicators(base_df)
+        data["sec_technology"] = calculate_indicators(base_df.copy())
+        for i, ind in enumerate(["ind_semiconductors", "ind_softwareapplication", "ind_banksregional"]):
+            df = base_df.copy()
+            df["count"] = (df["count"] * (0.8 + i * 0.1)).astype(int)
+            data[ind] = calculate_indicators(df)
+        return data
+
+    def test_build_industry_summary(self):
+        data = self._make_industry_data()
+        summary = build_industry_summary(data)
+        expected_columns = {"Industry", "Ratio", "10MA", "Trend", "Slope", "Status", "_key"}
+        assert set(summary.columns) == expected_columns
+        assert len(summary) == 3
+
+    def test_build_industry_summary_ratio_descending(self):
+        data = self._make_industry_data()
+        summary = build_industry_summary(data)
+        ratios = summary["Ratio"].tolist()
+        assert ratios == sorted(ratios, reverse=True)
+
+    def test_build_industry_summary_sector_filter(self):
+        data = self._make_industry_data()
+        summary = build_industry_summary(data, sector_key="sec_technology")
+        # Only ind_semiconductors and ind_softwareapplication are in sec_technology
+        assert len(summary) == 2
+        keys = set(summary["_key"])
+        assert keys == {"ind_semiconductors", "ind_softwareapplication"}
+
+    def test_build_industry_summary_no_filter(self):
+        data = self._make_industry_data()
+        summary = build_industry_summary(data, sector_key=None)
+        assert len(summary) == 3
+
+    def test_build_industry_summary_empty(self):
+        summary = build_industry_summary({})
+        expected_columns = {"Industry", "Ratio", "10MA", "Trend", "Slope", "Status", "_key"}
+        assert set(summary.columns) == expected_columns
+        assert len(summary) == 0
+
+    def test_build_sector_summary_excludes_industries(self):
+        data = self._make_industry_data()
+        summary = build_sector_summary(data)
+        keys = set(summary["_key"])
+        for key in keys:
+            assert not key.startswith("ind_"), f"Industry {key} should not be in sector summary"
+
+
+class TestStyleStatusRow:
+    """Tests for style_status_row function."""
+
+    def test_style_status_row_up_trend(self):
+        row = pd.Series({"Sector": "Technology", "Trend": "Up", "Status": "Normal"})
+        styles = style_status_row(row)
+        assert styles[1] == "color: #00cc96"
+
+    def test_style_status_row_overbought(self):
+        row = pd.Series({"Sector": "Technology", "Trend": "Up", "Status": "Overbought"})
+        styles = style_status_row(row)
+        assert styles[2] == "color: #d62728"

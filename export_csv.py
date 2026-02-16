@@ -6,7 +6,11 @@ import os
 import sys
 
 from src.db_client import DBClient, load_all_data
-from src.data_processor import build_sector_summary, prepare_all_timeseries_csv
+from src.data_processor import (
+    build_industry_summary,
+    build_sector_summary,
+    prepare_all_timeseries_csv,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -39,9 +43,16 @@ def export_csv(db_path: str, output_dir: str) -> dict:
     summary_path = os.path.join(output_dir, "sector_summary.csv")
     summary_df.to_csv(summary_path, index=False)
 
+    # Industry Summary CSV
+    ind_summary_df = build_industry_summary(all_data)
+    ind_summary_df = ind_summary_df.drop(columns=["_key"], errors="ignore")
+    ind_summary_path = os.path.join(output_dir, "industry_summary.csv")
+    ind_summary_df.to_csv(ind_summary_path, index=False)
+
     return {
         "timeseries": {"path": timeseries_path, "rows": len(timeseries_df)},
         "summary": {"path": summary_path, "rows": len(summary_df)},
+        "industry_summary": {"path": ind_summary_path, "rows": len(ind_summary_df)},
     }
 
 

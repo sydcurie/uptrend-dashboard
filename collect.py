@@ -8,8 +8,8 @@ from datetime import date
 
 from dotenv import load_dotenv
 
-from src.constants import VALID_WORKSHEETS
-from src.data_collector import CollectorConfig, DataCollector, mask_secrets
+from src.constants import SECTORS, VALID_WORKSHEETS
+from src.data_collector import CollectorConfig, CollectScope, DataCollector, mask_secrets
 from src.db_client import DBClient
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,9 @@ def main():
 
     parser = argparse.ArgumentParser(description="Collect uptrend data from Finviz Elite")
     parser.add_argument("--db", default="data/uptrend.db", help="Database path")
-    parser.add_argument("--worksheet", choices=VALID_WORKSHEETS, help="Collect specific worksheet only")
+    parser.add_argument("--worksheet", help="Collect specific worksheet only")
+    parser.add_argument("--scope", choices=["sectors", "industries", "all"], default=None,
+                        help="Collection scope (default: all)")
     parser.add_argument("--date", help="Date in YYYY-MM-DD format (default: today)")
     parser.add_argument("--dry-run", action="store_true", help="Fetch data without writing to DB")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
@@ -36,6 +38,16 @@ def main():
         logger.error("FINVIZ_API_KEY environment variable is not set")
         sys.exit(1)
 
+    # Mutual exclusion: --worksheet and --scope
+    if args.worksheet and args.scope is not None:
+        logger.error("--worksheet and --scope cannot be used together")
+        sys.exit(1)
+
+    # Worksheet validation
+    if args.worksheet and args.worksheet not in VALID_WORKSHEETS:
+        logger.error("Invalid worksheet: '%s'", args.worksheet)
+        sys.exit(1)
+
     # Date validation
     if args.date:
         try:
@@ -44,43 +56,70 @@ def main():
             logger.error("Invalid date format: '%s'. Use YYYY-MM-DD.", args.date)
             sys.exit(1)
 
+    scope = CollectScope(args.scope) if args.scope else CollectScope.ALL
     config = CollectorConfig(finviz_api_key=api_key)
     db_client = DBClient(args.db)
     collector = DataCollector(db_client=db_client, config=config)
 
     try:
-        if args.dry_run:
-            if args.worksheet:
-                results = {args.worksheet: collector.collect_worksheet(
-                    args.worksheet, date=args.date, dry_run=True,
-                )}
-            else:
-                results = collector.collect_all(date=args.date, dry_run=True)
-        elif args.worksheet:
+        if args.worksheet:
             try:
-                count, total = collector.collect_worksheet(args.worksheet, date=args.date)
-                results = {args.worksheet: (count, total)}
+                count, total = collector.collect_worksheet(
+                    args.worksheet, date=args.date, dry_run=args.dry_run,
+                )
+                print(f"\n  {args.worksheet}: {count}/{total}")
+                if args.dry_run:
+                    print("  (Dry run - no data written)")
             except Exception as exc:
                 logger.error("Failed to collect %s: %s", args.worksheet, mask_secrets(str(exc)))
                 sys.exit(1)
         else:
-            results = collector.collect_all(date=args.date)
+            result = collector.collect_all(date=args.date, dry_run=args.dry_run, scope=scope)
 
-        # Summary
-        print("\nCollection Summary:")
-        for ws, (count, total) in results.items():
-            ratio = f"{count / total:.1%}" if total > 0 else "N/A"
-            print(f"  {ws}: {count}/{total} ({ratio})")
-        print(f"  Worksheets collected: {len(results)}")
-        if args.dry_run:
-            print("  (Dry run - no data written)")
+            # Summary
+            print("\nCollection Summary:")
+            for ws, (count, total) in result.succeeded.items():
+                ratio = f"{count / total:.1%}" if total > 0 else "N/A"
+                print(f"  {ws}: {count}/{total} ({ratio})")
+            print(f"  Worksheets collected: {len(result.succeeded)}")
+            if result.failed:
+                print(f"  Worksheets failed: {len(result.failed)}")
+            if args.dry_run:
+                print("  (Dry run - no data written)")
 
-        # Exit code based on results (skip for dry-run and single worksheet)
-        if not args.dry_run and not args.worksheet:
-            if len(results) == 0:
-                sys.exit(1)
-            elif len(results) < len(VALID_WORKSHEETS):
-                sys.exit(2)
+            # Industry failure warning
+            if result.industry_failed:
+                failed_preview = ", ".join(result.industry_failed[:5])
+                if len(result.industry_failed) > 5:
+                    failed_preview += "..."
+                logger.warning(
+                    "Industry collection: %d/%d succeeded, %d failed: %s",
+                    len(result.industry_succeeded),
+                    len(result.industry_succeeded) + len(result.industry_failed),
+                    len(result.industry_failed),
+                    failed_preview,
+                )
+
+            # Exit code (skip for dry-run)
+            if not args.dry_run:
+                if scope == CollectScope.ALL:
+                    # Judge by sector results
+                    if len(result.sector_succeeded) == 0:
+                        sys.exit(1)
+                    elif result.sector_failed:
+                        sys.exit(2)
+                    elif len(result.industry_failed) > 0 and len(result.industry_succeeded) == 0:
+                        logger.error("All industry collections failed")
+                        sys.exit(2)
+                elif scope == CollectScope.SECTORS:
+                    expected = len(SECTORS) + 1  # "all" + 11 sectors
+                    if len(result.succeeded) == 0:
+                        sys.exit(1)
+                    elif len(result.succeeded) < expected:
+                        sys.exit(2)
+                elif scope == CollectScope.INDUSTRIES:
+                    if len(result.succeeded) == 0:
+                        sys.exit(1)
     finally:
         collector.close()
 

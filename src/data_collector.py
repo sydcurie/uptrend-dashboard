@@ -5,14 +5,15 @@ import logging
 import random
 import re
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
-from typing import Dict, Optional, Tuple
+from enum import Enum
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 import requests
 
-from src.constants import SECTORS, VALID_WORKSHEETS
+from src.constants import INDUSTRIES, SECTORS, VALID_WORKSHEETS
 from src.db_client import DBClient
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,38 @@ _UPTREND_FILTERS = _BASE_FILTERS + [
     "ta_sma200_pa",
     "ta_sma50_sa200",
 ]
+
+
+class CollectScope(Enum):
+    """Scope for data collection."""
+
+    SECTORS = "sectors"      # "all" + 11 sectors (12 worksheets)
+    INDUSTRIES = "industries"  # 149 industries
+    ALL = "all"              # all 161 worksheets
+
+
+@dataclass
+class CollectResult:
+    """Result of a collect_all run, separating succeeded and failed worksheets."""
+
+    succeeded: Dict[str, Tuple[int, int]] = field(default_factory=dict)
+    failed: List[str] = field(default_factory=list)
+
+    @property
+    def sector_succeeded(self) -> Dict[str, Tuple[int, int]]:
+        return {k: v for k, v in self.succeeded.items() if k == "all" or k.startswith("sec_")}
+
+    @property
+    def industry_succeeded(self) -> Dict[str, Tuple[int, int]]:
+        return {k: v for k, v in self.succeeded.items() if k.startswith("ind_")}
+
+    @property
+    def sector_failed(self) -> List[str]:
+        return [k for k in self.failed if k == "all" or k.startswith("sec_")]
+
+    @property
+    def industry_failed(self) -> List[str]:
+        return [k for k in self.failed if k.startswith("ind_")]
 
 
 def mask_secrets(text: str) -> str:
@@ -171,22 +204,41 @@ class DataCollector:
         return count, total
 
     def collect_all(
-        self, date: Optional[str] = None, dry_run: bool = False
-    ) -> Dict[str, Tuple[int, int]]:
-        """Collect data for all 12 worksheets."""
+        self,
+        date: Optional[str] = None,
+        dry_run: bool = False,
+        scope: CollectScope = CollectScope.ALL,
+    ) -> CollectResult:
+        """Collect data for worksheets determined by scope.
+
+        Args:
+            date: Date string in YYYY-MM-DD format (default: today).
+            dry_run: If True, fetch data without writing to DB.
+            scope: Which worksheets to collect (ALL, SECTORS, or INDUSTRIES).
+        """
         if date is None:
             from datetime import date as date_cls
             date = date_cls.today().isoformat()
 
-        results = {}
-        for worksheet in VALID_WORKSHEETS:
+        if scope == CollectScope.SECTORS:
+            worksheets = ["all"] + SECTORS
+        elif scope == CollectScope.INDUSTRIES:
+            worksheets = list(INDUSTRIES)
+        else:
+            worksheets = list(VALID_WORKSHEETS)
+
+        result = CollectResult()
+        total = len(worksheets)
+        for idx, worksheet in enumerate(worksheets):
+            logger.info("Collecting %d/%d: %s", idx + 1, total, worksheet)
             try:
-                results[worksheet] = self.collect_worksheet(
+                result.succeeded[worksheet] = self.collect_worksheet(
                     worksheet, date, dry_run=dry_run,
                 )
             except (requests.RequestException, ValueError, pd.errors.EmptyDataError) as exc:
                 logger.error("Failed to collect %s: %s", worksheet, mask_secrets(str(exc)))
-        return results
+                result.failed.append(worksheet)
+        return result
 
     def close(self) -> None:
         """Close the underlying HTTP session."""

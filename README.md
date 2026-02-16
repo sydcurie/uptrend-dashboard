@@ -7,10 +7,12 @@ Streamlit + Plotly dashboard for visualizing US market uptrend stock ratios. Dat
 ## Features
 
 - **Full Market Overview**: Ratio time series with 10MA, Upper/Lower thresholds, peak/trough markers
-- **Sector Detail**: Individual sector analysis with trend signals
+- **Sector Detail**: Individual sector analysis with trend signals + industry drilldown
 - **Sector Comparison**: Overlay multiple sector ratios (10MA smoothed) with threshold annotations
+- **Industry Detail**: Individual industry analysis with parent sector context
+- **Industry Comparison**: Compare industries within a sector or across sectors (max 15)
 - **Auto-refresh**: 1-hour cache with manual refresh button
-- **Self-Contained Data Collection**: Finviz Elite CSV scraper with cron-ready CLI
+- **Self-Contained Data Collection**: Finviz Elite CSV scraper with cron-ready CLI (161 worksheets)
 - **CSV Export for LLM Access**: Automated CSV generation via GitHub Actions, accessible via raw URL
 
 ## Setup
@@ -38,8 +40,14 @@ cp .env.sample .env
 ### Data Collection
 
 ```bash
-# Collect all sectors (writes to SQLite)
+# Collect all worksheets (161: market + sectors + industries)
 python collect.py
+
+# Collect sectors only (12 worksheets)
+python collect.py --scope sectors
+
+# Collect industries only (149 worksheets)
+python collect.py --scope industries
 
 # Dry run (fetch without writing to DB)
 python collect.py --dry-run
@@ -48,7 +56,7 @@ python collect.py --dry-run
 python collect.py --date 2026-02-07
 
 # Single worksheet
-python collect.py --worksheet sec_technology
+python collect.py --worksheet ind_semiconductors
 
 # Import from Excel (legacy data migration)
 python import_excel.py path/to/export.xlsx
@@ -92,8 +100,10 @@ uptrend-dashboard/
 │   ├── test_import_excel.py
 │   └── test_integration.py
 ├── pages/
-│   ├── 1_Sector_Detail.py          # Sector detail page
-│   └── 2_Sector_Comparison.py      # Sector comparison page
+│   ├── 1_Sector_Detail.py          # Sector detail + industry drilldown
+│   ├── 2_Sector_Comparison.py      # Sector comparison page
+│   ├── 3_Industry_Detail.py        # Industry detail page
+│   └── 4_Industry_Comparison.py    # Industry comparison page
 ├── app.py                          # Main page
 ├── collect.py                      # Data collection CLI (cron-ready)
 ├── export_csv.py                   # CSV export CLI (auto-runs in CI)
@@ -101,7 +111,8 @@ uptrend-dashboard/
 ├── data/
 │   ├── uptrend.db                  # SQLite database
 │   ├── uptrend_ratio_timeseries.csv # All worksheets timeseries (auto-generated)
-│   └── sector_summary.csv          # Sector summary snapshot (auto-generated)
+│   ├── sector_summary.csv          # Sector summary snapshot (auto-generated)
+│   └── industry_summary.csv        # Industry summary snapshot (auto-generated)
 └── docs/design.md                  # Design document
 ```
 
@@ -127,8 +138,9 @@ The **uptrend ratio** = (stocks meeting all conditions) / (stocks meeting base f
 Finviz Elite CSV export API. Collects uptrend count and total count for:
 - `all` -- Full market aggregate
 - `sec_*` -- 11 sector worksheets (Basic Materials, Technology, Financial, etc.)
+- `ind_*` -- 149 industry worksheets (Semiconductors, Software Application, Banks Regional, etc.)
 
-Data is stored in SQLite (`data/uptrend.db`) with raw counts (count, total). Indicators (ratio, 10MA, slope, trend) are calculated on-the-fly at read time.
+Data is stored in SQLite (`data/uptrend.db`) with raw counts (count, total). Indicators (ratio, 10MA, slope, trend) are calculated on-the-fly at read time. Total: 161 worksheets collected daily.
 
 ## CSV Access (for LLM / Programmatic Use)
 
@@ -136,8 +148,9 @@ After each data collection, CSV files are auto-generated and committed to git. A
 
 | File | URL | Description |
 |------|-----|-------------|
-| Timeseries | `https://raw.githubusercontent.com/tradermonty/uptrend-dashboard/main/data/uptrend_ratio_timeseries.csv` | All 12 worksheets with `worksheet, date, count, total, ratio, ma_10, slope, trend` |
+| Timeseries | `https://raw.githubusercontent.com/tradermonty/uptrend-dashboard/main/data/uptrend_ratio_timeseries.csv` | All 161 worksheets with `worksheet, date, count, total, ratio, ma_10, slope, trend` |
 | Sector Summary | `https://raw.githubusercontent.com/tradermonty/uptrend-dashboard/main/data/sector_summary.csv` | Latest snapshot: `Sector, Ratio, 10MA, Trend, Slope, Status` |
+| Industry Summary | `https://raw.githubusercontent.com/tradermonty/uptrend-dashboard/main/data/industry_summary.csv` | Latest snapshot: `Industry, Ratio, 10MA, Trend, Slope, Status` |
 
 - Values are raw decimals (0.29, not 29%)
 - Dates formatted as `YYYY-MM-DD`

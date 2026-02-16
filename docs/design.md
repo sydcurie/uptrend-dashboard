@@ -5,8 +5,8 @@
 | Document Type | Software Design Document |
 | Project Name | uptrend-dashboard |
 | Created | 2026-02-08 |
-| Revised | 2026-02-14 |
-| Status | v3.5 Automated CSV export via GitHub Actions |
+| Revised | 2026-02-16 |
+| Status | v4.0 Industry-level uptrend analysis |
 
 ---
 
@@ -19,10 +19,25 @@
 | 2026-02-08 | v2.1 | Removed signal logic (Long/Short Entry/Exit). Changed chart trend display to green/red/gray color coding |
 | 2026-02-08 | v2.2 | Code review fixes. Improved DB connection management, centralized constants, empty data handling, added logging, test improvements |
 | 2026-02-08 | v2.3 | Sector Comparison chart improvements. 10MA display, threshold lines, custom palette, latest value annotations, Y-axis % format, legend sorting |
+| 2026-02-16 | v4.0 | Industry-level uptrend analysis: 149 industries, Industry Detail/Comparison pages, data collection scope, CSV export |
 | 2026-02-14 | v3.5 | Automated CSV export via GitHub Actions for LLM data access via raw URL |
 | 2026-02-14 | v3.4 | CSV download buttons on main page for LLM data analysis |
 | 2026-02-11 | v3.3 | Sector summary bar chart click → Sector Detail page navigation |
 | 2026-02-11 | v3.2 | Data validation hardening, secret masking, CI test workflow. DB CHECK constraints, Python-level count/total validation, import_excel row filtering, mask_secrets/safe_http_error, GitHub Actions pytest |
+
+### v4.0 Key Changes (Industry-Level Analysis)
+
+- **149 industries added**: `ind_advertisingagencies` through `ind_wastemanagement`, each mapped to one of 11 sectors via `SECTOR_INDUSTRIES` / `INDUSTRY_TO_SECTOR`
+- **VALID_WORKSHEETS**: 12 → 161 (1 `all` + 11 sectors + 149 industries)
+- **New constants**: `INDUSTRIES`, `INDUSTRY_DISPLAY_NAMES`, `SECTOR_INDUSTRIES`, `INDUSTRY_TO_SECTOR`, `MAX_INDUSTRY_COMPARISON`, `is_sector()`, `is_industry()`
+- **Data collection scope**: `CollectScope` enum (`SECTORS`/`INDUSTRIES`/`ALL`), `CollectResult` dataclass with sector/industry split properties. `collect.py --scope all|sectors|industries`. Exit code: sector failures determine exit code, industry failures are warnings only
+- **New pages**: `3_Industry_Detail.py` (2-stage selector, parent sector display, status metrics), `4_Industry_Comparison.py` (Within Sector / Cross-Sector modes)
+- **Sector Detail drilldown**: Industry summary chart + table with click-to-navigate to Industry Detail
+- **Chart functions**: `build_industry_summary_chart()`, `build_industry_comparison_chart()`, shared `_build_comparison_chart()` extracted from sector comparison
+- **Data processor**: `get_industry_display_name()`, `build_industry_summary()`, `get_sector_for_industry()`, `style_status_row()` shared across pages
+- **DB client**: `load_sector_data()`, `load_industry_data()`, `fetch_all_raw_data(worksheets=)` filter, `cached_load_sector_data()` / `cached_load_all_data()` cross-page cache
+- **CSV export**: Added `industry_summary.csv` as 3rd export file
+- **Tests**: 132 → 187 tests
 
 ### v3.5 Key Changes (Automated CSV Export)
 
@@ -115,9 +130,10 @@ Data is read from raw data (Count, Total) stored in SQLite, derived indicators (
 
 - Read raw data (Count, Total) from SQLite
 - Python calculation of derived indicators (Ratio, 10MA, Slope, Trend)
-- Time series visualization of Ratio for the full market (all) and 11 sectors
+- Time series visualization of Ratio for the full market (all), 11 sectors, and 149 industries
 - Green/red/gray color-coded trend state display
-- Cross-sector comparison chart
+- Cross-sector and cross-industry comparison charts
+- Sector → Industry drilldown navigation
 - Historical data import from Excel files
 
 ### 1.3 Out of Scope
@@ -137,12 +153,12 @@ Data is read from raw data (Count, Total) stored in SQLite, derived indicators (
 ┌───────────────────────────────────────────────────────────────┐
 │                      Streamlit App                             │
 │                                                               │
-│  ┌──────────┐   ┌──────────────────┐   ┌──────────────────┐  │
-│  │ app.py   │   │ 1_Sector_        │   │ 2_Sector_        │  │
-│  │ (Main)   │   │  Detail.py       │   │  Comparison.py   │  │
-│  └────┬─────┘   └──────┬───────────┘   └──────┬───────────┘  │
-│       │                │                       │              │
-│       └────────────────┼───────────────────────┘              │
+│  ┌──────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐│
+│  │ app.py   │ │1_Sector_    │ │2_Sector_    │ │3_Industry_  │ │4_Industry_  ││
+│  │ (Main)   │ │ Detail.py   │ │ Comparison  │ │ Detail.py   │ │ Comparison  ││
+│  └────┬─────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘│
+│       │              │               │               │               │       │
+│       └──────────────┼───────────────┼───────────────┼───────────────┘       │
 │                        │                                      │
 │              ┌─────────▼────────────┐                         │
 │              │  chart_builder.py    │  ← Plotly Figure gen    │
@@ -188,7 +204,7 @@ Data is read from raw data (Count, Total) stored in SQLite, derived indicators (
 | Calculation | `src/indicator_calculator.py` | Derived indicator calculation (Ratio, 10MA, Slope, Trend) |
 | Data Access | `src/db_client.py` | SQLite read/write, table initialization |
 | CLI Tools | `import_excel.py` | Historical data import from Excel |
-| CLI Tools | `export_csv.py` | CSV export for LLM access (v3.5) |
+| CLI Tools | `export_csv.py` | CSV export for LLM access (v3.5, +industry_summary v4.0) |
 
 ### 2.3 Data Flow
 
@@ -296,16 +312,19 @@ CREATE INDEX IF NOT EXISTS idx_uptrend_raw_worksheet
 | `sec_realestate` | Real Estate | 2024-07-21 | ~370 |
 | `sec_technology` | Technology | 2024-07-21 | ~370 |
 | `sec_utilities` | Utilities | 2024-07-21 | ~370 |
+| `ind_*` (149 entries) | Industries (e.g., `ind_semiconductors`, `ind_banksregional`, etc.) | v4.0+ | — |
+
+> **v4.0:** 149 industry worksheets added. Full list defined in `src/constants.py` `INDUSTRIES`. Each industry belongs to exactly one sector via `SECTOR_INDUSTRIES` mapping. Total: 161 worksheets (1 `all` + 11 `sec_*` + 149 `ind_*`).
 
 ### 3.5 Data Volume Estimate
 
-| Item | Value |
-|------|-------|
-| Current total rows | ~4,720 |
-| Daily row increase | 12 (1 all + 11 sectors) |
-| Annual row increase | ~3,024 (252 trading days) |
-| Total rows after 10 years | ~35,000 |
-| DB size after 10 years | ~1 MB |
+| Item | Before v4.0 | After v4.0 |
+|------|-------------|------------|
+| Worksheets | 12 | 161 |
+| Daily row increase | 12 | 161 |
+| Annual row increase | ~3,024 | ~40,572 |
+| Total rows after 10 years | ~35,000 | ~408,000 |
+| DB size after 10 years | ~1 MB | ~13 MB |
 
 ### 3.6 Derived Data Definitions
 
@@ -351,19 +370,31 @@ Implementation: Plotly `Scatter` traces are split into segments of consecutive i
 
 ## 4. Module Design
 
-### 4.0 constants.py — Constants Module (new in v2.2)
+### 4.0 constants.py — Constants Module (new in v2.2, extended v4.0)
 
 Centrally manages constants used across all modules.
 
 | Constant | Description |
 |----------|-------------|
 | `SECTORS` | List of 11 sector worksheet names |
-| `VALID_WORKSHEETS` | `["all"] + SECTORS` |
-| `SECTOR_DISPLAY_NAMES` | Worksheet suffix → display name mapping |
+| `INDUSTRIES` | List of 149 industry worksheet names (v4.0) |
+| `VALID_WORKSHEETS` | `["all"] + SECTORS + INDUSTRIES` (161 entries, v4.0) |
+| `SECTOR_DISPLAY_NAMES` | Sector suffix → display name mapping |
+| `INDUSTRY_DISPLAY_NAMES` | Industry suffix → display name mapping (v4.0) |
+| `SECTOR_INDUSTRIES` | Sector key → list of industry keys mapping (v4.0) |
+| `INDUSTRY_TO_SECTOR` | Industry key → sector key reverse lookup (v4.0) |
+| `MAX_INDUSTRY_COMPARISON` | Max industries in comparison chart (15, v4.0) |
 | `UPPER_THRESHOLD` | Overbought threshold (0.37) |
 | `LOWER_THRESHOLD` | Oversold threshold (0.097) |
 | `MA_PERIOD` | Moving average period (10) |
 | `CHART_HEIGHT_*` | Chart height constants |
+
+**Helper functions (v4.0):**
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `is_sector` | `(ws: str) -> bool` | Check if worksheet is a sector |
+| `is_industry` | `(ws: str) -> bool` | Check if worksheet is an industry |
 
 ### 4.1 db_client.py — Data Access Layer
 
@@ -379,7 +410,7 @@ Centrally manages constants used across all modules.
 | `upsert_raw_data` | `(date, worksheet, count, total) -> None` | Single row UPSERT with worksheet + count/total validation |
 | `upsert_bulk` | `(df: DataFrame) -> None` | DataFrame bulk UPSERT with comprehensive validation (v3.2) |
 | `fetch_raw_data` | `(worksheet: str) -> DataFrame` | Fetch all data for specified category |
-| `fetch_all_raw_data` | `() -> Dict[str, DataFrame]` | Fetch all 12 categories at once |
+| `fetch_all_raw_data` | `(worksheets=None) -> Dict[str, DataFrame]` | Fetch categories (all if None, filtered subset if specified, v4.0) |
 | `get_worksheets` | `() -> List[str]` | List of registered category names |
 | `get_date_range` | `(worksheet: str) -> Tuple[str, str]` | Date range for specified category |
 
@@ -434,7 +465,11 @@ ORDER BY date ASC
 
 | Function | TTL | Description |
 |----------|-----|-------------|
-| `load_all_data()` | 3600 sec | Module-level cache wrapper. Executes `fetch_all_raw_data()` + `calculate_indicators()` together |
+| `load_all_data()` | — | Loads all 161 worksheets + `calculate_indicators()`. No direct caching |
+| `load_sector_data()` | — | Loads `["all"] + SECTORS` (12 worksheets) + `calculate_indicators()` (v4.0) |
+| `load_industry_data()` | — | Loads industries (optional sector filter) + `calculate_indicators()` (v4.0) |
+| `cached_load_all_data()` | 3600 sec | `@st.cache_data` wrapper for `load_all_data()`, cross-page shared (v4.0) |
+| `cached_load_sector_data()` | 3600 sec | `@st.cache_data` wrapper for `load_sector_data()`, cross-page shared (v4.0) |
 
 ### 4.2 indicator_calculator.py — Derived Indicator Calculation Layer (new)
 
@@ -503,6 +538,10 @@ Responsibility changes from v1:
 | `filter_by_date_range` | `(df, start, end) -> DataFrame` | Date range filter |
 | `prepare_timeseries_csv` | `(df: DataFrame) -> DataFrame` | Select/format columns for time series CSV export (v3.4) |
 | `prepare_all_timeseries_csv` | `(all_data: Dict[str, DataFrame]) -> DataFrame` | Combine all worksheets into single timeseries CSV with `worksheet` column (v3.5) |
+| `get_industry_display_name` | `(name: str) -> str` | Industry key → display name conversion (v4.0) |
+| `build_industry_summary` | `(all_data: Dict, sector_key=None) -> DataFrame` | Industry summary (all or filtered by sector, v4.0) |
+| `get_sector_for_industry` | `(industry_key: str) -> Optional[str]` | Reverse lookup: industry → parent sector (v4.0) |
+| `style_status_row` | `(row) -> list` | Row styling for Trend/Status columns, shared across pages (v4.0) |
 
 **MarketStatus dataclass (new in v2.2):**
 
@@ -558,7 +597,9 @@ v2.1 removed signal markers and switched to Ratio line color coding. v2.2 split 
 |----------|-----------|-------------|
 | `build_ratio_chart` | `(df, title) -> go.Figure` | Ratio time series chart (calls helpers below) |
 | `build_sector_summary_chart` | `(summary_df) -> go.Figure` | Sector horizontal bar chart (with `customdata` for click navigation, v3.3) |
-| `build_sector_comparison_chart` | `(all_data, selected, use_ma=True) -> go.Figure` | Sector comparison overlay (v2.3 revision) |
+| `build_sector_comparison_chart` | `(all_data, selected, use_ma=True) -> go.Figure` | Sector comparison overlay (v2.3, refactored v4.0) |
+| `build_industry_summary_chart` | `(summary_df, sector_name="") -> go.Figure` | Industry horizontal bar chart with click navigation (v4.0) |
+| `build_industry_comparison_chart` | `(all_data, selected_industries=None, use_ma=True) -> go.Figure` | Industry comparison overlay (v4.0) |
 
 **build_ratio_chart Internal Helpers (v2.2 decomposition):**
 
@@ -730,6 +771,14 @@ Screen layout is unchanged from v1. Only the data source changes; UI remains the
 │ └─────────────────────────────────────────────────────────┘ │
 │                                                             │
 │ ─────────────────────────────────────────────────────────── │
+│ Industries in {Sector}                              (v4.0)  │
+│ ┌─────────────────────┐ ┌───────────────────────────────┐  │
+│ │ [Horizontal Bar     │ │ [Table: Industry, Ratio,      │  │
+│ │  Chart]             │ │  10MA, Trend, Slope, Status]  │  │
+│ │ (click→Ind Detail)  │ │ (click row→Industry Detail)   │  │
+│ └─────────────────────┘ └───────────────────────────────┘  │
+│                                                             │
+│ ─────────────────────────────────────────────────────────── │
 │ Data Download                                               │
 │ ┌───────────────────────────────────┐                       │
 │ │ Download {Sector} Time Series     │                       │
@@ -763,6 +812,58 @@ Screen layout is unchanged from v1. Only the data source changes; UI remains the
 ```
 
 v2.3 revision: Display mode radio buttons, 10MA/Raw toggle, threshold dashed lines, latest value annotations, Y-axis % format, legend sorting (latest value descending).
+
+### 5.4 Industry Detail Page (pages/3_Industry_Detail.py, v4.0)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Industry Detail                                             │
+│                                                             │
+│ Filter by Sector: [All Sectors ▼]                           │
+│ Select Industry: [Semiconductors ▼]                         │
+│ Parent Sector: Technology                                   │
+│                                                             │
+│ ┌──────┐┌──────┐┌──────┐┌──────┐┌────────┐                │
+│ │Ratio ││ 10MA ││Trend ││Slope ││ Status │                │
+│ └──────┘└──────┘└──────┘└──────┘└────────┘                │
+│                                                             │
+│ Date Range: [start] ~ [end]                                 │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │    [Ratio Chart — green/red/gray trend colors]          │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ─────────────────────────────────────────────────────────── │
+│ Data Download                                               │
+│ ┌───────────────────────────────────┐                       │
+│ │ Download {Industry} Time Series   │                       │
+│ └───────────────────────────────────┘                       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 5.5 Industry Comparison Page (pages/4_Industry_Comparison.py, v4.0)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Industry Comparison                                         │
+│                                                             │
+│ Compare Mode: (●) Within Sector  ( ) Cross-Sector           │
+│                                                             │
+│ [Within Sector mode:]                                       │
+│ Select Sector: [Technology ▼]                               │
+│ Select Industries: [x] Semiconductors [x] Software App ...  │
+│                                                             │
+│ [Cross-Sector mode:]                                        │
+│ Select Industries (max 15): [ ] Tech / Semiconductors ...   │
+│                                                             │
+│ Date Range: [start] ~ [end]                                 │
+│ Display Mode: (●) Smoothed (10MA)  ( ) Raw Ratio            │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │    [Multi-line Industry Comparison Chart]                │ │
+│ └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -821,7 +922,8 @@ uptrend-dashboard/
 ├── data/
 │   ├── uptrend.db                     # SQLite DB
 │   ├── uptrend_ratio_timeseries.csv   # All worksheets timeseries (v3.5, auto-generated)
-│   └── sector_summary.csv            # Sector summary snapshot (v3.5, auto-generated)
+│   ├── sector_summary.csv            # Sector summary snapshot (v3.5, auto-generated)
+│   └── industry_summary.csv          # Industry summary snapshot (v4.0, auto-generated)
 ├── docs/
 │   └── design.md                      # This design document
 ├── src/
@@ -843,8 +945,10 @@ uptrend-dashboard/
 │   ├── test_integration.py          # Integration tests (new in v2.2)
 │   └── test_data_collector.py        # data_collector tests (Phase 3)
 ├── pages/
-│   ├── 1_Sector_Detail.py            # Sector detail page
-│   └── 2_Sector_Comparison.py        # Sector comparison page
+│   ├── 1_Sector_Detail.py            # Sector detail page (+ industry drilldown v4.0)
+│   ├── 2_Sector_Comparison.py        # Sector comparison page
+│   ├── 3_Industry_Detail.py          # Industry detail page (v4.0)
+│   └── 4_Industry_Comparison.py      # Industry comparison page (v4.0)
 ├── app.py                            # Main page
 ├── import_excel.py                   # Excel import CLI tool (Phase 1)
 ├── collect.py                        # Finviz data collection CLI tool (Phase 3)
@@ -935,6 +1039,13 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_bulk_upsert_rejects_missing_columns | Missing required columns → ValueError (v3.2) |
 | test_bulk_upsert_rejects_negative_values | Negative values in bulk → ValueError (v3.2) |
 | test_bulk_upsert_rejects_count_exceeding_total | count > total in bulk → ValueError (v3.2) |
+| test_upsert_accepts_industry_worksheet | `ind_semiconductors` accepted (v4.0) |
+| test_bulk_upsert_accepts_industry_worksheets | Bulk insert with `ind_*` (v4.0) |
+| test_fetch_all_raw_data_with_worksheets_filter | Worksheets subset filter (v4.0) |
+| test_fetch_all_raw_data_none_returns_all | worksheets=None returns all (v4.0) |
+| test_load_sector_data | Loads 12 sector worksheets (v4.0) |
+| test_load_industry_data_all | Loads all industries (v4.0) |
+| test_load_industry_data_sector_filter | Loads industries for specific sector (v4.0) |
 
 **test_indicator_calculator.py:**
 
@@ -982,8 +1093,19 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_empty_data | Empty dict → 0-row DataFrame with correct columns (v3.5) |
 | test_skips_empty_dataframes | Empty DataFrame worksheets are skipped (v3.5) |
 | test_date_format | date column is YYYY-MM-DD string (v3.5) |
+| test_get_industry_display_name | Industry key → display name (v4.0) |
+| test_get_industry_display_name_unknown | Unknown key fallback (v4.0) |
+| test_build_industry_summary | Industry summary generation (v4.0) |
+| test_build_industry_summary_sector_filter | Filter by sector_key (v4.0) |
+| test_build_industry_summary_no_filter | All industries when sector_key=None (v4.0) |
+| test_build_industry_summary_empty | Empty data handling (v4.0) |
+| test_get_sector_for_industry | Industry → sector lookup (v4.0) |
+| test_get_sector_for_industry_unknown | Unknown key → None (v4.0) |
+| test_build_sector_summary_excludes_industries | ind_* excluded from sector summary (v4.0) |
+| test_style_status_row_overbought | Overbought row styling (v4.0) |
+| test_style_status_row_normal_up | Normal/Up row styling (v4.0) |
 
-**test_export_csv.py (v3.5):**
+**test_export_csv.py (v3.5, extended v4.0):**
 
 | Test | Description |
 |------|-------------|
@@ -994,9 +1116,11 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_returns_results | Return value has timeseries/summary with path and rows (v3.5) |
 | test_empty_db | Empty DB returns empty dict (v3.5) |
 | test_cli_db_not_found | Non-existent DB → exit code 1 (v3.5) |
+| test_creates_industry_summary_file | Industry summary CSV is created (v4.0) |
+| test_industry_summary_excludes_key_column | Industry summary excludes _key column (v4.0) |
 | test_cli_output_dir_not_found | Non-existent output dir → exit code 1 (v3.5) |
 
-**test_chart_builder.py (continued from v1):**
+**test_chart_builder.py (continued from v1, extended v4.0):**
 
 | Test | Description |
 |------|-------------|
@@ -1015,8 +1139,18 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_sector_comparison_annotations | Latest value annotations (one per sector) |
 | test_sector_comparison_legend_sorted_by_latest_value | Legend sorted by latest value descending |
 | test_sector_comparison_custom_colors | Custom palette usage verification |
+| test_industry_summary_chart | Industry summary chart returns go.Figure (v4.0) |
+| test_industry_summary_chart_customdata | customdata has ind_* keys (v4.0) |
+| test_industry_summary_chart_dynamic_height | Dynamic height based on bar count (v4.0) |
+| test_industry_summary_chart_title_with_sector | Title includes sector name (v4.0) |
+| test_industry_summary_chart_title_without_sector | Title without sector name (v4.0) |
+| test_industry_comparison_chart | Industry comparison trace count (v4.0) |
+| test_industry_comparison_selected | Selection filter (v4.0) |
+| test_industry_comparison_palette | Industry palette used (v4.0) |
+| test_industry_comparison_title | Chart title (v4.0) |
+| test_sector_comparison_excludes_industries | ind_* excluded from sector comparison (v4.0) |
 
-**test_import_excel.py:**
+**test_import_excel.py (extended v4.0):**
 
 | Test | Description |
 |------|-------------|
@@ -1027,6 +1161,7 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_date_format_conversion | Dates stored as YYYY-MM-DD |
 | test_dry_run | Dry run does not write to DB |
 | test_invalid_count_total_rows_are_dropped | Non-integer/negative/count>total rows excluded (v3.2) |
+| test_import_industry_sheet | ind_semiconductors sheet accepted (v4.0) |
 
 **test_integration.py (new in v2.2):**
 
@@ -1065,6 +1200,31 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_cli_exit_code_partial_failure | Partial failure → exit 2 (v3.1) |
 | test_cli_worksheet_error_exit_code | --worksheet failure → exit 1 (v3.1) |
 | test_cli_invalid_date_format | Invalid date → exit 1 (v3.1) |
+| test_collect_worksheet_industry | ind_semiconductors collection (v4.0) |
+| test_collect_all_scope_sectors | scope=SECTORS collects 12 worksheets (v4.0) |
+| test_collect_all_scope_industries | scope=INDUSTRIES collects 149 worksheets (v4.0) |
+| test_collect_all_returns_collect_result | Return type is CollectResult (v4.0) |
+| test_collect_result_sector_industry_split | Sector/industry property split (v4.0) |
+| test_build_url_with_industry | ind_semiconductors in URL (v4.0) |
+| test_cli_scope_argument | --scope sectors passes CollectScope.SECTORS (v4.0) |
+| test_cli_scope_worksheet_simultaneous_error | --worksheet + --scope (any value) → exit 1 (v4.0) |
+| test_cli_scope_all_sector_partial_fail_exit2 | Sector partial fail → exit 2 (v4.0) |
+| test_cli_scope_all_industry_partial_fail_exit0 | Industry fail + sectors OK → exit 0 (v4.0) |
+| test_cli_scope_all_industry_all_fail_exit2 | All sectors OK + all industries failed → exit 2 (v4.0) |
+
+**test_constants.py (v4.0):**
+
+| Test | Description |
+|------|-------------|
+| test_industries_count | INDUSTRIES has 149 entries |
+| test_valid_worksheets_count | VALID_WORKSHEETS has 161 entries |
+| test_all_industries_have_display_names | All INDUSTRIES have INDUSTRY_DISPLAY_NAMES |
+| test_all_industries_in_exactly_one_sector | Each industry belongs to exactly one sector |
+| test_industry_to_sector_matches_industries | INDUSTRY_TO_SECTOR keys match INDUSTRIES |
+| test_no_duplicate_industries | No duplicates in INDUSTRIES |
+| test_sector_industries_keys_are_valid_sectors | SECTOR_INDUSTRIES keys are valid SECTORS |
+| test_is_sector | is_sector() helper function |
+| test_is_industry | is_industry() helper function |
 
 ### 9.3 Test Fixtures (conftest.py)
 
@@ -1074,6 +1234,8 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | `sample_raw_df` | `DataFrame` | 20-row sample with date, count, total |
 | `sample_calculated_df` | `DataFrame` | DataFrame with calculate_indicators applied (no signals) |
 | `sample_all_data` | `Dict[str, DataFrame]` | Data for all 12 categories |
+| `sample_industry_data` | `Dict[str, DataFrame]` | Data for 3 industry worksheets (v4.0) |
+| `sample_all_data_with_industries` | `Dict[str, DataFrame]` | sample_all_data + 3 industry entries (v4.0) |
 
 ### 9.4 Mock Targets
 
@@ -1257,11 +1419,17 @@ collect.py (CLI)
 #### collect.py CLI Design
 
 ```bash
-# Fetch all categories (default)
+# Fetch all categories (default: --scope all = 161 worksheets)
 python collect.py
 
+# Scope: sectors only (12 worksheets)
+python collect.py --scope sectors
+
+# Scope: industries only (149 worksheets)
+python collect.py --scope industries
+
 # Specific category only
-python collect.py --worksheet all
+python collect.py --worksheet ind_semiconductors
 
 # Specify date (for past data correction) — validates YYYY-MM-DD format
 python collect.py --date 2026-02-07
@@ -1273,13 +1441,26 @@ python collect.py --dry-run
 python collect.py --verbose
 ```
 
-**Exit codes (v3.1):**
+**`--worksheet` and `--scope` are mutually exclusive.** Specifying both causes exit 1.
 
-| Code | Meaning |
-|------|---------|
-| 0 | All 12 worksheets succeeded |
-| 1 | All failed (0 results), API key not set, invalid date format, exception in `--worksheet` mode |
-| 2 | Partial failure (1–11 worksheets succeeded) |
+**CollectScope enum (v4.0):**
+
+| Value | Worksheets |
+|-------|-----------|
+| `SECTORS` | `["all"] + SECTORS` (12) |
+| `INDUSTRIES` | `INDUSTRIES` (149) |
+| `ALL` | `VALID_WORKSHEETS` (161) |
+
+**CollectResult dataclass (v4.0):** Return value of `collect_all()`. Contains `succeeded` dict and `failed` list, with properties for sector/industry split (`sector_succeeded`, `industry_succeeded`, `sector_failed`, `industry_failed`).
+
+**Exit codes (v4.0):**
+
+| Scope | Code 0 | Code 1 | Code 2 |
+|-------|--------|--------|--------|
+| `--scope all` | All sectors succeeded (industry failures = warning) | All sectors failed | Partial sector failure, or all industries failed (sectors OK) |
+| `--scope sectors` | All 12 succeeded | All failed | Partial failure |
+| `--scope industries` | Any succeeded | All failed | — |
+| `--worksheet` | Success | Failure | — |
 
 **Scheduled execution (cron example):**
 

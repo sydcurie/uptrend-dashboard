@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-US Market Uptrend Dashboard — A Streamlit-based sector-level uptrend analysis dashboard. Uses SQLite (not DuckDB) as the backend, computing indicators on-the-fly from raw data (count, total) imported from Excel.
+US Market Uptrend Dashboard — A Streamlit-based sector and industry-level uptrend analysis dashboard. Tracks 161 worksheets (1 market + 11 sectors + 149 industries). Uses SQLite (not DuckDB) as the backend, computing indicators on-the-fly from raw data (count, total).
 
 ## Commands
 
@@ -54,8 +54,8 @@ Storage (data/uptrend.db) — uptrend_raw table, PK: (date, worksheet)
 ```sql
 uptrend_raw (date TEXT, worksheet TEXT, count INTEGER, total INTEGER)
 -- PK: (date, worksheet)
--- worksheets: 'all' + 11 sectors (sec_technology, sec_financial, etc.)
--- 12 rows/day, ~4,720 rows current
+-- worksheets: 'all' + 11 sectors (sec_*) + 149 industries (ind_*)
+-- 161 rows/day
 ```
 
 ### Indicator Thresholds
@@ -69,8 +69,10 @@ uptrend_raw (date TEXT, worksheet TEXT, count INTEGER, total INTEGER)
 
 Streamlit auto-discovers `pages/` directory:
 - `app.py` — Full market overview
-- `pages/1_Sector_Detail.py` — Individual sector deep dive
+- `pages/1_Sector_Detail.py` — Individual sector deep dive + industry drilldown
 - `pages/2_Sector_Comparison.py` — Multi-sector overlay comparison
+- `pages/3_Industry_Detail.py` — Individual industry analysis
+- `pages/4_Industry_Comparison.py` — Multi-industry overlay (within/cross-sector)
 
 ## Testing
 

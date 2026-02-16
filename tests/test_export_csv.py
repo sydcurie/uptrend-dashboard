@@ -96,6 +96,26 @@ class TestExportCsv:
         assert "rows" in result["summary"]
         assert result["summary"]["rows"] == 11
 
+    def test_creates_industry_summary_file(self, populated_db, tmp_path):
+        """CSV industry summary file should be created."""
+        from export_csv import export_csv
+
+        output_dir = str(tmp_path / "output")
+        os.makedirs(output_dir)
+        result = export_csv(populated_db, output_dir)
+        assert "industry_summary" in result
+        assert os.path.isfile(result["industry_summary"]["path"])
+
+    def test_industry_summary_excludes_key_column(self, populated_db, tmp_path):
+        """Industry summary CSV should not have _key column."""
+        from export_csv import export_csv
+
+        output_dir = str(tmp_path / "output")
+        os.makedirs(output_dir)
+        result = export_csv(populated_db, output_dir)
+        df = pd.read_csv(result["industry_summary"]["path"])
+        assert "_key" not in df.columns
+
     def test_empty_db(self, empty_db, tmp_path):
         """Empty DB should return empty dict."""
         from export_csv import export_csv

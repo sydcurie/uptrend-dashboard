@@ -7,9 +7,21 @@ from typing import Dict, Optional
 import pandas as pd
 import numpy as np
 
-from src.constants import SECTOR_DISPLAY_NAMES
+from src.constants import (
+    INDUSTRY_DISPLAY_NAMES,
+    INDUSTRY_TO_SECTOR,
+    SECTOR_DISPLAY_NAMES,
+    SECTOR_INDUSTRIES,
+)
 
 logger = logging.getLogger(__name__)
+
+
+STATUS_STYLES = {
+    "Overbought": "color: #d62728",
+    "Oversold": "color: #2ca02c",
+    "Normal": "color: #1f77b4",
+}
 
 
 @dataclass
@@ -73,20 +85,33 @@ def get_sector_display_name(worksheet_name: str) -> str:
     return SECTOR_DISPLAY_NAMES.get(suffix, suffix.title())
 
 
+def get_industry_display_name(worksheet_name: str) -> str:
+    """Convert worksheet name like 'ind_semiconductors' to 'Semiconductors'."""
+    suffix = worksheet_name.replace("ind_", "", 1)
+    return INDUSTRY_DISPLAY_NAMES.get(suffix, suffix.title())
+
+
+def get_sector_for_industry(industry_key: str) -> Optional[str]:
+    """Return the parent sector key for an industry, or None if unknown."""
+    return INDUSTRY_TO_SECTOR.get(industry_key)
+
+
+def _determine_market_status(status: MarketStatus) -> str:
+    """Determine market status label from a MarketStatus object."""
+    if status["is_overbought"]:
+        return "Overbought"
+    elif status["is_oversold"]:
+        return "Oversold"
+    return "Normal"
+
+
 def build_sector_summary(all_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     """Build a summary DataFrame of all sectors' latest status."""
     rows = []
     for name, df in all_data.items():
-        if name == "all" or df.empty:
+        if not name.startswith("sec_") or df.empty:
             continue
         status = get_current_status(df)
-        if status["is_overbought"]:
-            market_status = "Overbought"
-        elif status["is_oversold"]:
-            market_status = "Oversold"
-        else:
-            market_status = "Normal"
-
         rows.append(
             {
                 "Sector": get_sector_display_name(name),
@@ -94,7 +119,7 @@ def build_sector_summary(all_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
                 "10MA": status["ratio_10ma"],
                 "Trend": "Up" if status["trend"] == "up" else "Down",
                 "Slope": status["slope"],
-                "Status": market_status,
+                "Status": _determine_market_status(status),
                 "_key": name,
             }
         )
@@ -105,6 +130,61 @@ def build_sector_summary(all_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     summary = pd.DataFrame(rows)
     summary = summary.sort_values("Ratio", ascending=False).reset_index(drop=True)
     return summary
+
+
+def build_industry_summary(
+    all_data: Dict[str, pd.DataFrame],
+    sector_key: Optional[str] = None,
+) -> pd.DataFrame:
+    """Build a summary DataFrame of industries' latest status.
+
+    Args:
+        all_data: Dict mapping worksheet name to calculated DataFrame.
+        sector_key: If given, only include industries in this sector.
+    """
+    if sector_key is not None:
+        target_keys = set(SECTOR_INDUSTRIES.get(sector_key, []))
+    else:
+        target_keys = None
+
+    rows = []
+    for name, df in all_data.items():
+        if not name.startswith("ind_") or df.empty:
+            continue
+        if target_keys is not None and name not in target_keys:
+            continue
+        status = get_current_status(df)
+        rows.append(
+            {
+                "Industry": get_industry_display_name(name),
+                "Ratio": status["ratio"],
+                "10MA": status["ratio_10ma"],
+                "Trend": "Up" if status["trend"] == "up" else "Down",
+                "Slope": status["slope"],
+                "Status": _determine_market_status(status),
+                "_key": name,
+            }
+        )
+
+    if not rows:
+        return pd.DataFrame(columns=["Industry", "Ratio", "10MA", "Trend", "Slope", "Status", "_key"])
+
+    summary = pd.DataFrame(rows)
+    summary = summary.sort_values("Ratio", ascending=False).reset_index(drop=True)
+    return summary
+
+
+def style_status_row(row):
+    """Apply color styling to Trend and Status columns in a summary row."""
+    styles = []
+    for col in row.index:
+        if col == "Trend":
+            styles.append("color: #00cc96" if row["Trend"] == "Up" else "color: #ef553b")
+        elif col == "Status":
+            styles.append(STATUS_STYLES.get(row["Status"], ""))
+        else:
+            styles.append("")
+    return styles
 
 
 def prepare_timeseries_csv(df: pd.DataFrame) -> pd.DataFrame:

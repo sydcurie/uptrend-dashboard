@@ -4,7 +4,7 @@ import pytest
 import pandas as pd
 import numpy as np
 
-from src.constants import SECTORS, VALID_WORKSHEETS as ALL_WORKSHEET_NAMES
+from src.constants import SECTORS, SECTOR_INDUSTRIES, VALID_WORKSHEETS as ALL_WORKSHEET_NAMES
 
 
 @pytest.fixture
@@ -67,3 +67,24 @@ def sample_all_data(sample_raw_df):
         df["count"] = (df["count"] * factor).astype(int)
         data[sector] = calculate_indicators(df)
     return data
+
+
+@pytest.fixture
+def sample_industry_data(sample_raw_df):
+    """Dict of 3 industry worksheet names -> calculated DataFrames."""
+    from src.indicator_calculator import calculate_indicators
+
+    keys = ["ind_semiconductors", "ind_softwareapplication", "ind_banksregional"]
+    data = {}
+    for i, key in enumerate(keys):
+        df = sample_raw_df.copy()
+        factor = 0.7 + i * 0.1
+        df["count"] = (df["count"] * factor).astype(int)
+        data[key] = calculate_indicators(df)
+    return data
+
+
+@pytest.fixture
+def sample_all_data_with_industries(sample_all_data, sample_industry_data):
+    """sample_all_data extended with 3 industry entries."""
+    return {**sample_all_data, **sample_industry_data}

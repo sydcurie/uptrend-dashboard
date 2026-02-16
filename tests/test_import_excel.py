@@ -142,3 +142,17 @@ class TestImportExcel:
         rows = cursor.fetchall()
         conn.close()
         assert rows == [("2024-01-05", 80, 100)]
+
+    def test_import_industry_sheet(self, tmp_path, tmp_db):
+        """Industry worksheet names (ind_*) should be accepted."""
+        filepath = tmp_path / "industry.xlsx"
+        with pd.ExcelWriter(filepath, engine="openpyxl") as writer:
+            df = pd.DataFrame({
+                "Date": ["1/2/2024", "1/3/2024"],
+                "Count": [30, 35],
+                "Total": [80, 80],
+            })
+            df.to_excel(writer, sheet_name="ind_semiconductors", index=False)
+        result = import_excel(str(filepath), db_path=tmp_db)
+        assert "ind_semiconductors" in result
+        assert result["ind_semiconductors"] == 2

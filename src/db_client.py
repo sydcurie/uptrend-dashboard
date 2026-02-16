@@ -5,11 +5,11 @@ import numbers
 import os
 import sqlite3
 from contextlib import contextmanager
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from src.constants import VALID_WORKSHEETS
+from src.constants import INDUSTRIES, SECTORS, SECTOR_INDUSTRIES, VALID_WORKSHEETS
 
 
 logger = logging.getLogger(__name__)
@@ -144,9 +144,17 @@ class DBClient:
             df = pd.DataFrame(columns=["date", "count", "total"])
         return df
 
-    def fetch_all_raw_data(self) -> Dict[str, pd.DataFrame]:
-        worksheets = self.get_worksheets()
-        return {ws: self.fetch_raw_data(ws) for ws in worksheets}
+    def fetch_all_raw_data(self, worksheets: Optional[List[str]] = None) -> Dict[str, pd.DataFrame]:
+        """Fetch raw data for specified worksheets or all available.
+
+        Args:
+            worksheets: List of worksheet keys to fetch. None fetches all.
+        """
+        if worksheets is None:
+            target = self.get_worksheets()
+        else:
+            target = worksheets
+        return {ws: self.fetch_raw_data(ws) for ws in target}
 
     def get_worksheets(self) -> List[str]:
         with self._connection() as conn:
@@ -164,16 +172,47 @@ class DBClient:
         return (row[0], row[1])
 
 
-def load_all_data(db_path: str = None) -> Dict[str, pd.DataFrame]:
-    """Load all data from SQLite and calculate indicators.
-
-    This function is intended to be wrapped with @st.cache_data(ttl=3600)
-    in the Streamlit app layer.
-    """
+def _load_data_for_worksheets(db_path: str, worksheets: Optional[List[str]]) -> Dict[str, pd.DataFrame]:
+    """Shared loader: fetch raw data for given worksheets and calculate indicators."""
     from src.indicator_calculator import calculate_indicators
 
     if db_path is None:
         db_path = os.environ.get("DB_PATH", "data/uptrend.db")
     client = DBClient(db_path)
-    raw_data = client.fetch_all_raw_data()
+    raw_data = client.fetch_all_raw_data(worksheets=worksheets)
     return {name: calculate_indicators(df) for name, df in raw_data.items() if not df.empty}
+
+
+def load_all_data(db_path: str = None) -> Dict[str, pd.DataFrame]:
+    """Load all data from SQLite and calculate indicators."""
+    return _load_data_for_worksheets(db_path, worksheets=None)
+
+
+def load_sector_data(db_path: str = None) -> Dict[str, pd.DataFrame]:
+    """Load only 'all' + sector data (no industries)."""
+    return _load_data_for_worksheets(db_path, worksheets=["all"] + SECTORS)
+
+
+def load_industry_data(db_path: str = None, sector: str = None) -> Dict[str, pd.DataFrame]:
+    """Load industry data. If sector given, only its child industries."""
+    if sector is not None:
+        target = SECTOR_INDUSTRIES.get(sector, [])
+    else:
+        target = INDUSTRIES
+    return _load_data_for_worksheets(db_path, worksheets=target)
+
+
+# Streamlit cache wrappers — pages import these for cross-page cache sharing
+try:
+    import streamlit as st
+    _cache = st.cache_data(ttl=3600)
+except Exception:
+    _cache = lambda f: f
+
+@_cache
+def cached_load_sector_data(db_path=None):
+    return load_sector_data(db_path)
+
+@_cache
+def cached_load_all_data(db_path=None):
+    return load_all_data(db_path)

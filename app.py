@@ -5,12 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from src.db_client import load_all_data
+from src.db_client import cached_load_sector_data
 from src.data_processor import (
     get_current_status,
     build_sector_summary,
     filter_by_date_range,
     prepare_timeseries_csv,
+    style_status_row,
 )
 from src.chart_builder import build_ratio_chart, build_sector_summary_chart
 
@@ -23,10 +24,9 @@ st.set_page_config(
 st.title("US Market Uptrend Stock Ratio")
 
 
-@st.cache_data(ttl=3600)
 def load_data():
-    """Load and process all data from SQLite."""
-    return load_all_data()
+    """Load sector data from SQLite (cached cross-page)."""
+    return cached_load_sector_data()
 
 
 # Sidebar
@@ -123,29 +123,10 @@ if event and event.selection and event.selection.points:
         st.session_state["selected_sector"] = customdata
         st.switch_page("pages/1_Sector_Detail.py")
 
-STATUS_STYLES = {
-    "Overbought": "color: #d62728",
-    "Oversold": "color: #2ca02c",
-    "Normal": "color: #1f77b4",
-}
-
-
-def color_row(row):
-    styles = []
-    for col in row.index:
-        if col == "Trend":
-            styles.append("color: #00cc96" if row["Trend"] == "Up" else "color: #ef553b")
-        elif col == "Status":
-            styles.append(STATUS_STYLES.get(row["Status"], ""))
-        else:
-            styles.append("")
-    return styles
-
-
 table_event = st.dataframe(
     summary.drop(columns=["_key"]).style
     .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"})
-    .apply(color_row, axis=1),
+    .apply(style_status_row, axis=1),
     use_container_width=True,
     hide_index=True,
     on_select="rerun",
