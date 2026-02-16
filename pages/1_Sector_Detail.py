@@ -74,10 +74,10 @@ with col1:
 with col2:
     st.metric("10MA", f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] is not None else "N/A")
 with col3:
-    trend_icon = "🔼" if status["trend"] == "up" else "🔽"
-    st.metric("Trend", f"{trend_icon} {status['trend'].title()}")
+    trend_icons = {"up": "🔼", "down": "🔽", "neutral": "➖"}
+    st.metric("Trend", f"{trend_icons.get(status['trend'], '➖')} {status['trend'].title()}")
 with col4:
-    st.metric("Slope", f"{status['slope']:.4f}")
+    st.metric("Slope", f"{status['slope']:.4f}" if status["slope"] is not None else "N/A")
 with col5:
     if status["is_overbought"]:
         st.metric("Status", "⚠️ Overbought")
@@ -132,7 +132,7 @@ if has_industry_data:
 
         ind_table_event = st.dataframe(
             ind_summary.drop(columns=["_key"]).style
-            .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"})
+            .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"}, na_rep="N/A")
             .apply(style_status_row, axis=1),
             use_container_width=True,
             hide_index=True,
@@ -152,10 +152,20 @@ else:
 # Data Download
 st.markdown("---")
 st.subheader("Data Download")
-ts_csv = prepare_timeseries_csv(df_filtered)
-st.download_button(
-    f"Download {selected_display} Time Series",
-    ts_csv.to_csv(index=False),
-    f"{selected_key}_timeseries.csv",
-    "text/csv",
-)
+col_dl1, col_dl2 = st.columns(2)
+with col_dl1:
+    ts_csv = prepare_timeseries_csv(df_filtered)
+    st.download_button(
+        f"Download {selected_display} Time Series",
+        ts_csv.to_csv(index=False),
+        f"{selected_key}_timeseries.csv",
+        "text/csv",
+    )
+with col_dl2:
+    if has_industry_data and not ind_summary.empty:
+        st.download_button(
+            f"Download {selected_display} Industry Summary",
+            ind_summary.drop(columns=["_key"]).to_csv(index=False),
+            f"{selected_key}_industry_summary.csv",
+            "text/csv",
+        )

@@ -94,10 +94,10 @@ with col1:
 with col2:
     st.metric("10MA", f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] is not None else "N/A")
 with col3:
-    trend_icon = "🔼" if status["trend"] == "up" else "🔽"
-    st.metric("Trend", f"{trend_icon} {status['trend'].title()}")
+    trend_icons = {"up": "🔼", "down": "🔽", "neutral": "➖"}
+    st.metric("Trend", f"{trend_icons.get(status['trend'], '➖')} {status['trend'].title()}")
 with col4:
-    st.metric("Slope", f"{status['slope']:.4f}")
+    st.metric("Slope", f"{status['slope']:.4f}" if status["slope"] is not None else "N/A")
 with col5:
     if status["is_overbought"]:
         st.metric("Status", "⚠️ Overbought")
