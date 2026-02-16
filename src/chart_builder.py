@@ -13,6 +13,7 @@ from src.constants import (
     CHART_HEIGHT_RATIO,
     CHART_HEIGHT_SUMMARY,
     CHART_HEIGHT_COMPARISON,
+    CHART_HEIGHT_HEATMAP,
     CHART_Y_MAX_MIN,
     CHART_Y_MAX_MULTIPLIER,
 )
@@ -464,3 +465,144 @@ def build_industry_comparison_chart(
         use_ma=use_ma,
         title_prefix="Industry Comparison",
     )
+
+
+def build_industry_heatmap(
+    summary_df: pd.DataFrame,
+    color_mode: str = "ratio",
+    size_mode: str = "uniform",
+) -> go.Figure:
+    """Build a treemap chart of all industries grouped by sector.
+
+    Args:
+        summary_df: DataFrame from build_industry_summary_with_sector().
+            Expected columns: Industry, Ratio, 10MA, Trend, Slope, Status, _key, Sector, Total.
+        color_mode: "ratio" for continuous RdYlGn colorscale, "status" for categorical colors.
+        size_mode: "uniform" for equal cell sizes, "count" for stock count-based sizes.
+
+    Returns:
+        Plotly Figure with a Treemap trace.
+    """
+    fig = go.Figure()
+
+    if summary_df.empty:
+        fig.add_trace(go.Treemap(labels=[], parents=[], values=[]))
+        fig.update_layout(
+            title="Industry Heatmap",
+            height=CHART_HEIGHT_HEATMAP,
+            template="plotly_white",
+        )
+        return fig
+
+    # Build treemap data: root ("") -> sectors -> industries
+    sectors = summary_df["Sector"].unique().tolist()
+
+    labels = []
+    parents = []
+    values = []
+    colors = []
+    customdata = []
+    text = []
+    hovertext = []
+
+    # Add sector nodes
+    for sector in sectors:
+        labels.append(sector)
+        parents.append("")
+        values.append(0)
+        colors.append("#cccccc")
+        customdata.append("")
+        text.append("")
+        hovertext.append(sector)
+
+    # Add industry nodes
+    for _, row in summary_df.iterrows():
+        labels.append(row["Industry"])
+        parents.append(row["Sector"])
+
+        if size_mode == "count":
+            values.append(int(row["Total"]))
+        else:
+            values.append(1)
+
+        if color_mode == "status":
+            colors.append(STATUS_COLORS.get(row["Status"], "#1f77b4"))
+        else:
+            colors.append(None)  # placeholder, will use colorscale
+
+        customdata.append(row["_key"])
+
+        ratio_pct = f"{row['Ratio']:.1%}" if pd.notna(row["Ratio"]) else "N/A"
+        name = row["Industry"]
+        short_name = name[:14] + "…" if len(name) > 15 else name
+        text.append(f"{short_name}<br>{ratio_pct}")
+
+        ma_str = f"{row['10MA']:.1%}" if pd.notna(row["10MA"]) else "N/A"
+        slope_str = f"{row['Slope']:.4f}" if pd.notna(row["Slope"]) else "N/A"
+        hovertext.append(
+            f"<b>{row['Industry']}</b><br>"
+            f"Ratio: {ratio_pct}<br>"
+            f"10MA: {ma_str}<br>"
+            f"Trend: {row['Trend']}<br>"
+            f"Slope: {slope_str}<br>"
+            f"Status: {row['Status']}"
+        )
+
+    if color_mode == "ratio":
+        # Build marker colors array: ratio values for industries, NaN for sectors
+        marker_values = []
+        for i, label in enumerate(labels):
+            if label in sectors:
+                marker_values.append(np.nan)
+            else:
+                idx = len(sectors) + (i - len(sectors))
+                row = summary_df.iloc[i - len(sectors)]
+                marker_values.append(row["Ratio"] if pd.notna(row["Ratio"]) else 0)
+
+        valid_ratios = summary_df["Ratio"].dropna()
+        cmin = max(0, valid_ratios.min()) if len(valid_ratios) > 0 else 0
+        cmax = valid_ratios.max() if len(valid_ratios) > 0 else 1
+
+        fig.add_trace(
+            go.Treemap(
+                labels=labels,
+                parents=parents,
+                values=values,
+                marker=dict(
+                    colors=marker_values,
+                    colorscale="RdYlGn",
+                    cmin=cmin,
+                    cmax=cmax,
+                    showscale=True,
+                    colorbar=dict(title="Ratio"),
+                ),
+                customdata=customdata,
+                text=text,
+                textinfo="text",
+                hovertext=hovertext,
+                hoverinfo="text",
+            )
+        )
+    else:
+        fig.add_trace(
+            go.Treemap(
+                labels=labels,
+                parents=parents,
+                values=values,
+                marker=dict(colors=colors),
+                customdata=customdata,
+                text=text,
+                textinfo="text",
+                hovertext=hovertext,
+                hoverinfo="text",
+            )
+        )
+
+    fig.update_layout(
+        title="Industry Heatmap",
+        height=CHART_HEIGHT_HEATMAP,
+        template="plotly_white",
+        margin=dict(t=50, l=10, r=10, b=10),
+    )
+
+    return fig

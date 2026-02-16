@@ -9,6 +9,7 @@ from src.data_processor import (
     get_current_status,
     build_sector_summary,
     build_industry_summary,
+    build_industry_summary_with_sector,
     get_sector_display_name,
     get_industry_display_name,
     get_sector_for_industry,
@@ -112,6 +113,24 @@ class TestSectorDisplayName:
 class TestEmptyDataFrameGuards:
     """Tests for empty DataFrame handling."""
 
+    def test_get_current_status_neutral_trend(self):
+        """slope is NaN (insufficient data) should give trend='neutral'."""
+        df = pd.DataFrame({
+            "date": [pd.Timestamp("2024-01-01")],
+            "count": [100],
+            "total": [500],
+            "ratio": [0.20],
+            "ma_10": [np.nan],
+            "slope": [np.nan],
+            "trend_up": [np.nan],
+            "trend_down": [np.nan],
+            "upper": [0.37],
+            "lower": [0.097],
+        })
+        status = get_current_status(df)
+        assert status["trend"] == "neutral"
+        assert status["slope"] is None
+
     def test_get_current_status_empty_df(self):
         """Empty DataFrame should return default status values."""
         df = pd.DataFrame(columns=[
@@ -126,8 +145,8 @@ class TestEmptyDataFrameGuards:
         assert set(status.keys()) == expected_keys
         assert status["ratio"] == 0.0
         assert status["ratio_10ma"] is None
-        assert status["trend"] == "down"
-        assert status["slope"] == 0.0
+        assert status["trend"] == "neutral"
+        assert status["slope"] is None
         assert status["is_overbought"] is False
         assert status["is_oversold"] is False
 
@@ -357,6 +376,20 @@ class TestBuildIndustrySummary:
         summary = build_industry_summary(data, sector_key=None)
         assert len(summary) == 3
 
+    def test_build_industry_summary_neutral_trend(self):
+        """Industry with 1 day of data should show '—' for Trend."""
+        from src.indicator_calculator import calculate_indicators
+        data = {
+            "ind_semiconductors": calculate_indicators(pd.DataFrame({
+                "date": [pd.Timestamp("2024-01-02")],
+                "count": [100],
+                "total": [500],
+            })),
+        }
+        summary = build_industry_summary(data)
+        assert len(summary) == 1
+        assert summary.iloc[0]["Trend"] == "—"
+
     def test_build_industry_summary_empty(self):
         summary = build_industry_summary({})
         expected_columns = {"Industry", "Ratio", "10MA", "Trend", "Slope", "Status", "_key"}
@@ -371,6 +404,79 @@ class TestBuildIndustrySummary:
             assert not key.startswith("ind_"), f"Industry {key} should not be in sector summary"
 
 
+class TestBuildIndustrySummaryWithSector:
+    """Tests for build_industry_summary_with_sector function."""
+
+    def _make_industry_data(self):
+        """Create sample data with industry entries."""
+        from src.indicator_calculator import calculate_indicators
+        dates = pd.bdate_range("2024-01-02", periods=20, freq="B")
+        counts = [150, 170, 190, 200, 210, 220, 230, 240, 250, 245,
+                  230, 210, 195, 180, 170, 175, 185, 195, 210, 220]
+        base_df = pd.DataFrame({"date": dates, "count": counts, "total": [500] * 20})
+        data = {}
+        data["all"] = calculate_indicators(base_df)
+        data["sec_technology"] = calculate_indicators(base_df.copy())
+        for i, ind in enumerate(["ind_semiconductors", "ind_softwareapplication", "ind_banksregional"]):
+            df = base_df.copy()
+            df["count"] = (df["count"] * (0.8 + i * 0.1)).astype(int)
+            data[ind] = calculate_indicators(df)
+        return data
+
+    def test_build_industry_summary_with_sector_columns(self):
+        """Output should contain Sector and Total columns in addition to standard columns."""
+        data = self._make_industry_data()
+        summary = build_industry_summary_with_sector(data)
+        expected_columns = {"Industry", "Ratio", "10MA", "Trend", "Slope", "Status", "_key", "Sector", "Total"}
+        assert set(summary.columns) == expected_columns
+
+    def test_build_industry_summary_with_sector_sector_values(self):
+        """Sector column should match the parent sector display name."""
+        data = self._make_industry_data()
+        summary = build_industry_summary_with_sector(data)
+        semi_row = summary[summary["_key"] == "ind_semiconductors"].iloc[0]
+        assert semi_row["Sector"] == "Technology"
+        banks_row = summary[summary["_key"] == "ind_banksregional"].iloc[0]
+        assert banks_row["Sector"] == "Financial"
+
+    def test_build_industry_summary_with_sector_all_industries(self):
+        """All ind_* keys from input should appear in the output."""
+        data = self._make_industry_data()
+        summary = build_industry_summary_with_sector(data)
+        input_ind_keys = {k for k in data if k.startswith("ind_")}
+        output_keys = set(summary["_key"])
+        assert output_keys == input_ind_keys
+
+    def test_build_industry_summary_with_sector_empty(self):
+        """Empty data should return DataFrame with correct columns."""
+        summary = build_industry_summary_with_sector({})
+        expected_columns = {"Industry", "Ratio", "10MA", "Trend", "Slope", "Status", "_key", "Sector", "Total"}
+        assert set(summary.columns) == expected_columns
+        assert len(summary) == 0
+
+    def test_build_industry_summary_with_sector_total_values(self):
+        """Total should be the latest total value, with 0 corrected to 1."""
+        from src.indicator_calculator import calculate_indicators
+        dates = pd.bdate_range("2024-01-02", periods=5, freq="B")
+        data = {
+            "ind_semiconductors": calculate_indicators(pd.DataFrame({
+                "date": dates,
+                "count": [100, 110, 120, 130, 140],
+                "total": [500, 500, 500, 500, 500],
+            })),
+            "ind_softwareapplication": calculate_indicators(pd.DataFrame({
+                "date": dates,
+                "count": [0, 0, 0, 0, 0],
+                "total": [0, 0, 0, 0, 0],
+            })),
+        }
+        summary = build_industry_summary_with_sector(data)
+        semi_row = summary[summary["_key"] == "ind_semiconductors"].iloc[0]
+        assert semi_row["Total"] == 500
+        sw_row = summary[summary["_key"] == "ind_softwareapplication"].iloc[0]
+        assert sw_row["Total"] == 1  # 0 corrected to 1
+
+
 class TestStyleStatusRow:
     """Tests for style_status_row function."""
 
@@ -378,6 +484,11 @@ class TestStyleStatusRow:
         row = pd.Series({"Sector": "Technology", "Trend": "Up", "Status": "Normal"})
         styles = style_status_row(row)
         assert styles[1] == "color: #00cc96"
+
+    def test_style_status_row_neutral_trend(self):
+        row = pd.Series({"Sector": "Technology", "Trend": "—", "Status": "Normal"})
+        styles = style_status_row(row)
+        assert styles[1] == "color: #888888"
 
     def test_style_status_row_overbought(self):
         row = pd.Series({"Sector": "Technology", "Trend": "Up", "Status": "Overbought"})

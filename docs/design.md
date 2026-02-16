@@ -6,7 +6,7 @@
 | Project Name | uptrend-dashboard |
 | Created | 2026-02-08 |
 | Revised | 2026-02-16 |
-| Status | v4.0 Industry-level uptrend analysis |
+| Status | v4.2 Industry Heatmap page |
 
 ---
 
@@ -19,6 +19,8 @@
 | 2026-02-08 | v2.1 | Removed signal logic (Long/Short Entry/Exit). Changed chart trend display to green/red/gray color coding |
 | 2026-02-08 | v2.2 | Code review fixes. Improved DB connection management, centralized constants, empty data handling, added logging, test improvements |
 | 2026-02-08 | v2.3 | Sector Comparison chart improvements. 10MA display, threshold lines, custom palette, latest value annotations, Y-axis % format, legend sorting |
+| 2026-02-16 | v4.2 | Industry Heatmap: Treemap page for all 149 industries, grouped by sector with RdYlGn colorscale |
+| 2026-02-16 | v4.1 | Sector Detail: added Industry Summary CSV download button (2-column layout) |
 | 2026-02-16 | v4.0 | Industry-level uptrend analysis: 149 industries, Industry Detail/Comparison pages, data collection scope, CSV export |
 | 2026-02-14 | v3.5 | Automated CSV export via GitHub Actions for LLM data access via raw URL |
 | 2026-02-14 | v3.4 | CSV download buttons on main page for LLM data analysis |
@@ -37,7 +39,7 @@
 - **Data processor**: `get_industry_display_name()`, `build_industry_summary()`, `get_sector_for_industry()`, `style_status_row()` shared across pages
 - **DB client**: `load_sector_data()`, `load_industry_data()`, `fetch_all_raw_data(worksheets=)` filter, `cached_load_sector_data()` / `cached_load_all_data()` cross-page cache
 - **CSV export**: Added `industry_summary.csv` as 3rd export file
-- **Tests**: 132 → 187 tests
+- **Tests**: 132 → 187 tests (→ 204 after v4.2)
 
 ### v3.5 Key Changes (Automated CSV Export)
 
@@ -153,10 +155,10 @@ Data is read from raw data (Count, Total) stored in SQLite, derived indicators (
 ┌───────────────────────────────────────────────────────────────┐
 │                      Streamlit App                             │
 │                                                               │
-│  ┌──────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐│
-│  │ app.py   │ │1_Sector_    │ │2_Sector_    │ │3_Industry_  │ │4_Industry_  ││
-│  │ (Main)   │ │ Detail.py   │ │ Comparison  │ │ Detail.py   │ │ Comparison  ││
-│  └────┬─────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘│
+│  ┌──────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐│
+│  │ app.py   │ │1_Sector_    │ │2_Sector_    │ │3_Industry_  │ │4_Industry_  │ │5_Industry_  ││
+│  │ (Main)   │ │ Detail.py   │ │ Comparison  │ │ Detail.py   │ │ Comparison  │ │ Heatmap.py  ││
+│  └────┬─────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘ └──────┬──────┘│
 │       │              │               │               │               │       │
 │       └──────────────┼───────────────┼───────────────┼───────────────┘       │
 │                        │                                      │
@@ -387,7 +389,7 @@ Centrally manages constants used across all modules.
 | `UPPER_THRESHOLD` | Overbought threshold (0.37) |
 | `LOWER_THRESHOLD` | Oversold threshold (0.097) |
 | `MA_PERIOD` | Moving average period (10) |
-| `CHART_HEIGHT_*` | Chart height constants |
+| `CHART_HEIGHT_*` | Chart height constants (`CHART_HEIGHT_HEATMAP = 700` added v4.2) |
 
 **Helper functions (v4.0):**
 
@@ -542,6 +544,7 @@ Responsibility changes from v1:
 | `build_industry_summary` | `(all_data: Dict, sector_key=None) -> DataFrame` | Industry summary (all or filtered by sector, v4.0) |
 | `get_sector_for_industry` | `(industry_key: str) -> Optional[str]` | Reverse lookup: industry → parent sector (v4.0) |
 | `style_status_row` | `(row) -> list` | Row styling for Trend/Status columns, shared across pages (v4.0) |
+| `build_industry_summary_with_sector` | `(all_data: Dict) -> DataFrame` | Industry summary with Sector and Total columns for heatmap (v4.2) |
 
 **MarketStatus dataclass (new in v2.2):**
 
@@ -600,6 +603,7 @@ v2.1 removed signal markers and switched to Ratio line color coding. v2.2 split 
 | `build_sector_comparison_chart` | `(all_data, selected, use_ma=True) -> go.Figure` | Sector comparison overlay (v2.3, refactored v4.0) |
 | `build_industry_summary_chart` | `(summary_df, sector_name="") -> go.Figure` | Industry horizontal bar chart with click navigation (v4.0) |
 | `build_industry_comparison_chart` | `(all_data, selected_industries=None, use_ma=True) -> go.Figure` | Industry comparison overlay (v4.0) |
+| `build_industry_heatmap` | `(summary_df, color_mode="ratio", size_mode="uniform") -> go.Figure` | Industry treemap grouped by sector (v4.2) |
 
 **build_ratio_chart Internal Helpers (v2.2 decomposition):**
 
@@ -780,9 +784,10 @@ Screen layout is unchanged from v1. Only the data source changes; UI remains the
 │                                                             │
 │ ─────────────────────────────────────────────────────────── │
 │ Data Download                                               │
-│ ┌───────────────────────────────────┐                       │
-│ │ Download {Sector} Time Series     │                       │
-│ └───────────────────────────────────┘                       │
+│ ┌────────────────────────┐┌─────────────────────────────┐  │
+│ │ Download {Sector}      ││ Download {Sector}            │  │
+│ │ Time Series            ││ Industry Summary             │  │
+│ └────────────────────────┘└─────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -861,6 +866,31 @@ v2.3 revision: Display mode radio buttons, 10MA/Raw toggle, threshold dashed lin
 │                                                             │
 │ ┌─────────────────────────────────────────────────────────┐ │
 │ │    [Multi-line Industry Comparison Chart]                │ │
+│ └─────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 5.6 Industry Heatmap Page (pages/5_Industry_Heatmap.py, v4.2)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Industry Heatmap                                             │
+│                                                             │
+│ Color Mode: (●) Ratio  ( ) Trend Status     [horizontal]    │
+│ Size Mode:  (●) Uniform  ( ) Stock Count    [horizontal]    │
+│                                                             │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │  [Treemap: 149 cells grouped by 11 sectors]             │ │
+│ │  Sector→Industry hierarchy, RdYlGn colorscale           │ │
+│ │  Display only (no click navigation)                     │ │
+│ └─────────────────────────────────────────────────────────┘ │
+│                                                             │
+│ ─────────────────────────────────────────────────────────── │
+│ Industry Summary                                            │
+│ ┌─────────────────────────────────────────────────────────┐ │
+│ │ Sector | Industry | Ratio | 10MA | Trend | Slope | Stat │ │
+│ │ (sorted by Sector, then Industry)                       │ │
+│ │ (row click → Industry Detail page)                      │ │
 │ └─────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -948,7 +978,8 @@ uptrend-dashboard/
 │   ├── 1_Sector_Detail.py            # Sector detail page (+ industry drilldown v4.0)
 │   ├── 2_Sector_Comparison.py        # Sector comparison page
 │   ├── 3_Industry_Detail.py          # Industry detail page (v4.0)
-│   └── 4_Industry_Comparison.py      # Industry comparison page (v4.0)
+│   ├── 4_Industry_Comparison.py      # Industry comparison page (v4.0)
+│   └── 5_Industry_Heatmap.py        # Industry treemap heatmap page (v4.2)
 ├── app.py                            # Main page
 ├── import_excel.py                   # Excel import CLI tool (Phase 1)
 ├── collect.py                        # Finviz data collection CLI tool (Phase 3)
@@ -1104,6 +1135,11 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_build_sector_summary_excludes_industries | ind_* excluded from sector summary (v4.0) |
 | test_style_status_row_overbought | Overbought row styling (v4.0) |
 | test_style_status_row_normal_up | Normal/Up row styling (v4.0) |
+| test_build_industry_summary_with_sector_columns | Output columns include Sector, Total (v4.2) |
+| test_build_industry_summary_with_sector_sector_values | Sector matches parent sector display name (v4.2) |
+| test_build_industry_summary_with_sector_all_industries | All ind_* keys in output (v4.2) |
+| test_build_industry_summary_with_sector_empty | Empty data → correct columns (v4.2) |
+| test_build_industry_summary_with_sector_total_values | Total = latest total, 0 → 1 (v4.2) |
 
 **test_export_csv.py (v3.5, extended v4.0):**
 
@@ -1149,6 +1185,14 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_industry_comparison_palette | Industry palette used (v4.0) |
 | test_industry_comparison_title | Chart title (v4.0) |
 | test_sector_comparison_excludes_industries | ind_* excluded from sector comparison (v4.0) |
+| test_industry_heatmap_returns_figure | Returns go.Figure (v4.2) |
+| test_industry_heatmap_has_treemap_trace | Contains go.Treemap trace (v4.2) |
+| test_industry_heatmap_sector_parents | Sector display names in labels (v4.2) |
+| test_industry_heatmap_color_ratio_mode | RdYlGn colorscale in ratio mode (v4.2) |
+| test_industry_heatmap_color_status_mode | Categorical STATUS_COLORS in status mode (v4.2) |
+| test_industry_heatmap_uniform_size | All values = 1 in uniform mode (v4.2) |
+| test_industry_heatmap_customdata | customdata contains _key (v4.2) |
+| test_industry_heatmap_empty_data | Empty data no error (v4.2) |
 
 **test_import_excel.py (extended v4.0):**
 

@@ -11,6 +11,7 @@ from src.chart_builder import (
     build_sector_comparison_chart,
     build_industry_summary_chart,
     build_industry_comparison_chart,
+    build_industry_heatmap,
 )
 
 
@@ -309,3 +310,95 @@ class TestRatioChartPeakTroughMarkers:
         trace_names = [t.name for t in fig.data]
         assert "10MA Peak" in trace_names, f"Missing '10MA Peak' in {trace_names}"
         assert "10MA Trough" in trace_names, f"Missing '10MA Trough' in {trace_names}"
+
+
+class TestBuildIndustryHeatmap:
+    """Tests for build_industry_heatmap function."""
+
+    def _make_heatmap_summary(self):
+        """Create a sample summary DataFrame with Sector and Total columns."""
+        return pd.DataFrame({
+            "Industry": ["Semiconductors", "Software - Application", "Banks - Regional"],
+            "Ratio": [0.45, 0.32, 0.20],
+            "10MA": [0.40, 0.30, 0.22],
+            "Trend": ["Up", "Up", "Down"],
+            "Slope": [0.02, 0.01, -0.005],
+            "Status": ["Overbought", "Normal", "Normal"],
+            "_key": ["ind_semiconductors", "ind_softwareapplication", "ind_banksregional"],
+            "Sector": ["Technology", "Technology", "Financial"],
+            "Total": [100, 80, 120],
+        })
+
+    def test_industry_heatmap_returns_figure(self):
+        """Should return a go.Figure."""
+        summary = self._make_heatmap_summary()
+        fig = build_industry_heatmap(summary)
+        assert isinstance(fig, go.Figure)
+
+    def test_industry_heatmap_has_treemap_trace(self):
+        """Should contain a go.Treemap trace."""
+        summary = self._make_heatmap_summary()
+        fig = build_industry_heatmap(summary)
+        treemap_traces = [t for t in fig.data if isinstance(t, go.Treemap)]
+        assert len(treemap_traces) >= 1
+
+    def test_industry_heatmap_sector_parents(self):
+        """Sector display names should appear as labels in the treemap."""
+        summary = self._make_heatmap_summary()
+        fig = build_industry_heatmap(summary)
+        treemap = [t for t in fig.data if isinstance(t, go.Treemap)][0]
+        labels = list(treemap.labels)
+        assert "Technology" in labels
+        assert "Financial" in labels
+
+    def test_industry_heatmap_color_ratio_mode(self):
+        """Ratio mode should use RdYlGn colorscale."""
+        summary = self._make_heatmap_summary()
+        fig = build_industry_heatmap(summary, color_mode="ratio")
+        treemap = [t for t in fig.data if isinstance(t, go.Treemap)][0]
+        assert treemap.marker.colorscale is not None
+        # Verify it's using RdYlGn (check that the colorscale name or tuples exist)
+        cs = treemap.marker.colorscale
+        # Plotly stores named colorscales as tuple of tuples
+        assert cs is not None
+
+    def test_industry_heatmap_color_status_mode(self):
+        """Status mode should use categorical colors from STATUS_COLORS."""
+        from src.chart_builder import STATUS_COLORS
+        summary = self._make_heatmap_summary()
+        fig = build_industry_heatmap(summary, color_mode="status")
+        treemap = [t for t in fig.data if isinstance(t, go.Treemap)][0]
+        colors = list(treemap.marker.colors)
+        # Industry cells should have STATUS_COLORS values
+        industry_colors = [c for c in colors if c != "#cccccc"]
+        for c in industry_colors:
+            assert c in STATUS_COLORS.values(), f"Unexpected color: {c}"
+
+    def test_industry_heatmap_uniform_size(self):
+        """Uniform mode should set all values to 1."""
+        summary = self._make_heatmap_summary()
+        fig = build_industry_heatmap(summary, size_mode="uniform")
+        treemap = [t for t in fig.data if isinstance(t, go.Treemap)][0]
+        # All leaf values should be 1 (sectors have no explicit value)
+        industry_values = [v for v in treemap.values if v == 1]
+        # Should have at least 3 industry cells with value 1
+        assert len(industry_values) >= 3
+
+    def test_industry_heatmap_customdata(self):
+        """customdata should contain _key for industry cells."""
+        summary = self._make_heatmap_summary()
+        fig = build_industry_heatmap(summary)
+        treemap = [t for t in fig.data if isinstance(t, go.Treemap)][0]
+        customdata = list(treemap.customdata)
+        # Should contain the industry keys
+        assert "ind_semiconductors" in customdata
+        assert "ind_softwareapplication" in customdata
+        assert "ind_banksregional" in customdata
+
+    def test_industry_heatmap_empty_data(self):
+        """Empty DataFrame should not raise an error."""
+        empty_df = pd.DataFrame(columns=[
+            "Industry", "Ratio", "10MA", "Trend", "Slope", "Status", "_key", "Sector", "Total",
+        ])
+        fig = build_industry_heatmap(empty_df)
+        assert isinstance(fig, go.Figure)

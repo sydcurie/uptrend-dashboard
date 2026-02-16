@@ -54,15 +54,21 @@ def get_current_status(df: pd.DataFrame) -> MarketStatus:
             date="",
             ratio=0.0,
             ratio_10ma=None,
-            trend="down",
-            slope=0.0,
+            trend="neutral",
+            slope=None,
             is_overbought=False,
             is_oversold=False,
         )
 
     latest = df.iloc[-1]
 
-    trend = "up" if pd.notna(latest.get("trend_up")) else "down"
+    slope_val = latest.get("slope")
+    if pd.isna(slope_val):
+        trend = "neutral"
+    elif pd.notna(latest.get("trend_up")):
+        trend = "up"
+    else:
+        trend = "down"
 
     ratio = float(latest["ratio"])
     upper = float(latest["upper"]) if pd.notna(latest.get("upper")) else 0.37
@@ -73,7 +79,7 @@ def get_current_status(df: pd.DataFrame) -> MarketStatus:
         ratio=ratio,
         ratio_10ma=float(latest["ma_10"]) if pd.notna(latest.get("ma_10")) else None,
         trend=trend,
-        slope=float(latest["slope"]) if pd.notna(latest.get("slope")) else 0.0,
+        slope=float(latest["slope"]) if pd.notna(latest.get("slope")) else None,
         is_overbought=ratio > upper,
         is_oversold=ratio < lower,
     )
@@ -94,6 +100,14 @@ def get_industry_display_name(worksheet_name: str) -> str:
 def get_sector_for_industry(industry_key: str) -> Optional[str]:
     """Return the parent sector key for an industry, or None if unknown."""
     return INDUSTRY_TO_SECTOR.get(industry_key)
+
+
+_TREND_DISPLAY = {"up": "Up", "down": "Down", "neutral": "—"}
+
+
+def _trend_label(trend: str) -> str:
+    """Convert internal trend value to display label."""
+    return _TREND_DISPLAY.get(trend, "—")
 
 
 def _determine_market_status(status: MarketStatus) -> str:
@@ -117,7 +131,7 @@ def build_sector_summary(all_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
                 "Sector": get_sector_display_name(name),
                 "Ratio": status["ratio"],
                 "10MA": status["ratio_10ma"],
-                "Trend": "Up" if status["trend"] == "up" else "Down",
+                "Trend": _trend_label(status["trend"]),
                 "Slope": status["slope"],
                 "Status": _determine_market_status(status),
                 "_key": name,
@@ -159,7 +173,7 @@ def build_industry_summary(
                 "Industry": get_industry_display_name(name),
                 "Ratio": status["ratio"],
                 "10MA": status["ratio_10ma"],
-                "Trend": "Up" if status["trend"] == "up" else "Down",
+                "Trend": _trend_label(status["trend"]),
                 "Slope": status["slope"],
                 "Status": _determine_market_status(status),
                 "_key": name,
@@ -174,12 +188,50 @@ def build_industry_summary(
     return summary
 
 
+def build_industry_summary_with_sector(
+    all_data: Dict[str, pd.DataFrame],
+) -> pd.DataFrame:
+    """Build industry summary with Sector and Total columns for heatmap display.
+
+    Args:
+        all_data: Dict mapping worksheet name to calculated DataFrame.
+
+    Returns:
+        DataFrame with columns: Industry, Ratio, 10MA, Trend, Slope, Status, _key, Sector, Total.
+    """
+    expected_columns = ["Industry", "Ratio", "10MA", "Trend", "Slope", "Status", "_key", "Sector", "Total"]
+
+    summary = build_industry_summary(all_data)
+    if summary.empty:
+        return pd.DataFrame(columns=expected_columns)
+
+    # Add Sector column
+    summary["Sector"] = summary["_key"].apply(
+        lambda k: get_sector_display_name(get_sector_for_industry(k))
+        if get_sector_for_industry(k) else "Unknown"
+    )
+
+    # Add Total column (latest total value per industry, min 1)
+    totals = []
+    for key in summary["_key"]:
+        df = all_data.get(key)
+        if df is not None and not df.empty:
+            latest_total = int(df.iloc[-1]["total"])
+            totals.append(max(1, latest_total))
+        else:
+            totals.append(1)
+    summary["Total"] = totals
+
+    return summary
+
+
 def style_status_row(row):
     """Apply color styling to Trend and Status columns in a summary row."""
     styles = []
     for col in row.index:
         if col == "Trend":
-            styles.append("color: #00cc96" if row["Trend"] == "Up" else "color: #ef553b")
+            trend_colors = {"Up": "color: #00cc96", "Down": "color: #ef553b"}
+            styles.append(trend_colors.get(row["Trend"], "color: #888888"))
         elif col == "Status":
             styles.append(STATUS_STYLES.get(row["Status"], ""))
         else:
@@ -190,7 +242,10 @@ def style_status_row(row):
 def prepare_timeseries_csv(df: pd.DataFrame) -> pd.DataFrame:
     """Select and format columns for time series CSV export."""
     result = df[["date", "count", "total", "ratio", "ma_10", "slope"]].copy()
-    result["trend"] = np.where(df["slope"] > 0, "up", "down")
+    result["trend"] = np.where(
+        df["slope"].isna(), "neutral",
+        np.where(df["slope"] > 0, "up", "down"),
+    )
     return result
 
 
