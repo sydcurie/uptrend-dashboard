@@ -532,6 +532,9 @@ CHART_Y_MAX_MULTIPLIER = 1.1
 MAX_INDUSTRY_COMPARISON = 15
 CHART_HEIGHT_HEATMAP = 700
 
+# Date range display
+DEFAULT_DISPLAY_YEARS = 2
+
 
 def is_sector(worksheet: str) -> bool:
     """Check if a worksheet key is a sector."""

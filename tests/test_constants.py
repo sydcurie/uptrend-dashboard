@@ -1,6 +1,7 @@
 """Tests for constants module — industry definitions and helpers."""
 
 from src.constants import (
+    DEFAULT_DISPLAY_YEARS,
     INDUSTRIES,
     INDUSTRY_DISPLAY_NAMES,
     INDUSTRY_TO_SECTOR,
@@ -52,6 +53,9 @@ class TestIndustryConstants:
 
     def test_max_industry_comparison(self):
         assert MAX_INDUSTRY_COMPARISON == 15
+
+    def test_default_display_years(self):
+        assert DEFAULT_DISPLAY_YEARS == 2
 
 
 class TestHelperFunctions:

@@ -9,6 +9,7 @@ from src.db_client import cached_load_sector_data
 from src.data_processor import (
     get_current_status,
     build_sector_summary,
+    default_start_date,
     filter_by_date_range,
     prepare_timeseries_csv,
     style_status_row,
@@ -42,9 +43,10 @@ with st.sidebar:
     if df_all is not None and not df_all.empty:
         min_date = df_all["date"].min().date()
         max_date = df_all["date"].max().date()
+        default_start = default_start_date(min_date, max_date)
         date_range = st.date_input(
             "Date Range",
-            value=(min_date, max_date),
+            value=(default_start, max_date),
             min_value=min_date,
             max_value=max_date,
         )

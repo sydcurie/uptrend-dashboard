@@ -10,6 +10,7 @@ from src.db_client import cached_load_all_data
 from src.data_processor import (
     get_sector_display_name,
     get_industry_display_name,
+    default_start_date,
     filter_by_date_range,
 )
 from src.chart_builder import build_industry_comparison_chart
@@ -89,9 +90,10 @@ first_df = next((all_data[k] for k in selected_keys if k in all_data and not all
 if first_df is not None:
     min_date = first_df["date"].min().date()
     max_date = first_df["date"].max().date()
+    default_start = default_start_date(min_date, max_date)
     date_range = st.date_input(
         "Date Range",
-        value=(min_date, max_date),
+        value=(default_start, max_date),
         min_value=min_date,
         max_value=max_date,
     )

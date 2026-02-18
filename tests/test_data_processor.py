@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import pytest
 
+import datetime
+
 from src.data_processor import (
     MarketStatus,
     get_current_status,
@@ -16,6 +18,7 @@ from src.data_processor import (
     style_status_row,
     prepare_timeseries_csv,
     prepare_all_timeseries_csv,
+    default_start_date,
 )
 
 
@@ -494,3 +497,36 @@ class TestStyleStatusRow:
         row = pd.Series({"Sector": "Technology", "Trend": "Up", "Status": "Overbought"})
         styles = style_status_row(row)
         assert styles[2] == "color: #d62728"
+
+
+class TestDefaultStartDate:
+    """Tests for default_start_date function."""
+
+    def test_data_less_than_2_years(self):
+        """When data spans < 2 years, return min_date."""
+        min_date = datetime.date(2024, 7, 1)
+        max_date = datetime.date(2025, 1, 1)
+        assert default_start_date(min_date, max_date) == min_date
+
+    def test_data_exactly_2_years(self):
+        """When data spans exactly 2 years, return min_date."""
+        min_date = datetime.date(2023, 1, 1)
+        max_date = datetime.date(2025, 1, 1)
+        assert default_start_date(min_date, max_date) == min_date
+
+    def test_data_more_than_2_years(self):
+        """When data spans > 2 years, return max_date - 2 years."""
+        min_date = datetime.date(2020, 1, 1)
+        max_date = datetime.date(2025, 6, 15)
+        assert default_start_date(min_date, max_date) == datetime.date(2023, 6, 15)
+
+    def test_leap_year(self):
+        """Leap year max_date: 2028-02-29 - 2 years = 2026-02-28."""
+        min_date = datetime.date(2020, 1, 1)
+        max_date = datetime.date(2028, 2, 29)
+        assert default_start_date(min_date, max_date) == datetime.date(2026, 2, 28)
+
+    def test_same_date(self):
+        """When min_date == max_date, return that date."""
+        d = datetime.date(2025, 3, 1)
+        assert default_start_date(d, d) == d

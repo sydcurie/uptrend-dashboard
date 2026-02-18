@@ -7,7 +7,7 @@ load_dotenv()
 
 from src.constants import SECTORS
 from src.db_client import cached_load_sector_data
-from src.data_processor import get_sector_display_name, filter_by_date_range
+from src.data_processor import get_sector_display_name, default_start_date, filter_by_date_range
 from src.chart_builder import build_sector_comparison_chart
 
 st.set_page_config(page_title="Sector Comparison", page_icon="📊", layout="wide")
@@ -55,9 +55,10 @@ first_df = all_data.get(selected_keys[0])
 if first_df is not None and not first_df.empty:
     min_date = first_df["date"].min().date()
     max_date = first_df["date"].max().date()
+    default_start = default_start_date(min_date, max_date)
     date_range = st.date_input(
         "Date Range",
-        value=(min_date, max_date),
+        value=(default_start, max_date),
         min_value=min_date,
         max_value=max_date,
     )

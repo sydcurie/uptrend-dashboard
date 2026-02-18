@@ -12,6 +12,7 @@ from src.data_processor import (
     get_industry_display_name,
     get_sector_display_name,
     get_sector_for_industry,
+    default_start_date,
     filter_by_date_range,
     prepare_timeseries_csv,
 )
@@ -109,9 +110,10 @@ with col5:
 # Date filter
 min_date = df["date"].min().date()
 max_date = df["date"].max().date()
+default_start = default_start_date(min_date, max_date)
 date_range = st.date_input(
     "Date Range",
-    value=(min_date, max_date),
+    value=(default_start, max_date),
     min_value=min_date,
     max_value=max_date,
 )

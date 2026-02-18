@@ -5,8 +5,8 @@
 | Document Type | Software Design Document |
 | Project Name | uptrend-dashboard |
 | Created | 2026-02-08 |
-| Revised | 2026-02-16 |
-| Status | v4.2 Industry Heatmap page |
+| Revised | 2026-02-18 |
+| Status | v4.3 Default display period limit (2 years) |
 
 ---
 
@@ -19,6 +19,7 @@
 | 2026-02-08 | v2.1 | Removed signal logic (Long/Short Entry/Exit). Changed chart trend display to green/red/gray color coding |
 | 2026-02-08 | v2.2 | Code review fixes. Improved DB connection management, centralized constants, empty data handling, added logging, test improvements |
 | 2026-02-08 | v2.3 | Sector Comparison chart improvements. 10MA display, threshold lines, custom palette, latest value annotations, Y-axis % format, legend sorting |
+| 2026-02-18 | v4.3 | Default display period limit: date_input defaults to max 2 years via `default_start_date()`, `python-dateutil` dependency |
 | 2026-02-16 | v4.2 | Industry Heatmap: Treemap page for all 149 industries, grouped by sector with RdYlGn colorscale |
 | 2026-02-16 | v4.1 | Sector Detail: added Industry Summary CSV download button (2-column layout) |
 | 2026-02-16 | v4.0 | Industry-level uptrend analysis: 149 industries, Industry Detail/Comparison pages, data collection scope, CSV export |
@@ -39,7 +40,7 @@
 - **Data processor**: `get_industry_display_name()`, `build_industry_summary()`, `get_sector_for_industry()`, `style_status_row()` shared across pages
 - **DB client**: `load_sector_data()`, `load_industry_data()`, `fetch_all_raw_data(worksheets=)` filter, `cached_load_sector_data()` / `cached_load_all_data()` cross-page cache
 - **CSV export**: Added `industry_summary.csv` as 3rd export file
-- **Tests**: 132 → 187 tests (→ 204 after v4.2)
+- **Tests**: 132 → 187 tests (→ 204 after v4.2, → 210 after v4.3)
 
 ### v3.5 Key Changes (Automated CSV Export)
 
@@ -390,6 +391,7 @@ Centrally manages constants used across all modules.
 | `LOWER_THRESHOLD` | Oversold threshold (0.097) |
 | `MA_PERIOD` | Moving average period (10) |
 | `CHART_HEIGHT_*` | Chart height constants (`CHART_HEIGHT_HEATMAP = 700` added v4.2) |
+| `DEFAULT_DISPLAY_YEARS` | Default display period limit in years (2, v4.3) |
 
 **Helper functions (v4.0):**
 
@@ -545,6 +547,7 @@ Responsibility changes from v1:
 | `get_sector_for_industry` | `(industry_key: str) -> Optional[str]` | Reverse lookup: industry → parent sector (v4.0) |
 | `style_status_row` | `(row) -> list` | Row styling for Trend/Status columns, shared across pages (v4.0) |
 | `build_industry_summary_with_sector` | `(all_data: Dict) -> DataFrame` | Industry summary with Sector and Total columns for heatmap (v4.2) |
+| `default_start_date` | `(min_date: date, max_date: date) -> date` | Default start date clamped to at most DEFAULT_DISPLAY_YEARS years before max_date (v4.3) |
 
 **MarketStatus dataclass (new in v2.2):**
 
@@ -1023,6 +1026,7 @@ uptrend-dashboard/
 | pandas | >= 2.0.0 | Data manipulation | Retained |
 | openpyxl | >= 3.1.0 | Excel file reading | **New** |
 | requests | >= 2.31.0 | Finviz API HTTP requests (Phase 3) | **New** |
+| python-dateutil | >= 2.8.0 | Accurate year arithmetic via `relativedelta` (v4.3) | **New** |
 | python-dotenv | >= 1.0.0 | Environment variable loading | Retained |
 | pytest | >= 8.0.0 | Test framework | Retained |
 | pytest-mock | >= 3.12.0 | Mock library | Retained |
@@ -1140,6 +1144,11 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_build_industry_summary_with_sector_all_industries | All ind_* keys in output (v4.2) |
 | test_build_industry_summary_with_sector_empty | Empty data → correct columns (v4.2) |
 | test_build_industry_summary_with_sector_total_values | Total = latest total, 0 → 1 (v4.2) |
+| test_data_less_than_2_years | Data < 2 years → returns min_date (v4.3) |
+| test_data_exactly_2_years | Data exactly 2 years → returns min_date (v4.3) |
+| test_data_more_than_2_years | Data > 2 years → returns max_date - 2 years (v4.3) |
+| test_leap_year | Leap year handling: 2028-02-29 - 2y = 2026-02-28 (v4.3) |
+| test_same_date | min == max → returns that date (v4.3) |
 
 **test_export_csv.py (v3.5, extended v4.0):**
 
@@ -1269,6 +1278,7 @@ Implemented with TDD. Tests are written first, and implementation is written to 
 | test_sector_industries_keys_are_valid_sectors | SECTOR_INDUSTRIES keys are valid SECTORS |
 | test_is_sector | is_sector() helper function |
 | test_is_industry | is_industry() helper function |
+| test_default_display_years | DEFAULT_DISPLAY_YEARS == 2 (v4.3) |
 
 ### 9.3 Test Fixtures (conftest.py)
 

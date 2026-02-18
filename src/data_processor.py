@@ -1,13 +1,16 @@
 """Data processing utilities for uptrend dashboard (v2)."""
 
+import datetime
 import logging
 from dataclasses import dataclass, asdict
 from typing import Dict, Optional
 
 import pandas as pd
 import numpy as np
+from dateutil.relativedelta import relativedelta
 
 from src.constants import (
+    DEFAULT_DISPLAY_YEARS,
     INDUSTRY_DISPLAY_NAMES,
     INDUSTRY_TO_SECTOR,
     SECTOR_DISPLAY_NAMES,
@@ -290,3 +293,11 @@ def filter_by_date_range(df: pd.DataFrame, start, end) -> pd.DataFrame:
     """
     mask = (df["date"].dt.date >= start) & (df["date"].dt.date <= end)
     return df[mask]
+
+
+def default_start_date(
+    min_date: datetime.date, max_date: datetime.date
+) -> datetime.date:
+    """Return the default start date, clamped to at most DEFAULT_DISPLAY_YEARS years before max_date."""
+    cutoff = max_date - relativedelta(years=DEFAULT_DISPLAY_YEARS)
+    return max(min_date, cutoff)
