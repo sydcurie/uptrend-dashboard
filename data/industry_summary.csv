@@ -1,146 +1,146 @@
 Industry,Ratio,10MA,Trend,Slope,Status
-Airports & Air Services,1.0,,—,,Overbought
-Real Estate - Development,1.0,,—,,Overbought
+Aluminum,1.0,,—,,Overbought
 Marine Shipping,1.0,,—,,Overbought
+Department Stores,1.0,,—,,Overbought
+Oil & Gas Drilling,1.0,,—,,Overbought
+Real Estate - Development,1.0,,—,,Overbought
 Tools & Accessories,1.0,,—,,Overbought
+REIT - Hotel & Motel,0.8333333333333334,,—,,Overbought
 Drug Manufacturers - General,0.7857142857142857,,—,,Overbought
-Utilities - Renewable,0.7777777777777778,,—,,Overbought
-Semiconductor Equipment & Materials,0.76,,—,,Overbought
+Oil & Gas Midstream,0.7631578947368421,,—,,Overbought
 Medical Distribution,0.75,,—,,Overbought
 Food Distribution,0.75,,—,,Overbought
+Closed-End Fund - Foreign,0.75,,—,,Overbought
 Trucking,0.75,,—,,Overbought
-Oil & Gas Drilling,0.75,,—,,Overbought
-Oil & Gas Equipment & Services,0.7352941176470589,,—,,Overbought
-Oil & Gas Midstream,0.7105263157894737,,—,,Overbought
-Farm & Heavy Construction Machinery,0.7058823529411765,,—,,Overbought
-REIT - Healthcare Facilities,0.6923076923076923,,—,,Overbought
-Insurance - Reinsurance,0.6666666666666666,,—,,Overbought
+Oil & Gas Equipment & Services,0.7058823529411765,,—,,Overbought
+Oil & Gas Integrated,0.7058823529411765,,—,,Overbought
 Confectioners,0.6666666666666666,,—,,Overbought
+Insurance - Reinsurance,0.6666666666666666,,—,,Overbought
 Broadcasting,0.6666666666666666,,—,,Overbought
-Luxury Goods,0.6666666666666666,,—,,Overbought
+Utilities - Renewable,0.6666666666666666,,—,,Overbought
 Pollution & Treatment Controls,0.6666666666666666,,—,,Overbought
 Railroads,0.6666666666666666,,—,,Overbought
-REIT - Hotel & Motel,0.6666666666666666,,—,,Overbought
-Department Stores,0.6666666666666666,,—,,Overbought
-Oil & Gas Integrated,0.6470588235294118,,—,,Overbought
-Engineering & Construction,0.6470588235294118,,—,,Overbought
+Farm & Heavy Construction Machinery,0.6470588235294118,,—,,Overbought
+Semiconductor Equipment & Materials,0.64,,—,,Overbought
 Steel,0.6363636363636364,,—,,Overbought
-Oil & Gas Refining & Marketing,0.6363636363636364,,—,,Overbought
 Lodging,0.625,,—,,Overbought
 Security & Protection Services,0.625,,—,,Overbought
-Banks - Regional,0.6158536585365854,,—,,Overbought
-Specialty Industrial Machinery,0.6078431372549019,,—,,Overbought
-Utilities - Diversified,0.6,,—,,Overbought
+Chemicals,0.625,,—,,Overbought
+Engineering & Construction,0.6176470588235294,,—,,Overbought
+Airlines,0.6153846153846154,,—,,Overbought
+Luxury Goods,0.6,,—,,Overbought
+Solar,0.6,,—,,Overbought
 Scientific & Technical Instruments,0.5882352941176471,,—,,Overbought
+Banks - Diversified,0.5789473684210527,,—,,Overbought
+Residential Construction,0.5555555555555556,,—,,Overbought
+Discount Stores,0.5555555555555556,,—,,Overbought
+Banks - Regional,0.5515151515151515,,—,,Overbought
+Specialty Industrial Machinery,0.5490196078431373,,—,,Overbought
+Electronic Components,0.5384615384615384,,—,,Overbought
+Specialty Chemicals,0.5277777777777778,,—,,Overbought
+Medical Care Facilities,0.52,,—,,Overbought
 Auto Parts,0.5172413793103449,,—,,Overbought
-Apparel Retail,0.5,,—,,Overbought
-Residential Construction,0.5,,—,,Overbought
-Specialty Chemicals,0.5,,—,,Overbought
+Gold,0.5151515151515151,,—,,Overbought
+Metal Fabrication,0.5,,—,,Overbought
+Recreational Vehicles,0.5,,—,,Overbought
 Real Estate - Diversified,0.5,,—,,Overbought
-Packaging & Containers,0.5,,—,,Overbought
-Electronic Components,0.5,,—,,Overbought
-Closed-End Fund - Foreign,0.5,,—,,Overbought
+Travel Services,0.5,,—,,Overbought
+Apparel Manufacturing,0.5,,—,,Overbought
+Apparel Retail,0.5,,—,,Overbought
 Financial Conglomerates,0.5,,—,,Overbought
-Utilities - Regulated Electric,0.4722222222222222,,—,,Overbought
+Packaging & Containers,0.5,,—,,Overbought
+Oil & Gas E&P,0.475,,—,,Overbought
 Drug Manufacturers - Specialty & Generic,0.46875,,—,,Overbought
+Other Industrial Metals & Mining,0.4666666666666667,,—,,Overbought
 Electrical Equipment & Parts,0.4666666666666667,,—,,Overbought
-Airlines,0.46153846153846156,,—,,Overbought
-REIT - Retail,0.4583333333333333,,—,,Overbought
+REIT - Healthcare Facilities,0.46153846153846156,,—,,Overbought
+Communication Equipment,0.4583333333333333,,—,,Overbought
+Semiconductors,0.4583333333333333,,—,,Overbought
+Oil & Gas Refining & Marketing,0.45454545454545453,,—,,Overbought
 Integrated Freight & Logistics,0.45454545454545453,,—,,Overbought
-Oil & Gas E&P,0.4473684210526316,,—,,Overbought
-Discount Stores,0.4444444444444444,,—,,Overbought
-Medical Care Facilities,0.44,,—,,Overbought
-Communication Equipment,0.44,,—,,Overbought
-Semiconductors,0.4375,,—,,Overbought
-Farm Products,0.42857142857142855,,—,,Overbought
-Travel Services,0.42857142857142855,,—,,Overbought
+Agricultural Inputs,0.42857142857142855,,—,,Overbought
 Rental & Leasing Services,0.42857142857142855,,—,,Overbought
-Utilities - Regulated Gas,0.42857142857142855,,—,,Overbought
-Gold,0.42424242424242425,,—,,Overbought
-Other Industrial Metals & Mining,0.4,,—,,Overbought
-Metal Fabrication,0.4,,—,,Overbought
-Recreational Vehicles,0.4,,—,,Overbought
+Leisure,0.4166666666666667,,—,,Overbought
+Resorts & Casinos,0.4166666666666667,,—,,Overbought
+Utilities - Diversified,0.4,,—,,Overbought
 Electronics & Computer Distribution,0.4,,—,,Overbought
-Solar,0.4,,—,,Overbought
-Leisure,0.38461538461538464,,—,,Overbought
+Closed-End Fund - Equity,0.3902439024390244,,—,,Overbought
+Utilities - Regulated Electric,0.3888888888888889,,—,,Overbought
+Telecom Services,0.38235294117647056,,—,,Overbought
 Industrial Distribution,0.375,,—,,Overbought
-Banks - Diversified,0.3684210526315789,,—,,Normal
-Beverages - Non-Alcoholic,0.36363636363636365,,—,,Normal
-Computer Hardware,0.35714285714285715,,—,,Normal
-Telecom Services,0.35294117647058826,,—,,Normal
-Beverages - Brewers,0.3333333333333333,,—,,Normal
-Apparel Manufacturing,0.3333333333333333,,—,,Normal
-Paper & Paper Products,0.3333333333333333,,—,,Normal
+REIT - Retail,0.375,,—,,Overbought
+Aerospace & Defense,0.37254901960784315,,—,,Overbought
+Auto Manufacturers,0.36363636363636365,,—,,Normal
 REIT - Industrial,0.3333333333333333,,—,,Normal
 Home Improvement Retail,0.3333333333333333,,—,,Normal
+Beverages - Brewers,0.3333333333333333,,—,,Normal
 Building Products & Equipment,0.3333333333333333,,—,,Normal
-Closed-End Fund - Equity,0.3170731707317073,,—,,Normal
-Aerospace & Defense,0.3137254901960784,,—,,Normal
+Biotechnology,0.3118279569892473,,—,,Normal
 Specialty Retail,0.3,,—,,Normal
-"Furnishings, Fixtures & Appliances",0.2857142857142857,,—,,Normal
 Insurance - Diversified,0.2857142857142857,,—,,Normal
-Agricultural Inputs,0.2857142857142857,,—,,Normal
-Biotechnology,0.2786885245901639,,—,,Normal
-Auto Manufacturers,0.2727272727272727,,—,,Normal
+Utilities - Independent Power Producers,0.2857142857142857,,—,,Normal
+Farm Products,0.2857142857142857,,—,,Normal
+"Furnishings, Fixtures & Appliances",0.2857142857142857,,—,,Normal
+Diagnostics & Research,0.28125,,—,,Normal
 Building Materials,0.2727272727272727,,—,,Normal
-Chemicals,0.25,,—,,Normal
-Publishing,0.25,,—,,Normal
+Beverages - Non-Alcoholic,0.2727272727272727,,—,,Normal
 Lumber & Wood Production,0.25,,—,,Normal
-Aluminum,0.25,,—,,Normal
+Publishing,0.25,,—,,Normal
 Medical Instruments & Supplies,0.23333333333333334,,—,,Normal
 Entertainment,0.23076923076923078,,—,,Normal
 REIT - Office,0.23076923076923078,,—,,Normal
-REIT - Diversified,0.2222222222222222,,—,,Normal
 Waste Management,0.2222222222222222,,—,,Normal
 Conglomerates,0.2222222222222222,,—,,Normal
-Insurance - Property & Casualty,0.21052631578947367,,—,,Normal
+REIT - Diversified,0.2222222222222222,,—,,Normal
+Insurance - Life,0.21428571428571427,,—,,Normal
+Utilities - Regulated Gas,0.21428571428571427,,—,,Normal
+Computer Hardware,0.21428571428571427,,—,,Normal
+Education & Training Services,0.2,,—,,Normal
+Copper,0.2,,—,,Normal
 Tobacco,0.2,,—,,Normal
 Consumer Electronics,0.2,,—,,Normal
-Diagnostics & Research,0.1875,,—,,Normal
-Asset Management,0.14285714285714285,,—,,Normal
+Credit Services,0.2,,—,,Normal
+Insurance - Property & Casualty,0.18421052631578946,,—,,Normal
+Medical Devices,0.18,,—,,Normal
+Asset Management,0.15942028985507245,,—,,Normal
 Packaged Foods,0.14285714285714285,,—,,Normal
-Insurance - Life,0.14285714285714285,,—,,Normal
 Grocery Stores,0.14285714285714285,,—,,Normal
-Utilities - Independent Power Producers,0.14285714285714285,,—,,Normal
-Utilities - Regulated Water,0.14285714285714285,,—,,Normal
 Footwear & Accessories,0.14285714285714285,,—,,Normal
-Education & Training Services,0.13333333333333333,,—,,Normal
-Credit Services,0.12,,—,,Normal
-Medical Devices,0.12,,—,,Normal
+Other Precious Metals & Mining,0.14285714285714285,,—,,Normal
+Utilities - Regulated Water,0.14285714285714285,,—,,Normal
+REIT - Specialty,0.14285714285714285,,—,,Normal
 Capital Markets,0.1111111111111111,,—,,Normal
 Software - Infrastructure,0.1,,—,,Normal
-Financial Data & Stock Exchanges,0.09090909090909091,,—,,Oversold
 Specialty Business Services,0.09090909090909091,,—,,Oversold
+Financial Data & Stock Exchanges,0.09090909090909091,,—,,Oversold
 Information Technology Services,0.08823529411764706,,—,,Oversold
-Resorts & Casinos,0.08333333333333333,,—,,Oversold
+Software - Application,0.07692307692307693,,—,,Oversold
 Insurance - Specialty,0.07692307692307693,,—,,Oversold
 Real Estate Services,0.07692307692307693,,—,,Oversold
-REIT - Mortgage,0.07142857142857142,,—,,Oversold
-REIT - Specialty,0.07142857142857142,,—,,Oversold
 Auto & Truck Dealerships,0.06666666666666667,,—,,Oversold
-Software - Application,0.06666666666666667,,—,,Oversold
 Household & Personal Products,0.06666666666666667,,—,,Oversold
-Closed-End Fund - Debt,0.0547945205479452,,—,,Oversold
+Health Information Services,0.05555555555555555,,—,,Oversold
+Internet Retail,0.05555555555555555,,—,,Oversold
+Closed-End Fund - Debt,0.05405405405405406,,—,,Oversold
 Restaurants,0.037037037037037035,,—,,Oversold
-Shell Companies,0.014705882352941176,,—,,Oversold
+Shell Companies,0.013888888888888888,,—,,Oversold
 Advertising Agencies,0.0,,—,,Oversold
+Airports & Air Services,0.0,,—,,Oversold
 Beverages - Wineries & Distilleries,0.0,,—,,Oversold
-Business Equipment & Supplies,0.0,,—,,Oversold
-Copper,0.0,,—,,Oversold
 Consulting Services,0.0,,—,,Oversold
-Coking Coal,0.0,,—,,Oversold
+Business Equipment & Supplies,0.0,,—,,Oversold
 Electronic Gaming & Multimedia,0.0,,—,,Oversold
 Internet Content & Information,0.0,,—,,Oversold
-Internet Retail,0.0,,—,,Oversold
-Infrastructure Operations,0.0,,—,,Oversold
 Gambling,0.0,,—,,Oversold
-Healthcare Plans,0.0,,—,,Oversold
-Health Information Services,0.0,,—,,Oversold
+Infrastructure Operations,0.0,,—,,Oversold
 Insurance - Brokers,0.0,,—,,Oversold
-Personal Services,0.0,,—,,Oversold
-REIT - Residential,0.0,,—,,Oversold
+Healthcare Plans,0.0,,—,,Oversold
+Coking Coal,0.0,,—,,Oversold
 Mortgage Finance,0.0,,—,,Oversold
-Other Precious Metals & Mining,0.0,,—,,Oversold
+Paper & Paper Products,0.0,,—,,Oversold
+REIT - Mortgage,0.0,,—,,Oversold
+REIT - Residential,0.0,,—,,Oversold
+Personal Services,0.0,,—,,Oversold
 Silver,0.0,,—,,Oversold
 Staffing & Employment Services,0.0,,—,,Oversold
 Thermal Coal,0.0,,—,,Oversold
