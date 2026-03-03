@@ -665,6 +665,7 @@ all,2026-02-25,860,2805,0.3065953654188948,0.32096558613050935,-0.00461794666772
 all,2026-02-26,884,2808,0.3148148148148148,0.32221616175053436,0.0012505756200250073,up
 all,2026-02-27,812,2803,0.2896896182661434,0.318158901039941,-0.004057260710593369,down
 all,2026-03-02,791,2805,0.2819964349376114,0.3133101114852691,-0.004848789554671884,down
+all,2026-03-03,619,2788,0.22202295552367288,0.3028702904841863,-0.010439821001082816,down
 ind_advertisingagencies,2026-02-16,0,8,0.0,,,neutral
 ind_advertisingagencies,2026-02-17,0,8,0.0,,,neutral
 ind_advertisingagencies,2026-02-18,0,8,0.0,,,neutral
@@ -676,6 +677,7 @@ ind_advertisingagencies,2026-02-25,0,8,0.0,,,neutral
 ind_advertisingagencies,2026-02-26,0,8,0.0,,,neutral
 ind_advertisingagencies,2026-02-27,0,9,0.0,0.0,,neutral
 ind_advertisingagencies,2026-03-02,0,9,0.0,0.0,0.0,down
+ind_advertisingagencies,2026-03-03,1,9,0.1111111111111111,0.01111111111111111,0.01111111111111111,up
 ind_aerospacedefense,2026-02-16,17,51,0.3333333333333333,,,neutral
 ind_aerospacedefense,2026-02-17,16,51,0.3137254901960784,,,neutral
 ind_aerospacedefense,2026-02-18,19,51,0.37254901960784315,,,neutral
@@ -687,6 +689,7 @@ ind_aerospacedefense,2026-02-25,23,51,0.45098039215686275,,,neutral
 ind_aerospacedefense,2026-02-26,22,52,0.4230769230769231,,,neutral
 ind_aerospacedefense,2026-02-27,25,51,0.49019607843137253,0.417948006488517,,neutral
 ind_aerospacedefense,2026-03-02,26,52,0.5,0.4346146731551837,0.01666666666666672,up
+ind_aerospacedefense,2026-03-03,25,52,0.4807692307692308,0.45131904721249894,0.01670437405731523,up
 ind_agriculturalinputs,2026-02-16,3,7,0.42857142857142855,,,neutral
 ind_agriculturalinputs,2026-02-17,2,7,0.2857142857142857,,,neutral
 ind_agriculturalinputs,2026-02-18,3,7,0.42857142857142855,,,neutral
@@ -698,6 +701,7 @@ ind_agriculturalinputs,2026-02-25,4,7,0.5714285714285714,,,neutral
 ind_agriculturalinputs,2026-02-26,4,7,0.5714285714285714,,,neutral
 ind_agriculturalinputs,2026-02-27,5,7,0.7142857142857143,0.4714285714285714,,neutral
 ind_agriculturalinputs,2026-03-02,5,7,0.7142857142857143,0.5,0.02857142857142858,up
+ind_agriculturalinputs,2026-03-03,5,7,0.7142857142857143,0.5428571428571428,0.042857142857142816,up
 ind_airlines,2026-02-16,6,13,0.46153846153846156,,,neutral
 ind_airlines,2026-02-17,6,13,0.46153846153846156,,,neutral
 ind_airlines,2026-02-18,8,13,0.6153846153846154,,,neutral
@@ -709,6 +713,7 @@ ind_airlines,2026-02-25,2,12,0.16666666666666666,,,neutral
 ind_airlines,2026-02-26,7,12,0.5833333333333334,,,neutral
 ind_airlines,2026-02-27,0,12,0.0,0.3717948717948718,,neutral
 ind_airlines,2026-03-02,0,12,0.0,0.32564102564102565,-0.046153846153846156,down
+ind_airlines,2026-03-03,0,12,0.0,0.2794871794871795,-0.046153846153846156,down
 ind_airportsairservices,2026-02-16,0,1,0.0,,,neutral
 ind_airportsairservices,2026-02-17,1,1,1.0,,,neutral
 ind_airportsairservices,2026-02-18,0,2,0.0,,,neutral
@@ -720,6 +725,7 @@ ind_airportsairservices,2026-02-25,1,1,1.0,,,neutral
 ind_airportsairservices,2026-02-26,0,2,0.0,,,neutral
 ind_airportsairservices,2026-02-27,0,2,0.0,0.35,,neutral
 ind_airportsairservices,2026-03-02,0,2,0.0,0.35,0.0,down
+ind_airportsairservices,2026-03-03,0,1,0.0,0.25,-0.09999999999999998,down
 ind_aluminum,2026-02-16,1,4,0.25,,,neutral
 ind_aluminum,2026-02-17,1,4,0.25,,,neutral
 ind_aluminum,2026-02-18,4,4,1.0,,,neutral
@@ -731,6 +737,7 @@ ind_aluminum,2026-02-25,3,4,0.75,,,neutral
 ind_aluminum,2026-02-26,3,4,0.75,,,neutral
 ind_aluminum,2026-02-27,3,4,0.75,0.575,,neutral
 ind_aluminum,2026-03-02,3,4,0.75,0.625,0.050000000000000044,up
+ind_aluminum,2026-03-03,3,4,0.75,0.675,0.050000000000000044,up
 ind_apparelmanufacturing,2026-02-16,6,12,0.5,,,neutral
 ind_apparelmanufacturing,2026-02-17,4,12,0.3333333333333333,,,neutral
 ind_apparelmanufacturing,2026-02-18,6,12,0.5,,,neutral
@@ -742,6 +749,7 @@ ind_apparelmanufacturing,2026-02-25,5,12,0.4166666666666667,,,neutral
 ind_apparelmanufacturing,2026-02-26,6,12,0.5,,,neutral
 ind_apparelmanufacturing,2026-02-27,4,12,0.3333333333333333,0.4666666666666667,,neutral
 ind_apparelmanufacturing,2026-03-02,3,12,0.25,0.4416666666666667,-0.024999999999999967,down
+ind_apparelmanufacturing,2026-03-03,2,12,0.16666666666666666,0.425,-0.01666666666666672,down
 ind_apparelretail,2026-02-16,6,18,0.3333333333333333,,,neutral
 ind_apparelretail,2026-02-17,9,18,0.5,,,neutral
 ind_apparelretail,2026-02-18,9,18,0.5,,,neutral
@@ -753,6 +761,7 @@ ind_apparelretail,2026-02-25,9,18,0.5,,,neutral
 ind_apparelretail,2026-02-26,12,18,0.6666666666666666,,,neutral
 ind_apparelretail,2026-02-27,10,18,0.5555555555555556,0.4888888888888888,,neutral
 ind_apparelretail,2026-03-02,7,18,0.3888888888888889,0.49444444444444446,0.005555555555555647,up
+ind_apparelretail,2026-03-03,5,18,0.2777777777777778,0.4722222222222222,-0.022222222222222254,down
 ind_assetmanagement,2026-02-16,11,70,0.15714285714285714,,,neutral
 ind_assetmanagement,2026-02-17,10,70,0.14285714285714285,,,neutral
 ind_assetmanagement,2026-02-18,11,69,0.15942028985507245,,,neutral
@@ -764,6 +773,7 @@ ind_assetmanagement,2026-02-25,12,69,0.17391304347826086,,,neutral
 ind_assetmanagement,2026-02-26,12,69,0.17391304347826086,,,neutral
 ind_assetmanagement,2026-02-27,7,68,0.10294117647058823,0.14464194373401534,,neutral
 ind_assetmanagement,2026-03-02,8,69,0.11594202898550725,0.14052186091828034,-0.0041200828157350045,down
+ind_assetmanagement,2026-03-03,8,69,0.11594202898550725,0.13783034953111678,-0.0026915113871635588,down
 ind_automanufacturers,2026-02-16,4,12,0.3333333333333333,,,neutral
 ind_automanufacturers,2026-02-17,3,11,0.2727272727272727,,,neutral
 ind_automanufacturers,2026-02-18,4,11,0.36363636363636365,,,neutral
@@ -775,6 +785,7 @@ ind_automanufacturers,2026-02-25,2,12,0.16666666666666666,,,neutral
 ind_automanufacturers,2026-02-26,3,12,0.25,,,neutral
 ind_automanufacturers,2026-02-27,3,12,0.25,0.24545454545454545,,neutral
 ind_automanufacturers,2026-03-02,1,12,0.08333333333333333,0.2204545454545454,-0.02500000000000005,down
+ind_automanufacturers,2026-03-03,0,12,0.0,0.19318181818181818,-0.027272727272727226,down
 ind_autoparts,2026-02-16,17,29,0.5862068965517241,,,neutral
 ind_autoparts,2026-02-17,15,29,0.5172413793103449,,,neutral
 ind_autoparts,2026-02-18,15,29,0.5172413793103449,,,neutral
@@ -786,6 +797,7 @@ ind_autoparts,2026-02-25,14,29,0.4827586206896552,,,neutral
 ind_autoparts,2026-02-26,13,29,0.4482758620689655,,,neutral
 ind_autoparts,2026-02-27,10,29,0.3448275862068966,0.48275862068965514,,neutral
 ind_autoparts,2026-03-02,9,29,0.3103448275862069,0.45517241379310347,-0.027586206896551668,down
+ind_autoparts,2026-03-03,4,29,0.13793103448275862,0.41724137931034494,-0.03793103448275853,down
 ind_autotruckdealerships,2026-02-16,1,15,0.06666666666666667,,,neutral
 ind_autotruckdealerships,2026-02-17,1,15,0.06666666666666667,,,neutral
 ind_autotruckdealerships,2026-02-18,1,15,0.06666666666666667,,,neutral
@@ -797,6 +809,7 @@ ind_autotruckdealerships,2026-02-25,1,14,0.07142857142857142,,,neutral
 ind_autotruckdealerships,2026-02-26,1,14,0.07142857142857142,,,neutral
 ind_autotruckdealerships,2026-02-27,0,14,0.0,0.060952380952380945,,neutral
 ind_autotruckdealerships,2026-03-02,1,14,0.07142857142857142,0.06142857142857143,0.0004761904761904842,up
+ind_autotruckdealerships,2026-03-03,0,14,0.0,0.05476190476190477,-0.006666666666666661,down
 ind_banksdiversified,2026-02-16,7,19,0.3684210526315789,,,neutral
 ind_banksdiversified,2026-02-17,7,19,0.3684210526315789,,,neutral
 ind_banksdiversified,2026-02-18,11,19,0.5789473684210527,,,neutral
@@ -808,6 +821,7 @@ ind_banksdiversified,2026-02-25,7,19,0.3684210526315789,,,neutral
 ind_banksdiversified,2026-02-26,9,19,0.47368421052631576,,,neutral
 ind_banksdiversified,2026-02-27,4,19,0.21052631578947367,0.4,,neutral
 ind_banksdiversified,2026-03-02,4,19,0.21052631578947367,0.38421052631578945,-0.015789473684210575,down
+ind_banksdiversified,2026-03-03,3,19,0.15789473684210525,0.36315789473684207,-0.02105263157894738,down
 ind_banksregional,2026-02-16,97,164,0.5914634146341463,,,neutral
 ind_banksregional,2026-02-17,101,164,0.6158536585365854,,,neutral
 ind_banksregional,2026-02-18,91,165,0.5515151515151515,,,neutral
@@ -819,6 +833,7 @@ ind_banksregional,2026-02-25,29,167,0.17365269461077845,,,neutral
 ind_banksregional,2026-02-26,28,166,0.1686746987951807,,,neutral
 ind_banksregional,2026-02-27,6,165,0.03636363636363636,0.33770442125393113,,neutral
 ind_banksregional,2026-03-02,6,164,0.036585365853658534,0.28221661637588236,-0.055487804878048774,down
+ind_banksregional,2026-03-03,3,165,0.01818181818181818,0.2224494323404056,-0.05976718403547676,down
 ind_beveragesbrewers,2026-02-16,2,6,0.3333333333333333,,,neutral
 ind_beveragesbrewers,2026-02-17,2,6,0.3333333333333333,,,neutral
 ind_beveragesbrewers,2026-02-18,2,6,0.3333333333333333,,,neutral
@@ -830,6 +845,7 @@ ind_beveragesbrewers,2026-02-25,2,6,0.3333333333333333,,,neutral
 ind_beveragesbrewers,2026-02-26,2,6,0.3333333333333333,,,neutral
 ind_beveragesbrewers,2026-02-27,2,6,0.3333333333333333,0.3333333333333333,,neutral
 ind_beveragesbrewers,2026-03-02,2,6,0.3333333333333333,0.3333333333333333,0.0,down
+ind_beveragesbrewers,2026-03-03,0,6,0.0,0.3,-0.033333333333333326,down
 ind_beveragesnonalcoholic,2026-02-16,5,11,0.45454545454545453,,,neutral
 ind_beveragesnonalcoholic,2026-02-17,4,11,0.36363636363636365,,,neutral
 ind_beveragesnonalcoholic,2026-02-18,3,11,0.2727272727272727,,,neutral
@@ -841,6 +857,7 @@ ind_beveragesnonalcoholic,2026-02-25,5,11,0.45454545454545453,,,neutral
 ind_beveragesnonalcoholic,2026-02-26,6,11,0.5454545454545454,,,neutral
 ind_beveragesnonalcoholic,2026-02-27,6,11,0.5454545454545454,0.40909090909090906,,neutral
 ind_beveragesnonalcoholic,2026-03-02,3,11,0.2727272727272727,0.39090909090909093,-0.018181818181818132,down
+ind_beveragesnonalcoholic,2026-03-03,2,11,0.18181818181818182,0.3727272727272727,-0.018181818181818243,down
 ind_beverageswineriesdistilleries,2026-02-16,0,5,0.0,,,neutral
 ind_beverageswineriesdistilleries,2026-02-17,0,5,0.0,,,neutral
 ind_beverageswineriesdistilleries,2026-02-18,0,4,0.0,,,neutral
@@ -852,6 +869,7 @@ ind_beverageswineriesdistilleries,2026-02-25,1,5,0.2,,,neutral
 ind_beverageswineriesdistilleries,2026-02-26,1,5,0.2,,,neutral
 ind_beverageswineriesdistilleries,2026-02-27,1,5,0.2,0.12000000000000002,,neutral
 ind_beverageswineriesdistilleries,2026-03-02,1,5,0.2,0.14,0.01999999999999999,up
+ind_beverageswineriesdistilleries,2026-03-03,1,5,0.2,0.16,0.01999999999999999,up
 ind_biotechnology,2026-02-16,40,181,0.22099447513812154,,,neutral
 ind_biotechnology,2026-02-17,51,183,0.2786885245901639,,,neutral
 ind_biotechnology,2026-02-18,58,186,0.3118279569892473,,,neutral
@@ -863,6 +881,7 @@ ind_biotechnology,2026-02-25,82,191,0.4293193717277487,,,neutral
 ind_biotechnology,2026-02-26,73,192,0.3802083333333333,,,neutral
 ind_biotechnology,2026-02-27,82,193,0.42487046632124353,0.34998696384071176,,neutral
 ind_biotechnology,2026-03-02,73,192,0.3802083333333333,0.365908349660233,0.01592138581952124,up
+ind_biotechnology,2026-03-03,59,187,0.3155080213903743,0.369590299340254,0.0036819496800210016,up
 ind_broadcasting,2026-02-16,2,3,0.6666666666666666,,,neutral
 ind_broadcasting,2026-02-17,2,3,0.6666666666666666,,,neutral
 ind_broadcasting,2026-02-18,2,3,0.6666666666666666,,,neutral
@@ -874,6 +893,7 @@ ind_broadcasting,2026-02-25,2,3,0.6666666666666666,,,neutral
 ind_broadcasting,2026-02-26,3,3,1.0,,,neutral
 ind_broadcasting,2026-02-27,3,3,1.0,0.7333333333333333,,neutral
 ind_broadcasting,2026-03-02,3,3,1.0,0.7666666666666666,0.033333333333333326,up
+ind_broadcasting,2026-03-03,2,3,0.6666666666666666,0.7666666666666667,1.1102230246251565e-16,up
 ind_buildingmaterials,2026-02-16,5,11,0.45454545454545453,,,neutral
 ind_buildingmaterials,2026-02-17,3,11,0.2727272727272727,,,neutral
 ind_buildingmaterials,2026-02-18,3,11,0.2727272727272727,,,neutral
@@ -885,6 +905,7 @@ ind_buildingmaterials,2026-02-25,4,11,0.36363636363636365,,,neutral
 ind_buildingmaterials,2026-02-26,4,11,0.36363636363636365,,,neutral
 ind_buildingmaterials,2026-02-27,2,11,0.18181818181818182,0.32727272727272727,,neutral
 ind_buildingmaterials,2026-03-02,1,11,0.09090909090909091,0.2909090909090909,-0.036363636363636376,down
+ind_buildingmaterials,2026-03-03,1,10,0.1,0.2736363636363636,-0.017272727272727273,down
 ind_buildingproductsequipment,2026-02-16,7,21,0.3333333333333333,,,neutral
 ind_buildingproductsequipment,2026-02-17,7,21,0.3333333333333333,,,neutral
 ind_buildingproductsequipment,2026-02-18,7,21,0.3333333333333333,,,neutral
@@ -896,6 +917,7 @@ ind_buildingproductsequipment,2026-02-25,3,21,0.14285714285714285,,,neutral
 ind_buildingproductsequipment,2026-02-26,5,21,0.23809523809523808,,,neutral
 ind_buildingproductsequipment,2026-02-27,3,21,0.14285714285714285,0.26666666666666666,,neutral
 ind_buildingproductsequipment,2026-03-02,2,21,0.09523809523809523,0.24285714285714283,-0.023809523809523836,down
+ind_buildingproductsequipment,2026-03-03,0,22,0.0,0.20952380952380953,-0.0333333333333333,down
 ind_businessequipmentsupplies,2026-02-16,0,1,0.0,,,neutral
 ind_businessequipmentsupplies,2026-02-17,0,1,0.0,,,neutral
 ind_businessequipmentsupplies,2026-02-18,0,1,0.0,,,neutral
@@ -907,6 +929,7 @@ ind_businessequipmentsupplies,2026-02-25,1,1,1.0,,,neutral
 ind_businessequipmentsupplies,2026-02-26,0,1,0.0,,,neutral
 ind_businessequipmentsupplies,2026-02-27,0,1,0.0,0.1,,neutral
 ind_businessequipmentsupplies,2026-03-02,0,1,0.0,0.1,0.0,down
+ind_businessequipmentsupplies,2026-03-03,1,1,1.0,0.2,0.1,up
 ind_capitalmarkets,2026-02-16,4,36,0.1111111111111111,,,neutral
 ind_capitalmarkets,2026-02-17,4,36,0.1111111111111111,,,neutral
 ind_capitalmarkets,2026-02-18,4,36,0.1111111111111111,,,neutral
@@ -918,6 +941,7 @@ ind_capitalmarkets,2026-02-25,6,37,0.16216216216216217,,,neutral
 ind_capitalmarkets,2026-02-26,5,37,0.13513513513513514,,,neutral
 ind_capitalmarkets,2026-02-27,7,35,0.2,0.13615830115830116,,neutral
 ind_capitalmarkets,2026-03-02,6,36,0.16666666666666666,0.1417138567138567,0.005555555555555536,up
+ind_capitalmarkets,2026-03-03,4,35,0.11428571428571428,0.14203131703131705,0.0003174603174603552,up
 ind_chemicals,2026-02-16,5,8,0.625,,,neutral
 ind_chemicals,2026-02-17,2,8,0.25,,,neutral
 ind_chemicals,2026-02-18,5,8,0.625,,,neutral
@@ -929,6 +953,7 @@ ind_chemicals,2026-02-25,4,10,0.4,,,neutral
 ind_chemicals,2026-02-26,3,9,0.3333333333333333,,,neutral
 ind_chemicals,2026-02-27,5,9,0.5555555555555556,0.4969444444444445,,neutral
 ind_chemicals,2026-03-02,5,9,0.5555555555555556,0.49000000000000005,-0.006944444444444475,down
+ind_chemicals,2026-03-03,4,9,0.4444444444444444,0.5094444444444445,0.01944444444444443,up
 ind_closedendfunddebt,2026-02-16,4,74,0.05405405405405406,,,neutral
 ind_closedendfunddebt,2026-02-17,4,73,0.0547945205479452,,,neutral
 ind_closedendfunddebt,2026-02-18,4,74,0.05405405405405406,,,neutral
@@ -940,6 +965,7 @@ ind_closedendfunddebt,2026-02-25,3,70,0.04285714285714286,,,neutral
 ind_closedendfunddebt,2026-02-26,3,71,0.04225352112676056,,,neutral
 ind_closedendfunddebt,2026-02-27,3,70,0.04285714285714286,0.048545079209542465,,neutral
 ind_closedendfunddebt,2026-03-02,3,70,0.04285714285714286,0.04742538808985135,-0.0011196911196911172,down
+ind_closedendfunddebt,2026-03-03,0,70,0.0,0.04194593603505682,-0.005479452054794526,down
 ind_closedendfundequity,2026-02-16,14,41,0.34146341463414637,,,neutral
 ind_closedendfundequity,2026-02-17,13,41,0.3170731707317073,,,neutral
 ind_closedendfundequity,2026-02-18,16,41,0.3902439024390244,,,neutral
@@ -951,6 +977,7 @@ ind_closedendfundequity,2026-02-25,15,39,0.38461538461538464,,,neutral
 ind_closedendfundequity,2026-02-26,13,39,0.3333333333333333,,,neutral
 ind_closedendfundequity,2026-02-27,13,40,0.325,0.34740462789243276,,neutral
 ind_closedendfundequity,2026-03-02,15,40,0.375,0.35075828642901813,0.003353658536585369,up
+ind_closedendfundequity,2026-03-03,10,40,0.25,0.3440509693558474,-0.006707317073170738,down
 ind_closedendfundforeign,2026-02-16,2,4,0.5,,,neutral
 ind_closedendfundforeign,2026-02-17,2,4,0.5,,,neutral
 ind_closedendfundforeign,2026-02-18,3,4,0.75,,,neutral
@@ -962,6 +989,7 @@ ind_closedendfundforeign,2026-02-25,3,5,0.6,,,neutral
 ind_closedendfundforeign,2026-02-26,3,5,0.6,,,neutral
 ind_closedendfundforeign,2026-02-27,2,5,0.4,0.515,,neutral
 ind_closedendfundforeign,2026-03-02,3,5,0.6,0.525,0.010000000000000009,up
+ind_closedendfundforeign,2026-03-03,0,5,0.0,0.475,-0.050000000000000044,down
 ind_cokingcoal,2026-02-16,0,3,0.0,,,neutral
 ind_cokingcoal,2026-02-17,0,3,0.0,,,neutral
 ind_cokingcoal,2026-02-18,0,3,0.0,,,neutral
@@ -973,6 +1001,7 @@ ind_cokingcoal,2026-02-25,0,3,0.0,,,neutral
 ind_cokingcoal,2026-02-26,0,3,0.0,,,neutral
 ind_cokingcoal,2026-02-27,0,3,0.0,0.0,,neutral
 ind_cokingcoal,2026-03-02,0,3,0.0,0.0,0.0,down
+ind_cokingcoal,2026-03-03,0,3,0.0,0.0,0.0,down
 ind_communicationequipment,2026-02-16,13,24,0.5416666666666666,,,neutral
 ind_communicationequipment,2026-02-17,11,25,0.44,,,neutral
 ind_communicationequipment,2026-02-18,11,24,0.4583333333333333,,,neutral
@@ -984,6 +1013,7 @@ ind_communicationequipment,2026-02-25,15,26,0.5769230769230769,,,neutral
 ind_communicationequipment,2026-02-26,13,25,0.52,,,neutral
 ind_communicationequipment,2026-02-27,13,26,0.5,0.4898461538461539,,neutral
 ind_communicationequipment,2026-03-02,14,25,0.56,0.4916794871794871,0.0018333333333332424,up
+ind_communicationequipment,2026-03-03,12,25,0.48,0.49567948717948723,0.004000000000000115,up
 ind_computerhardware,2026-02-16,5,15,0.3333333333333333,,,neutral
 ind_computerhardware,2026-02-17,5,14,0.35714285714285715,,,neutral
 ind_computerhardware,2026-02-18,3,14,0.21428571428571427,,,neutral
@@ -995,6 +1025,7 @@ ind_computerhardware,2026-02-25,3,13,0.23076923076923078,,,neutral
 ind_computerhardware,2026-02-26,2,15,0.13333333333333333,,,neutral
 ind_computerhardware,2026-02-27,1,15,0.06666666666666667,0.19570970695970696,,neutral
 ind_computerhardware,2026-03-02,0,15,0.0,0.16237637362637364,-0.033333333333333326,down
+ind_computerhardware,2026-03-03,1,15,0.06666666666666667,0.13332875457875457,-0.029047619047619072,down
 ind_confectioners,2026-02-16,1,3,0.3333333333333333,,,neutral
 ind_confectioners,2026-02-17,2,3,0.6666666666666666,,,neutral
 ind_confectioners,2026-02-18,2,3,0.6666666666666666,,,neutral
@@ -1006,6 +1037,7 @@ ind_confectioners,2026-02-25,2,3,0.6666666666666666,,,neutral
 ind_confectioners,2026-02-26,2,3,0.6666666666666666,,,neutral
 ind_confectioners,2026-02-27,2,3,0.6666666666666666,0.6333333333333333,,neutral
 ind_confectioners,2026-03-02,2,3,0.6666666666666666,0.6666666666666666,0.033333333333333326,up
+ind_confectioners,2026-03-03,2,3,0.6666666666666666,0.6666666666666666,0.0,down
 ind_conglomerates,2026-02-16,4,9,0.4444444444444444,,,neutral
 ind_conglomerates,2026-02-17,2,9,0.2222222222222222,,,neutral
 ind_conglomerates,2026-02-18,2,9,0.2222222222222222,,,neutral
@@ -1017,6 +1049,7 @@ ind_conglomerates,2026-02-25,4,9,0.4444444444444444,,,neutral
 ind_conglomerates,2026-02-26,5,8,0.625,,,neutral
 ind_conglomerates,2026-02-27,3,8,0.375,0.4,,neutral
 ind_conglomerates,2026-03-02,2,8,0.25,0.38055555555555554,-0.019444444444444486,down
+ind_conglomerates,2026-03-03,2,8,0.25,0.38333333333333336,0.0027777777777778234,up
 ind_consultingservices,2026-02-16,0,7,0.0,,,neutral
 ind_consultingservices,2026-02-17,0,8,0.0,,,neutral
 ind_consultingservices,2026-02-18,0,8,0.0,,,neutral
@@ -1028,6 +1061,7 @@ ind_consultingservices,2026-02-25,0,8,0.0,,,neutral
 ind_consultingservices,2026-02-26,0,8,0.0,,,neutral
 ind_consultingservices,2026-02-27,0,8,0.0,0.0,,neutral
 ind_consultingservices,2026-03-02,0,8,0.0,0.0,0.0,down
+ind_consultingservices,2026-03-03,0,8,0.0,0.0,0.0,down
 ind_consumerelectronics,2026-02-16,0,5,0.0,,,neutral
 ind_consumerelectronics,2026-02-17,1,5,0.2,,,neutral
 ind_consumerelectronics,2026-02-18,1,5,0.2,,,neutral
@@ -1039,6 +1073,7 @@ ind_consumerelectronics,2026-02-25,1,5,0.2,,,neutral
 ind_consumerelectronics,2026-02-26,2,5,0.4,,,neutral
 ind_consumerelectronics,2026-02-27,0,5,0.0,0.16,,neutral
 ind_consumerelectronics,2026-03-02,0,5,0.0,0.16,0.0,down
+ind_consumerelectronics,2026-03-03,0,5,0.0,0.14,-0.01999999999999999,down
 ind_copper,2026-02-16,3,5,0.6,,,neutral
 ind_copper,2026-02-17,0,5,0.0,,,neutral
 ind_copper,2026-02-18,1,5,0.2,,,neutral
@@ -1050,6 +1085,7 @@ ind_copper,2026-02-25,4,5,0.8,,,neutral
 ind_copper,2026-02-26,3,5,0.6,,,neutral
 ind_copper,2026-02-27,3,5,0.6,0.48,,neutral
 ind_copper,2026-03-02,2,5,0.4,0.4600000000000001,-0.019999999999999907,down
+ind_copper,2026-03-03,2,5,0.4,0.5,0.039999999999999925,up
 ind_creditservices,2026-02-16,3,25,0.12,,,neutral
 ind_creditservices,2026-02-17,3,25,0.12,,,neutral
 ind_creditservices,2026-02-18,5,25,0.2,,,neutral
@@ -1061,6 +1097,7 @@ ind_creditservices,2026-02-25,3,27,0.1111111111111111,,,neutral
 ind_creditservices,2026-02-26,6,27,0.2222222222222222,,,neutral
 ind_creditservices,2026-02-27,3,27,0.1111111111111111,0.13773219373219373,,neutral
 ind_creditservices,2026-03-02,4,27,0.14814814814814814,0.14054700854700855,0.0028148148148148255,up
+ind_creditservices,2026-03-03,4,27,0.14814814814814814,0.14336182336182338,0.0028148148148148255,up
 ind_departmentstores,2026-02-16,2,3,0.6666666666666666,,,neutral
 ind_departmentstores,2026-02-17,2,3,0.6666666666666666,,,neutral
 ind_departmentstores,2026-02-18,3,3,1.0,,,neutral
@@ -1072,6 +1109,7 @@ ind_departmentstores,2026-02-25,0,3,0.0,,,neutral
 ind_departmentstores,2026-02-26,0,3,0.0,,,neutral
 ind_departmentstores,2026-02-27,0,3,0.0,0.4333333333333333,,neutral
 ind_departmentstores,2026-03-02,0,3,0.0,0.36666666666666664,-0.06666666666666665,down
+ind_departmentstores,2026-03-03,0,3,0.0,0.3,-0.06666666666666665,down
 ind_diagnosticsresearch,2026-02-16,6,32,0.1875,,,neutral
 ind_diagnosticsresearch,2026-02-17,6,32,0.1875,,,neutral
 ind_diagnosticsresearch,2026-02-18,9,32,0.28125,,,neutral
@@ -1083,6 +1121,7 @@ ind_diagnosticsresearch,2026-02-25,6,31,0.1935483870967742,,,neutral
 ind_diagnosticsresearch,2026-02-26,6,32,0.1875,,,neutral
 ind_diagnosticsresearch,2026-02-27,5,31,0.16129032258064516,0.1934475806451613,,neutral
 ind_diagnosticsresearch,2026-03-02,6,31,0.1935483870967742,0.1940524193548387,0.0006048387096773966,up
+ind_diagnosticsresearch,2026-03-03,5,31,0.16129032258064516,0.19143145161290323,-0.0026209677419354593,down
 ind_discountstores,2026-02-16,5,9,0.5555555555555556,,,neutral
 ind_discountstores,2026-02-17,4,9,0.4444444444444444,,,neutral
 ind_discountstores,2026-02-18,5,9,0.5555555555555556,,,neutral
@@ -1094,6 +1133,7 @@ ind_discountstores,2026-02-25,4,9,0.4444444444444444,,,neutral
 ind_discountstores,2026-02-26,4,9,0.4444444444444444,,,neutral
 ind_discountstores,2026-02-27,4,9,0.4444444444444444,0.5111111111111111,,neutral
 ind_discountstores,2026-03-02,2,9,0.2222222222222222,0.47777777777777775,-0.033333333333333326,down
+ind_discountstores,2026-03-03,3,9,0.3333333333333333,0.4666666666666667,-0.011111111111111072,down
 ind_drugmanufacturersgeneral,2026-02-16,11,14,0.7857142857142857,,,neutral
 ind_drugmanufacturersgeneral,2026-02-17,11,14,0.7857142857142857,,,neutral
 ind_drugmanufacturersgeneral,2026-02-18,11,14,0.7857142857142857,,,neutral
@@ -1105,6 +1145,7 @@ ind_drugmanufacturersgeneral,2026-02-25,9,14,0.6428571428571429,,,neutral
 ind_drugmanufacturersgeneral,2026-02-26,7,14,0.5,,,neutral
 ind_drugmanufacturersgeneral,2026-02-27,11,14,0.7857142857142857,0.7071428571428571,,neutral
 ind_drugmanufacturersgeneral,2026-03-02,9,14,0.6428571428571429,0.6928571428571428,-0.014285714285714235,down
+ind_drugmanufacturersgeneral,2026-03-03,6,14,0.42857142857142855,0.6571428571428573,-0.03571428571428559,down
 ind_drugmanufacturersspecialtygeneric,2026-02-16,11,32,0.34375,,,neutral
 ind_drugmanufacturersspecialtygeneric,2026-02-17,15,32,0.46875,,,neutral
 ind_drugmanufacturersspecialtygeneric,2026-02-18,15,32,0.46875,,,neutral
@@ -1116,6 +1157,7 @@ ind_drugmanufacturersspecialtygeneric,2026-02-25,11,31,0.3548387096774194,,,neut
 ind_drugmanufacturersspecialtygeneric,2026-02-26,10,31,0.3225806451612903,,,neutral
 ind_drugmanufacturersspecialtygeneric,2026-02-27,10,30,0.3333333333333333,0.38434139784946236,,neutral
 ind_drugmanufacturersspecialtygeneric,2026-03-02,12,29,0.41379310344827586,0.39134570819428993,0.007004310344827569,up
+ind_drugmanufacturersspecialtygeneric,2026-03-03,6,29,0.20689655172413793,0.3651603633667037,-0.02618534482758622,down
 ind_educationtrainingservices,2026-02-16,2,15,0.13333333333333333,,,neutral
 ind_educationtrainingservices,2026-02-17,2,15,0.13333333333333333,,,neutral
 ind_educationtrainingservices,2026-02-18,3,15,0.2,,,neutral
@@ -1127,6 +1169,7 @@ ind_educationtrainingservices,2026-02-25,2,16,0.125,,,neutral
 ind_educationtrainingservices,2026-02-26,2,16,0.125,,,neutral
 ind_educationtrainingservices,2026-02-27,2,16,0.125,0.13541666666666669,,neutral
 ind_educationtrainingservices,2026-03-02,3,16,0.1875,0.14083333333333334,0.005416666666666653,up
+ind_educationtrainingservices,2026-03-03,2,16,0.125,0.14,-0.0008333333333333248,down
 ind_electricalequipmentparts,2026-02-16,7,15,0.4666666666666667,,,neutral
 ind_electricalequipmentparts,2026-02-17,7,15,0.4666666666666667,,,neutral
 ind_electricalequipmentparts,2026-02-18,7,15,0.4666666666666667,,,neutral
@@ -1138,6 +1181,7 @@ ind_electricalequipmentparts,2026-02-25,6,18,0.3333333333333333,,,neutral
 ind_electricalequipmentparts,2026-02-26,6,17,0.35294117647058826,,,neutral
 ind_electricalequipmentparts,2026-02-27,4,17,0.23529411764705882,0.3738235294117647,,neutral
 ind_electricalequipmentparts,2026-03-02,6,17,0.35294117647058826,0.36245098039215684,-0.01137254901960788,down
+ind_electricalequipmentparts,2026-03-03,3,17,0.17647058823529413,0.3334313725490196,-0.02901960784313723,down
 ind_electroniccomponents,2026-02-16,15,26,0.5769230769230769,,,neutral
 ind_electroniccomponents,2026-02-17,13,26,0.5,,,neutral
 ind_electroniccomponents,2026-02-18,14,26,0.5384615384615384,,,neutral
@@ -1149,6 +1193,7 @@ ind_electroniccomponents,2026-02-25,19,26,0.7307692307692307,,,neutral
 ind_electroniccomponents,2026-02-26,16,26,0.6153846153846154,,,neutral
 ind_electroniccomponents,2026-02-27,15,26,0.5769230769230769,0.5961538461538461,,neutral
 ind_electroniccomponents,2026-03-02,13,26,0.5,0.5884615384615385,-0.007692307692307665,down
+ind_electroniccomponents,2026-03-03,7,26,0.2692307692307692,0.5653846153846154,-0.023076923076923106,down
 ind_electronicgamingmultimedia,2026-02-16,0,4,0.0,,,neutral
 ind_electronicgamingmultimedia,2026-02-17,0,4,0.0,,,neutral
 ind_electronicgamingmultimedia,2026-02-18,0,4,0.0,,,neutral
@@ -1160,6 +1205,7 @@ ind_electronicgamingmultimedia,2026-02-25,0,4,0.0,,,neutral
 ind_electronicgamingmultimedia,2026-02-26,0,4,0.0,,,neutral
 ind_electronicgamingmultimedia,2026-02-27,0,4,0.0,0.0,,neutral
 ind_electronicgamingmultimedia,2026-03-02,0,4,0.0,0.0,0.0,down
+ind_electronicgamingmultimedia,2026-03-03,0,4,0.0,0.0,0.0,down
 ind_electronicscomputerdistribution,2026-02-16,3,5,0.6,,,neutral
 ind_electronicscomputerdistribution,2026-02-17,2,5,0.4,,,neutral
 ind_electronicscomputerdistribution,2026-02-18,2,5,0.4,,,neutral
@@ -1171,6 +1217,7 @@ ind_electronicscomputerdistribution,2026-02-25,2,5,0.4,,,neutral
 ind_electronicscomputerdistribution,2026-02-26,2,5,0.4,,,neutral
 ind_electronicscomputerdistribution,2026-02-27,2,5,0.4,0.42000000000000004,,neutral
 ind_electronicscomputerdistribution,2026-03-02,0,5,0.0,0.36,-0.06000000000000005,down
+ind_electronicscomputerdistribution,2026-03-03,0,5,0.0,0.32,-0.03999999999999998,down
 ind_engineeringconstruction,2026-02-16,22,34,0.6470588235294118,,,neutral
 ind_engineeringconstruction,2026-02-17,22,34,0.6470588235294118,,,neutral
 ind_engineeringconstruction,2026-02-18,21,34,0.6176470588235294,,,neutral
@@ -1182,6 +1229,7 @@ ind_engineeringconstruction,2026-02-25,21,34,0.6176470588235294,,,neutral
 ind_engineeringconstruction,2026-02-26,20,34,0.5882352941176471,,,neutral
 ind_engineeringconstruction,2026-02-27,19,34,0.5588235294117647,0.6294117647058824,,neutral
 ind_engineeringconstruction,2026-03-02,19,34,0.5588235294117647,0.6205882352941177,-0.008823529411764786,down
+ind_engineeringconstruction,2026-03-03,12,34,0.35294117647058826,0.5911764705882353,-0.02941176470588236,down
 ind_entertainment,2026-02-16,4,26,0.15384615384615385,,,neutral
 ind_entertainment,2026-02-17,6,26,0.23076923076923078,,,neutral
 ind_entertainment,2026-02-18,6,26,0.23076923076923078,,,neutral
@@ -1193,6 +1241,7 @@ ind_entertainment,2026-02-25,6,26,0.23076923076923078,,,neutral
 ind_entertainment,2026-02-26,7,26,0.2692307692307692,,,neutral
 ind_entertainment,2026-02-27,8,27,0.2962962962962963,0.2257834757834758,,neutral
 ind_entertainment,2026-03-02,7,27,0.25925925925925924,0.23632478632478632,0.010541310541310522,up
+ind_entertainment,2026-03-03,7,27,0.25925925925925924,0.23917378917378915,0.0028490028490028296,up
 ind_farmheavyconstructionmachinery,2026-02-16,12,17,0.7058823529411765,,,neutral
 ind_farmheavyconstructionmachinery,2026-02-17,12,17,0.7058823529411765,,,neutral
 ind_farmheavyconstructionmachinery,2026-02-18,11,17,0.6470588235294118,,,neutral
@@ -1204,6 +1253,7 @@ ind_farmheavyconstructionmachinery,2026-02-25,9,17,0.5294117647058824,,,neutral
 ind_farmheavyconstructionmachinery,2026-02-26,8,16,0.5,,,neutral
 ind_farmheavyconstructionmachinery,2026-02-27,8,16,0.5,0.611764705882353,,neutral
 ind_farmheavyconstructionmachinery,2026-03-02,7,15,0.4666666666666667,0.587843137254902,-0.023921568627450984,down
+ind_farmheavyconstructionmachinery,2026-03-03,3,15,0.2,0.5372549019607843,-0.05058823529411771,down
 ind_farmproducts,2026-02-16,3,7,0.42857142857142855,,,neutral
 ind_farmproducts,2026-02-17,3,7,0.42857142857142855,,,neutral
 ind_farmproducts,2026-02-18,2,7,0.2857142857142857,,,neutral
@@ -1215,6 +1265,7 @@ ind_farmproducts,2026-02-25,2,7,0.2857142857142857,,,neutral
 ind_farmproducts,2026-02-26,2,7,0.2857142857142857,,,neutral
 ind_farmproducts,2026-02-27,3,7,0.42857142857142855,0.3714285714285714,,neutral
 ind_farmproducts,2026-03-02,3,7,0.42857142857142855,0.37142857142857144,5.551115123125783e-17,up
+ind_farmproducts,2026-03-03,1,7,0.14285714285714285,0.34285714285714286,-0.02857142857142858,down
 ind_financialconglomerates,2026-02-16,2,4,0.5,,,neutral
 ind_financialconglomerates,2026-02-17,2,4,0.5,,,neutral
 ind_financialconglomerates,2026-02-18,2,4,0.5,,,neutral
@@ -1226,6 +1277,7 @@ ind_financialconglomerates,2026-02-25,1,5,0.2,,,neutral
 ind_financialconglomerates,2026-02-26,2,5,0.4,,,neutral
 ind_financialconglomerates,2026-02-27,1,5,0.2,0.37,,neutral
 ind_financialconglomerates,2026-03-02,0,5,0.0,0.32,-0.04999999999999999,down
+ind_financialconglomerates,2026-03-03,0,5,0.0,0.27,-0.04999999999999999,down
 ind_financialdatastockexchanges,2026-02-16,1,11,0.09090909090909091,,,neutral
 ind_financialdatastockexchanges,2026-02-17,1,11,0.09090909090909091,,,neutral
 ind_financialdatastockexchanges,2026-02-18,1,11,0.09090909090909091,,,neutral
@@ -1237,6 +1289,7 @@ ind_financialdatastockexchanges,2026-02-25,1,11,0.09090909090909091,,,neutral
 ind_financialdatastockexchanges,2026-02-26,1,11,0.09090909090909091,,,neutral
 ind_financialdatastockexchanges,2026-02-27,1,11,0.09090909090909091,0.09090909090909091,,neutral
 ind_financialdatastockexchanges,2026-03-02,2,11,0.18181818181818182,0.1,0.009090909090909094,up
+ind_financialdatastockexchanges,2026-03-03,2,11,0.18181818181818182,0.1090909090909091,0.009090909090909094,up
 ind_fooddistribution,2026-02-16,6,8,0.75,,,neutral
 ind_fooddistribution,2026-02-17,6,8,0.75,,,neutral
 ind_fooddistribution,2026-02-18,6,8,0.75,,,neutral
@@ -1248,6 +1301,7 @@ ind_fooddistribution,2026-02-25,4,8,0.5,,,neutral
 ind_fooddistribution,2026-02-26,5,8,0.625,,,neutral
 ind_fooddistribution,2026-02-27,4,8,0.5,0.625,,neutral
 ind_fooddistribution,2026-03-02,4,8,0.5,0.6,-0.025000000000000022,down
+ind_fooddistribution,2026-03-03,1,8,0.125,0.5375,-0.0625,down
 ind_footwearaccessories,2026-02-16,1,7,0.14285714285714285,,,neutral
 ind_footwearaccessories,2026-02-17,1,7,0.14285714285714285,,,neutral
 ind_footwearaccessories,2026-02-18,1,7,0.14285714285714285,,,neutral
@@ -1259,6 +1313,7 @@ ind_footwearaccessories,2026-02-25,1,7,0.14285714285714285,,,neutral
 ind_footwearaccessories,2026-02-26,1,7,0.14285714285714285,,,neutral
 ind_footwearaccessories,2026-02-27,1,7,0.14285714285714285,0.14285714285714285,,neutral
 ind_footwearaccessories,2026-03-02,0,7,0.0,0.12857142857142856,-0.01428571428571429,down
+ind_footwearaccessories,2026-03-03,0,7,0.0,0.11428571428571428,-0.014285714285714277,down
 ind_furnishingsfixturesappliances,2026-02-16,6,14,0.42857142857142855,,,neutral
 ind_furnishingsfixturesappliances,2026-02-17,4,14,0.2857142857142857,,,neutral
 ind_furnishingsfixturesappliances,2026-02-18,4,14,0.2857142857142857,,,neutral
@@ -1270,6 +1325,7 @@ ind_furnishingsfixturesappliances,2026-02-25,1,14,0.07142857142857142,,,neutral
 ind_furnishingsfixturesappliances,2026-02-26,1,14,0.07142857142857142,,,neutral
 ind_furnishingsfixturesappliances,2026-02-27,0,14,0.0,0.2,,neutral
 ind_furnishingsfixturesappliances,2026-03-02,0,14,0.0,0.1571428571428571,-0.0428571428571429,down
+ind_furnishingsfixturesappliances,2026-03-03,0,13,0.0,0.12857142857142856,-0.028571428571428553,down
 ind_gambling,2026-02-16,0,6,0.0,,,neutral
 ind_gambling,2026-02-17,0,6,0.0,,,neutral
 ind_gambling,2026-02-18,0,6,0.0,,,neutral
@@ -1281,6 +1337,7 @@ ind_gambling,2026-02-25,1,7,0.14285714285714285,,,neutral
 ind_gambling,2026-02-26,1,7,0.14285714285714285,,,neutral
 ind_gambling,2026-02-27,1,7,0.14285714285714285,0.09047619047619046,,neutral
 ind_gambling,2026-03-02,1,7,0.14285714285714285,0.10476190476190475,0.01428571428571429,up
+ind_gambling,2026-03-03,1,7,0.14285714285714285,0.11904761904761904,0.01428571428571429,up
 ind_gold,2026-02-16,22,33,0.6666666666666666,,,neutral
 ind_gold,2026-02-17,14,33,0.42424242424242425,,,neutral
 ind_gold,2026-02-18,17,33,0.5151515151515151,,,neutral
@@ -1292,6 +1349,7 @@ ind_gold,2026-02-25,17,34,0.5,,,neutral
 ind_gold,2026-02-26,24,34,0.7058823529411765,,,neutral
 ind_gold,2026-02-27,21,34,0.6176470588235294,0.576114081996435,,neutral
 ind_gold,2026-03-02,27,34,0.7941176470588235,0.5888591800356506,0.012745098039215641,up
+ind_gold,2026-03-03,24,34,0.7058823529411765,0.6170231729055258,0.028163992869875143,up
 ind_grocerystores,2026-02-16,1,7,0.14285714285714285,,,neutral
 ind_grocerystores,2026-02-17,1,7,0.14285714285714285,,,neutral
 ind_grocerystores,2026-02-18,1,7,0.14285714285714285,,,neutral
@@ -1303,6 +1361,7 @@ ind_grocerystores,2026-02-25,1,6,0.16666666666666666,,,neutral
 ind_grocerystores,2026-02-26,1,6,0.16666666666666666,,,neutral
 ind_grocerystores,2026-02-27,0,6,0.0,0.1357142857142857,,neutral
 ind_grocerystores,2026-03-02,1,6,0.16666666666666666,0.1380952380952381,0.0023809523809524002,up
+ind_grocerystores,2026-03-03,1,6,0.16666666666666666,0.14047619047619048,0.0023809523809523725,up
 ind_healthcareplans,2026-02-16,0,10,0.0,,,neutral
 ind_healthcareplans,2026-02-17,0,10,0.0,,,neutral
 ind_healthcareplans,2026-02-18,0,10,0.0,,,neutral
@@ -1314,6 +1373,7 @@ ind_healthcareplans,2026-02-25,0,10,0.0,,,neutral
 ind_healthcareplans,2026-02-26,2,10,0.2,,,neutral
 ind_healthcareplans,2026-02-27,2,10,0.2,0.04,,neutral
 ind_healthcareplans,2026-03-02,2,10,0.2,0.06000000000000001,0.02000000000000001,up
+ind_healthcareplans,2026-03-03,2,10,0.2,0.08,0.01999999999999999,up
 ind_healthinformationservices,2026-02-16,0,19,0.0,,,neutral
 ind_healthinformationservices,2026-02-17,0,19,0.0,,,neutral
 ind_healthinformationservices,2026-02-18,1,18,0.05555555555555555,,,neutral
@@ -1325,6 +1385,7 @@ ind_healthinformationservices,2026-02-25,1,19,0.05263157894736842,,,neutral
 ind_healthinformationservices,2026-02-26,3,19,0.15789473684210525,,,neutral
 ind_healthinformationservices,2026-02-27,2,20,0.1,0.05766081871345029,,neutral
 ind_healthinformationservices,2026-03-02,2,20,0.1,0.06766081871345028,0.009999999999999995,up
+ind_healthinformationservices,2026-03-03,2,21,0.09523809523809523,0.07718462823725981,0.009523809523809532,up
 ind_homeimprovementretail,2026-02-16,1,3,0.3333333333333333,,,neutral
 ind_homeimprovementretail,2026-02-17,1,3,0.3333333333333333,,,neutral
 ind_homeimprovementretail,2026-02-18,1,3,0.3333333333333333,,,neutral
@@ -1336,6 +1397,7 @@ ind_homeimprovementretail,2026-02-25,0,3,0.0,,,neutral
 ind_homeimprovementretail,2026-02-26,0,3,0.0,,,neutral
 ind_homeimprovementretail,2026-02-27,0,3,0.0,0.2,,neutral
 ind_homeimprovementretail,2026-03-02,0,3,0.0,0.16666666666666666,-0.033333333333333354,down
+ind_homeimprovementretail,2026-03-03,0,3,0.0,0.1333333333333333,-0.033333333333333354,down
 ind_householdpersonalproducts,2026-02-16,1,15,0.06666666666666667,,,neutral
 ind_householdpersonalproducts,2026-02-17,1,15,0.06666666666666667,,,neutral
 ind_householdpersonalproducts,2026-02-18,1,15,0.06666666666666667,,,neutral
@@ -1347,6 +1409,7 @@ ind_householdpersonalproducts,2026-02-25,1,15,0.06666666666666667,,,neutral
 ind_householdpersonalproducts,2026-02-26,2,15,0.13333333333333333,,,neutral
 ind_householdpersonalproducts,2026-02-27,2,15,0.13333333333333333,0.09333333333333334,,neutral
 ind_householdpersonalproducts,2026-03-02,2,15,0.13333333333333333,0.1,0.006666666666666668,up
+ind_householdpersonalproducts,2026-03-03,1,15,0.06666666666666667,0.1,0.0,down
 ind_industrialdistribution,2026-02-16,7,16,0.4375,,,neutral
 ind_industrialdistribution,2026-02-17,6,16,0.375,,,neutral
 ind_industrialdistribution,2026-02-18,6,16,0.375,,,neutral
@@ -1358,6 +1421,7 @@ ind_industrialdistribution,2026-02-25,4,16,0.25,,,neutral
 ind_industrialdistribution,2026-02-26,5,16,0.3125,,,neutral
 ind_industrialdistribution,2026-02-27,4,16,0.25,0.325,,neutral
 ind_industrialdistribution,2026-03-02,3,16,0.1875,0.3,-0.025000000000000022,down
+ind_industrialdistribution,2026-03-03,1,16,0.0625,0.26875,-0.03125,down
 ind_informationtechnologyservices,2026-02-16,3,34,0.08823529411764706,,,neutral
 ind_informationtechnologyservices,2026-02-17,3,34,0.08823529411764706,,,neutral
 ind_informationtechnologyservices,2026-02-18,3,34,0.08823529411764706,,,neutral
@@ -1369,6 +1433,7 @@ ind_informationtechnologyservices,2026-02-25,0,34,0.0,,,neutral
 ind_informationtechnologyservices,2026-02-26,0,34,0.0,,,neutral
 ind_informationtechnologyservices,2026-02-27,0,35,0.0,0.047058823529411764,,neutral
 ind_informationtechnologyservices,2026-03-02,1,36,0.027777777777777776,0.04101307189542484,-0.0060457516339869274,down
+ind_informationtechnologyservices,2026-03-03,2,35,0.05714285714285714,0.03790382819794584,-0.003109243697478996,down
 ind_infrastructureoperations,2026-02-16,0,1,0.0,,,neutral
 ind_infrastructureoperations,2026-02-17,0,1,0.0,,,neutral
 ind_infrastructureoperations,2026-02-18,0,1,0.0,,,neutral
@@ -1380,6 +1445,7 @@ ind_infrastructureoperations,2026-02-25,0,1,0.0,,,neutral
 ind_infrastructureoperations,2026-02-26,0,1,0.0,,,neutral
 ind_infrastructureoperations,2026-02-27,0,1,0.0,0.0,,neutral
 ind_infrastructureoperations,2026-03-02,0,1,0.0,0.0,0.0,down
+ind_infrastructureoperations,2026-03-03,0,1,0.0,0.0,0.0,down
 ind_insurancebrokers,2026-02-16,0,12,0.0,,,neutral
 ind_insurancebrokers,2026-02-17,0,12,0.0,,,neutral
 ind_insurancebrokers,2026-02-18,0,12,0.0,,,neutral
@@ -1391,6 +1457,7 @@ ind_insurancebrokers,2026-02-25,0,12,0.0,,,neutral
 ind_insurancebrokers,2026-02-26,0,12,0.0,,,neutral
 ind_insurancebrokers,2026-02-27,0,12,0.0,0.0,,neutral
 ind_insurancebrokers,2026-03-02,0,12,0.0,0.0,0.0,down
+ind_insurancebrokers,2026-03-03,0,12,0.0,0.0,0.0,down
 ind_insurancediversified,2026-02-16,3,7,0.42857142857142855,,,neutral
 ind_insurancediversified,2026-02-17,2,7,0.2857142857142857,,,neutral
 ind_insurancediversified,2026-02-18,2,7,0.2857142857142857,,,neutral
@@ -1402,6 +1469,7 @@ ind_insurancediversified,2026-02-25,2,7,0.2857142857142857,,,neutral
 ind_insurancediversified,2026-02-26,1,7,0.14285714285714285,,,neutral
 ind_insurancediversified,2026-02-27,1,7,0.14285714285714285,0.2714285714285714,,neutral
 ind_insurancediversified,2026-03-02,1,7,0.14285714285714285,0.24285714285714288,-0.028571428571428525,down
+ind_insurancediversified,2026-03-03,0,7,0.0,0.21428571428571425,-0.028571428571428636,down
 ind_insurancelife,2026-02-16,1,14,0.07142857142857142,,,neutral
 ind_insurancelife,2026-02-17,2,14,0.14285714285714285,,,neutral
 ind_insurancelife,2026-02-18,3,14,0.21428571428571427,,,neutral
@@ -1413,6 +1481,7 @@ ind_insurancelife,2026-02-25,1,14,0.07142857142857142,,,neutral
 ind_insurancelife,2026-02-26,2,14,0.14285714285714285,,,neutral
 ind_insurancelife,2026-02-27,1,14,0.07142857142857142,0.08571428571428572,,neutral
 ind_insurancelife,2026-03-02,1,14,0.07142857142857142,0.08571428571428572,0.0,down
+ind_insurancelife,2026-03-03,1,14,0.07142857142857142,0.07857142857142856,-0.007142857142857159,down
 ind_insurancepropertycasualty,2026-02-16,6,38,0.15789473684210525,,,neutral
 ind_insurancepropertycasualty,2026-02-17,8,38,0.21052631578947367,,,neutral
 ind_insurancepropertycasualty,2026-02-18,7,38,0.18421052631578946,,,neutral
@@ -1424,6 +1493,7 @@ ind_insurancepropertycasualty,2026-02-25,9,39,0.23076923076923078,,,neutral
 ind_insurancepropertycasualty,2026-02-26,11,39,0.28205128205128205,,,neutral
 ind_insurancepropertycasualty,2026-02-27,11,39,0.28205128205128205,0.20229419703103915,,neutral
 ind_insurancepropertycasualty,2026-03-02,12,39,0.3076923076923077,0.21727395411605938,0.014979757085020223,up
+ind_insurancepropertycasualty,2026-03-03,12,39,0.3076923076923077,0.22699055330634277,0.009716599190283393,up
 ind_insurancereinsurance,2026-02-16,4,6,0.6666666666666666,,,neutral
 ind_insurancereinsurance,2026-02-17,4,6,0.6666666666666666,,,neutral
 ind_insurancereinsurance,2026-02-18,4,6,0.6666666666666666,,,neutral
@@ -1435,6 +1505,7 @@ ind_insurancereinsurance,2026-02-25,4,6,0.6666666666666666,,,neutral
 ind_insurancereinsurance,2026-02-26,4,6,0.6666666666666666,,,neutral
 ind_insurancereinsurance,2026-02-27,3,6,0.5,0.65,,neutral
 ind_insurancereinsurance,2026-03-02,3,6,0.5,0.6333333333333333,-0.01666666666666672,down
+ind_insurancereinsurance,2026-03-03,3,6,0.5,0.6166666666666667,-0.016666666666666607,down
 ind_insurancespecialty,2026-02-16,1,13,0.07692307692307693,,,neutral
 ind_insurancespecialty,2026-02-17,1,13,0.07692307692307693,,,neutral
 ind_insurancespecialty,2026-02-18,1,13,0.07692307692307693,,,neutral
@@ -1446,6 +1517,7 @@ ind_insurancespecialty,2026-02-25,1,13,0.07692307692307693,,,neutral
 ind_insurancespecialty,2026-02-26,1,13,0.07692307692307693,,,neutral
 ind_insurancespecialty,2026-02-27,1,13,0.07692307692307693,0.053846153846153856,,neutral
 ind_insurancespecialty,2026-03-02,2,13,0.15384615384615385,0.06153846153846154,0.007692307692307686,up
+ind_insurancespecialty,2026-03-03,1,13,0.07692307692307693,0.06153846153846154,0.0,down
 ind_integratedfreightlogistics,2026-02-16,5,11,0.45454545454545453,,,neutral
 ind_integratedfreightlogistics,2026-02-17,5,11,0.45454545454545453,,,neutral
 ind_integratedfreightlogistics,2026-02-18,5,11,0.45454545454545453,,,neutral
@@ -1457,6 +1529,7 @@ ind_integratedfreightlogistics,2026-02-25,3,11,0.2727272727272727,,,neutral
 ind_integratedfreightlogistics,2026-02-26,6,11,0.5454545454545454,,,neutral
 ind_integratedfreightlogistics,2026-02-27,6,11,0.5454545454545454,0.46363636363636357,,neutral
 ind_integratedfreightlogistics,2026-03-02,4,11,0.36363636363636365,0.4545454545454546,-0.009090909090908983,down
+ind_integratedfreightlogistics,2026-03-03,3,11,0.2727272727272727,0.43636363636363634,-0.018181818181818243,down
 ind_internetcontentinformation,2026-02-16,0,27,0.0,,,neutral
 ind_internetcontentinformation,2026-02-17,0,25,0.0,,,neutral
 ind_internetcontentinformation,2026-02-18,0,27,0.0,,,neutral
@@ -1468,6 +1541,7 @@ ind_internetcontentinformation,2026-02-25,0,28,0.0,,,neutral
 ind_internetcontentinformation,2026-02-26,0,27,0.0,,,neutral
 ind_internetcontentinformation,2026-02-27,0,26,0.0,0.0,,neutral
 ind_internetcontentinformation,2026-03-02,0,27,0.0,0.0,0.0,down
+ind_internetcontentinformation,2026-03-03,0,28,0.0,0.0,0.0,down
 ind_internetretail,2026-02-16,0,18,0.0,,,neutral
 ind_internetretail,2026-02-17,0,18,0.0,,,neutral
 ind_internetretail,2026-02-18,1,18,0.05555555555555555,,,neutral
@@ -1479,6 +1553,7 @@ ind_internetretail,2026-02-25,1,17,0.058823529411764705,,,neutral
 ind_internetretail,2026-02-26,1,17,0.058823529411764705,,,neutral
 ind_internetretail,2026-02-27,0,17,0.0,0.03398692810457517,,neutral
 ind_internetretail,2026-03-02,0,17,0.0,0.03398692810457517,0.0,down
+ind_internetretail,2026-03-03,1,17,0.058823529411764705,0.03986928104575163,0.005882352941176464,up
 ind_leisure,2026-02-16,4,13,0.3076923076923077,,,neutral
 ind_leisure,2026-02-17,5,13,0.38461538461538464,,,neutral
 ind_leisure,2026-02-18,5,12,0.4166666666666667,,,neutral
@@ -1490,6 +1565,7 @@ ind_leisure,2026-02-25,2,13,0.15384615384615385,,,neutral
 ind_leisure,2026-02-26,4,13,0.3076923076923077,,,neutral
 ind_leisure,2026-02-27,3,13,0.23076923076923078,0.3217948717948718,,neutral
 ind_leisure,2026-03-02,2,13,0.15384615384615385,0.30641025641025643,-0.015384615384615385,down
+ind_leisure,2026-03-03,1,13,0.07692307692307693,0.27564102564102566,-0.03076923076923077,down
 ind_lodging,2026-02-16,5,8,0.625,,,neutral
 ind_lodging,2026-02-17,5,8,0.625,,,neutral
 ind_lodging,2026-02-18,5,8,0.625,,,neutral
@@ -1501,6 +1577,7 @@ ind_lodging,2026-02-25,5,8,0.625,,,neutral
 ind_lodging,2026-02-26,5,8,0.625,,,neutral
 ind_lodging,2026-02-27,2,8,0.25,0.6125,,neutral
 ind_lodging,2026-03-02,2,8,0.25,0.575,-0.03750000000000009,down
+ind_lodging,2026-03-03,0,8,0.0,0.5125,-0.0625,down
 ind_lumberwoodproduction,2026-02-16,2,4,0.5,,,neutral
 ind_lumberwoodproduction,2026-02-17,1,4,0.25,,,neutral
 ind_lumberwoodproduction,2026-02-18,1,4,0.25,,,neutral
@@ -1512,6 +1589,7 @@ ind_lumberwoodproduction,2026-02-25,0,4,0.0,,,neutral
 ind_lumberwoodproduction,2026-02-26,0,4,0.0,,,neutral
 ind_lumberwoodproduction,2026-02-27,0,4,0.0,0.2,,neutral
 ind_lumberwoodproduction,2026-03-02,0,4,0.0,0.15,-0.05000000000000002,down
+ind_lumberwoodproduction,2026-03-03,0,4,0.0,0.125,-0.024999999999999994,down
 ind_luxurygoods,2026-02-16,3,6,0.5,,,neutral
 ind_luxurygoods,2026-02-17,4,6,0.6666666666666666,,,neutral
 ind_luxurygoods,2026-02-18,3,5,0.6,,,neutral
@@ -1523,6 +1601,7 @@ ind_luxurygoods,2026-02-25,3,5,0.6,,,neutral
 ind_luxurygoods,2026-02-26,3,5,0.6,,,neutral
 ind_luxurygoods,2026-02-27,3,5,0.6,0.5966666666666667,,neutral
 ind_luxurygoods,2026-03-02,2,5,0.4,0.5866666666666667,-0.010000000000000009,down
+ind_luxurygoods,2026-03-03,2,5,0.4,0.5599999999999999,-0.026666666666666727,down
 ind_marineshipping,2026-02-16,13,14,0.9285714285714286,,,neutral
 ind_marineshipping,2026-02-17,14,14,1.0,,,neutral
 ind_marineshipping,2026-02-18,14,14,1.0,,,neutral
@@ -1534,6 +1613,7 @@ ind_marineshipping,2026-02-25,14,14,1.0,,,neutral
 ind_marineshipping,2026-02-26,14,14,1.0,,,neutral
 ind_marineshipping,2026-02-27,14,14,1.0,0.9857142857142858,,neutral
 ind_marineshipping,2026-03-02,14,14,1.0,0.9928571428571429,0.0071428571428571175,up
+ind_marineshipping,2026-03-03,14,14,1.0,0.9928571428571429,0.0,down
 ind_medicalcarefacilities,2026-02-16,11,25,0.44,,,neutral
 ind_medicalcarefacilities,2026-02-17,11,25,0.44,,,neutral
 ind_medicalcarefacilities,2026-02-18,13,25,0.52,,,neutral
@@ -1545,6 +1625,7 @@ ind_medicalcarefacilities,2026-02-25,9,25,0.36,,,neutral
 ind_medicalcarefacilities,2026-02-26,7,25,0.28,,,neutral
 ind_medicalcarefacilities,2026-02-27,7,25,0.28,0.384,,neutral
 ind_medicalcarefacilities,2026-03-02,7,26,0.2692307692307692,0.36692307692307696,-0.017076923076923045,down
+ind_medicalcarefacilities,2026-03-03,8,26,0.3076923076923077,0.3536923076923077,-0.013230769230769268,down
 ind_medicaldevices,2026-02-16,5,50,0.1,,,neutral
 ind_medicaldevices,2026-02-17,6,50,0.12,,,neutral
 ind_medicaldevices,2026-02-18,9,50,0.18,,,neutral
@@ -1556,6 +1637,7 @@ ind_medicaldevices,2026-02-25,9,50,0.18,,,neutral
 ind_medicaldevices,2026-02-26,11,49,0.22448979591836735,,,neutral
 ind_medicaldevices,2026-02-27,10,49,0.20408163265306123,0.16514285714285715,,neutral
 ind_medicaldevices,2026-03-02,10,48,0.20833333333333334,0.17597619047619045,0.010833333333333306,up
+ind_medicaldevices,2026-03-03,6,48,0.125,0.17647619047619048,0.0005000000000000282,up
 ind_medicaldistribution,2026-02-16,3,4,0.75,,,neutral
 ind_medicaldistribution,2026-02-17,3,4,0.75,,,neutral
 ind_medicaldistribution,2026-02-18,3,4,0.75,,,neutral
@@ -1567,6 +1649,7 @@ ind_medicaldistribution,2026-02-25,4,4,1.0,,,neutral
 ind_medicaldistribution,2026-02-26,4,4,1.0,,,neutral
 ind_medicaldistribution,2026-02-27,4,4,1.0,0.9,,neutral
 ind_medicaldistribution,2026-03-02,4,4,1.0,0.925,0.025000000000000022,up
+ind_medicaldistribution,2026-03-03,4,4,1.0,0.95,0.02499999999999991,up
 ind_medicalinstrumentssupplies,2026-02-16,6,30,0.2,,,neutral
 ind_medicalinstrumentssupplies,2026-02-17,7,30,0.23333333333333334,,,neutral
 ind_medicalinstrumentssupplies,2026-02-18,7,30,0.23333333333333334,,,neutral
@@ -1578,6 +1661,7 @@ ind_medicalinstrumentssupplies,2026-02-25,8,30,0.26666666666666666,,,neutral
 ind_medicalinstrumentssupplies,2026-02-26,8,30,0.26666666666666666,,,neutral
 ind_medicalinstrumentssupplies,2026-02-27,9,30,0.3,0.26666666666666666,,neutral
 ind_medicalinstrumentssupplies,2026-03-02,9,29,0.3103448275862069,0.27770114942528734,0.011034482758620678,up
+ind_medicalinstrumentssupplies,2026-03-03,7,29,0.2413793103448276,0.2785057471264368,0.0008045977011494343,up
 ind_metalfabrication,2026-02-16,5,10,0.5,,,neutral
 ind_metalfabrication,2026-02-17,4,10,0.4,,,neutral
 ind_metalfabrication,2026-02-18,5,10,0.5,,,neutral
@@ -1589,6 +1673,7 @@ ind_metalfabrication,2026-02-25,4,10,0.4,,,neutral
 ind_metalfabrication,2026-02-26,4,10,0.4,,,neutral
 ind_metalfabrication,2026-02-27,2,10,0.2,0.41000000000000003,,neutral
 ind_metalfabrication,2026-03-02,4,10,0.4,0.4,-0.010000000000000009,down
+ind_metalfabrication,2026-03-03,2,10,0.2,0.38,-0.020000000000000018,down
 ind_mortgagefinance,2026-02-16,0,5,0.0,,,neutral
 ind_mortgagefinance,2026-02-17,0,5,0.0,,,neutral
 ind_mortgagefinance,2026-02-18,0,5,0.0,,,neutral
@@ -1600,6 +1685,7 @@ ind_mortgagefinance,2026-02-25,0,5,0.0,,,neutral
 ind_mortgagefinance,2026-02-26,0,5,0.0,,,neutral
 ind_mortgagefinance,2026-02-27,0,5,0.0,0.0,,neutral
 ind_mortgagefinance,2026-03-02,0,5,0.0,0.0,0.0,down
+ind_mortgagefinance,2026-03-03,0,5,0.0,0.0,0.0,down
 ind_oilgasdrilling,2026-02-16,3,4,0.75,,,neutral
 ind_oilgasdrilling,2026-02-17,3,4,0.75,,,neutral
 ind_oilgasdrilling,2026-02-18,4,4,1.0,,,neutral
@@ -1611,6 +1697,7 @@ ind_oilgasdrilling,2026-02-25,3,4,0.75,,,neutral
 ind_oilgasdrilling,2026-02-26,3,4,0.75,,,neutral
 ind_oilgasdrilling,2026-02-27,4,4,1.0,0.9,,neutral
 ind_oilgasdrilling,2026-03-02,4,4,1.0,0.925,0.025000000000000022,up
+ind_oilgasdrilling,2026-03-03,4,5,0.8,0.93,0.0050000000000000044,up
 ind_oilgasep,2026-02-16,20,40,0.5,,,neutral
 ind_oilgasep,2026-02-17,17,38,0.4473684210526316,,,neutral
 ind_oilgasep,2026-02-18,19,40,0.475,,,neutral
@@ -1622,6 +1709,7 @@ ind_oilgasep,2026-02-25,15,40,0.375,,,neutral
 ind_oilgasep,2026-02-26,17,40,0.425,,,neutral
 ind_oilgasep,2026-02-27,23,40,0.575,0.4747368421052632,,neutral
 ind_oilgasep,2026-03-02,25,41,0.6097560975609756,0.4857124518613607,0.010975609756097515,up
+ind_oilgasep,2026-03-03,25,41,0.6097560975609756,0.5019512195121951,0.01623876765083443,up
 ind_oilgasequipmentservices,2026-02-16,26,34,0.7647058823529411,,,neutral
 ind_oilgasequipmentservices,2026-02-17,25,34,0.7352941176470589,,,neutral
 ind_oilgasequipmentservices,2026-02-18,24,34,0.7058823529411765,,,neutral
@@ -1633,6 +1721,7 @@ ind_oilgasequipmentservices,2026-02-25,29,34,0.8529411764705882,,,neutral
 ind_oilgasequipmentservices,2026-02-26,27,34,0.7941176470588235,,,neutral
 ind_oilgasequipmentservices,2026-02-27,27,34,0.7941176470588235,0.7624836601307189,,neutral
 ind_oilgasequipmentservices,2026-03-02,26,35,0.7428571428571429,0.7602987861811391,-0.0021848739495797798,down
+ind_oilgasequipmentservices,2026-03-03,20,34,0.5882352941176471,0.745592903828198,-0.014705882352941124,down
 ind_oilgasintegrated,2026-02-16,12,17,0.7058823529411765,,,neutral
 ind_oilgasintegrated,2026-02-17,11,17,0.6470588235294118,,,neutral
 ind_oilgasintegrated,2026-02-18,12,17,0.7058823529411765,,,neutral
@@ -1644,6 +1733,7 @@ ind_oilgasintegrated,2026-02-25,11,17,0.6470588235294118,,,neutral
 ind_oilgasintegrated,2026-02-26,11,17,0.6470588235294118,,,neutral
 ind_oilgasintegrated,2026-02-27,12,17,0.7058823529411765,0.711764705882353,,neutral
 ind_oilgasintegrated,2026-03-02,12,17,0.7058823529411765,0.7117647058823529,-1.1102230246251565e-16,down
+ind_oilgasintegrated,2026-03-03,12,17,0.7058823529411765,0.7176470588235294,0.005882352941176561,up
 ind_oilgasmidstream,2026-02-16,25,39,0.6410256410256411,,,neutral
 ind_oilgasmidstream,2026-02-17,27,38,0.7105263157894737,,,neutral
 ind_oilgasmidstream,2026-02-18,29,38,0.7631578947368421,,,neutral
@@ -1655,6 +1745,7 @@ ind_oilgasmidstream,2026-02-25,28,38,0.7368421052631579,,,neutral
 ind_oilgasmidstream,2026-02-26,28,38,0.7368421052631579,,,neutral
 ind_oilgasmidstream,2026-02-27,30,38,0.7894736842105263,0.7325236167341431,,neutral
 ind_oilgasmidstream,2026-03-02,33,39,0.8461538461538461,0.7530364372469636,0.02051282051282044,up
+ind_oilgasmidstream,2026-03-03,30,39,0.7692307692307693,0.7589068825910931,0.005870445344129505,up
 ind_oilgasrefiningmarketing,2026-02-16,7,11,0.6363636363636364,,,neutral
 ind_oilgasrefiningmarketing,2026-02-17,7,11,0.6363636363636364,,,neutral
 ind_oilgasrefiningmarketing,2026-02-18,5,11,0.45454545454545453,,,neutral
@@ -1666,6 +1757,7 @@ ind_oilgasrefiningmarketing,2026-02-25,4,11,0.36363636363636365,,,neutral
 ind_oilgasrefiningmarketing,2026-02-26,5,11,0.45454545454545453,,,neutral
 ind_oilgasrefiningmarketing,2026-02-27,6,11,0.5454545454545454,0.5272727272727272,,neutral
 ind_oilgasrefiningmarketing,2026-03-02,7,11,0.6363636363636364,0.5272727272727272,0.0,down
+ind_oilgasrefiningmarketing,2026-03-03,7,11,0.6363636363636364,0.5272727272727272,0.0,down
 ind_otherindustrialmetalsmining,2026-02-16,7,14,0.5,,,neutral
 ind_otherindustrialmetalsmining,2026-02-17,6,15,0.4,,,neutral
 ind_otherindustrialmetalsmining,2026-02-18,7,15,0.4666666666666667,,,neutral
@@ -1677,6 +1769,7 @@ ind_otherindustrialmetalsmining,2026-02-25,8,15,0.5333333333333333,,,neutral
 ind_otherindustrialmetalsmining,2026-02-26,8,15,0.5333333333333333,,,neutral
 ind_otherindustrialmetalsmining,2026-02-27,8,15,0.5333333333333333,0.45916666666666667,,neutral
 ind_otherindustrialmetalsmining,2026-03-02,12,19,0.631578947368421,0.4723245614035088,0.013157894736842146,up
+ind_otherindustrialmetalsmining,2026-03-03,7,15,0.4666666666666667,0.47899122807017547,0.006666666666666654,up
 ind_otherpreciousmetalsmining,2026-02-16,3,7,0.42857142857142855,,,neutral
 ind_otherpreciousmetalsmining,2026-02-17,0,7,0.0,,,neutral
 ind_otherpreciousmetalsmining,2026-02-18,1,7,0.14285714285714285,,,neutral
@@ -1688,6 +1781,7 @@ ind_otherpreciousmetalsmining,2026-02-25,5,8,0.625,,,neutral
 ind_otherpreciousmetalsmining,2026-02-26,6,8,0.75,,,neutral
 ind_otherpreciousmetalsmining,2026-02-27,5,8,0.625,0.44107142857142856,,neutral
 ind_otherpreciousmetalsmining,2026-03-02,5,8,0.625,0.46071428571428574,0.019642857142857184,up
+ind_otherpreciousmetalsmining,2026-03-03,3,7,0.42857142857142855,0.5035714285714286,0.042857142857142816,up
 ind_packagedfoods,2026-02-16,4,29,0.13793103448275862,,,neutral
 ind_packagedfoods,2026-02-17,4,28,0.14285714285714285,,,neutral
 ind_packagedfoods,2026-02-18,4,28,0.14285714285714285,,,neutral
@@ -1699,6 +1793,7 @@ ind_packagedfoods,2026-02-25,7,27,0.25925925925925924,,,neutral
 ind_packagedfoods,2026-02-26,7,27,0.25925925925925924,,,neutral
 ind_packagedfoods,2026-02-27,7,27,0.25925925925925924,0.20868910782703884,,neutral
 ind_packagedfoods,2026-03-02,7,27,0.25925925925925924,0.2208219303046889,0.012132822477650074,up
+ind_packagedfoods,2026-03-03,4,27,0.14814814814814814,0.22135103083378946,0.0005291005291005457,up
 ind_packagingcontainers,2026-02-16,8,16,0.5,,,neutral
 ind_packagingcontainers,2026-02-17,8,16,0.5,,,neutral
 ind_packagingcontainers,2026-02-18,8,16,0.5,,,neutral
@@ -1710,6 +1805,7 @@ ind_packagingcontainers,2026-02-25,6,16,0.375,,,neutral
 ind_packagingcontainers,2026-02-26,7,16,0.4375,,,neutral
 ind_packagingcontainers,2026-02-27,6,16,0.375,0.4625,,neutral
 ind_packagingcontainers,2026-03-02,5,16,0.3125,0.44375,-0.018750000000000044,down
+ind_packagingcontainers,2026-03-03,3,16,0.1875,0.4125,-0.03125,down
 ind_paperpaperproducts,2026-02-16,1,3,0.3333333333333333,,,neutral
 ind_paperpaperproducts,2026-02-17,1,3,0.3333333333333333,,,neutral
 ind_paperpaperproducts,2026-02-18,0,3,0.0,,,neutral
@@ -1721,6 +1817,7 @@ ind_paperpaperproducts,2026-02-25,1,3,0.3333333333333333,,,neutral
 ind_paperpaperproducts,2026-02-26,1,3,0.3333333333333333,,,neutral
 ind_paperpaperproducts,2026-02-27,1,3,0.3333333333333333,0.3,,neutral
 ind_paperpaperproducts,2026-03-02,1,3,0.3333333333333333,0.29999999999999993,-5.551115123125783e-17,down
+ind_paperpaperproducts,2026-03-03,0,3,0.0,0.26666666666666666,-0.03333333333333327,down
 ind_personalservices,2026-02-16,0,8,0.0,,,neutral
 ind_personalservices,2026-02-17,0,8,0.0,,,neutral
 ind_personalservices,2026-02-18,0,8,0.0,,,neutral
@@ -1732,6 +1829,7 @@ ind_personalservices,2026-02-25,0,8,0.0,,,neutral
 ind_personalservices,2026-02-26,0,8,0.0,,,neutral
 ind_personalservices,2026-02-27,0,8,0.0,0.0,,neutral
 ind_personalservices,2026-03-02,0,7,0.0,0.0,0.0,down
+ind_personalservices,2026-03-03,0,7,0.0,0.0,0.0,down
 ind_pollutiontreatmentcontrols,2026-02-16,4,6,0.6666666666666666,,,neutral
 ind_pollutiontreatmentcontrols,2026-02-17,4,6,0.6666666666666666,,,neutral
 ind_pollutiontreatmentcontrols,2026-02-18,4,6,0.6666666666666666,,,neutral
@@ -1743,6 +1841,7 @@ ind_pollutiontreatmentcontrols,2026-02-25,3,6,0.5,,,neutral
 ind_pollutiontreatmentcontrols,2026-02-26,2,6,0.3333333333333333,,,neutral
 ind_pollutiontreatmentcontrols,2026-02-27,2,6,0.3333333333333333,0.5666666666666667,,neutral
 ind_pollutiontreatmentcontrols,2026-03-02,2,6,0.3333333333333333,0.5333333333333333,-0.033333333333333326,down
+ind_pollutiontreatmentcontrols,2026-03-03,1,6,0.16666666666666666,0.4833333333333333,-0.050000000000000044,down
 ind_publishing,2026-02-16,1,4,0.25,,,neutral
 ind_publishing,2026-02-17,1,4,0.25,,,neutral
 ind_publishing,2026-02-18,1,4,0.25,,,neutral
@@ -1754,6 +1853,7 @@ ind_publishing,2026-02-25,1,4,0.25,,,neutral
 ind_publishing,2026-02-26,2,4,0.5,,,neutral
 ind_publishing,2026-02-27,1,4,0.25,0.275,,neutral
 ind_publishing,2026-03-02,1,4,0.25,0.275,0.0,down
+ind_publishing,2026-03-03,1,4,0.25,0.275,0.0,down
 ind_railroads,2026-02-16,6,9,0.6666666666666666,,,neutral
 ind_railroads,2026-02-17,6,9,0.6666666666666666,,,neutral
 ind_railroads,2026-02-18,6,9,0.6666666666666666,,,neutral
@@ -1765,6 +1865,7 @@ ind_railroads,2026-02-25,6,9,0.6666666666666666,,,neutral
 ind_railroads,2026-02-26,7,9,0.7777777777777778,,,neutral
 ind_railroads,2026-02-27,7,9,0.7777777777777778,0.711111111111111,,neutral
 ind_railroads,2026-03-02,8,9,0.8888888888888888,0.7333333333333333,0.022222222222222254,up
+ind_railroads,2026-03-03,7,9,0.7777777777777778,0.7444444444444445,0.011111111111111183,up
 ind_realestatedevelopment,2026-02-16,2,2,1.0,,,neutral
 ind_realestatedevelopment,2026-02-17,2,2,1.0,,,neutral
 ind_realestatedevelopment,2026-02-18,2,2,1.0,,,neutral
@@ -1776,6 +1877,7 @@ ind_realestatedevelopment,2026-02-25,0,3,0.0,,,neutral
 ind_realestatedevelopment,2026-02-26,0,3,0.0,,,neutral
 ind_realestatedevelopment,2026-02-27,0,3,0.0,0.6,,neutral
 ind_realestatedevelopment,2026-03-02,0,3,0.0,0.5,-0.09999999999999998,down
+ind_realestatedevelopment,2026-03-03,0,3,0.0,0.4,-0.09999999999999998,down
 ind_realestatediversified,2026-02-16,2,2,1.0,,,neutral
 ind_realestatediversified,2026-02-17,1,2,0.5,,,neutral
 ind_realestatediversified,2026-02-18,1,2,0.5,,,neutral
@@ -1787,6 +1889,7 @@ ind_realestatediversified,2026-02-25,1,2,0.5,,,neutral
 ind_realestatediversified,2026-02-26,1,2,0.5,,,neutral
 ind_realestatediversified,2026-02-27,1,2,0.5,0.6,,neutral
 ind_realestatediversified,2026-03-02,1,2,0.5,0.55,-0.04999999999999993,down
+ind_realestatediversified,2026-03-03,1,2,0.5,0.55,0.0,down
 ind_realestateservices,2026-02-16,0,12,0.0,,,neutral
 ind_realestateservices,2026-02-17,1,13,0.07692307692307693,,,neutral
 ind_realestateservices,2026-02-18,1,13,0.07692307692307693,,,neutral
@@ -1798,6 +1901,7 @@ ind_realestateservices,2026-02-25,1,12,0.08333333333333333,,,neutral
 ind_realestateservices,2026-02-26,1,13,0.07692307692307693,,,neutral
 ind_realestateservices,2026-02-27,1,12,0.08333333333333333,0.07179487179487179,,neutral
 ind_realestateservices,2026-03-02,1,13,0.07692307692307693,0.0794871794871795,0.007692307692307707,up
+ind_realestateservices,2026-03-03,1,12,0.08333333333333333,0.08012820512820513,0.0006410256410256387,up
 ind_recreationalvehicles,2026-02-16,4,10,0.4,,,neutral
 ind_recreationalvehicles,2026-02-17,4,10,0.4,,,neutral
 ind_recreationalvehicles,2026-02-18,5,10,0.5,,,neutral
@@ -1809,6 +1913,7 @@ ind_recreationalvehicles,2026-02-25,0,10,0.0,,,neutral
 ind_recreationalvehicles,2026-02-26,0,10,0.0,,,neutral
 ind_recreationalvehicles,2026-02-27,0,10,0.0,0.21000000000000002,,neutral
 ind_recreationalvehicles,2026-03-02,0,10,0.0,0.17,-0.04000000000000001,down
+ind_recreationalvehicles,2026-03-03,0,10,0.0,0.13,-0.04000000000000001,down
 ind_reitdiversified,2026-02-16,2,9,0.2222222222222222,,,neutral
 ind_reitdiversified,2026-02-17,2,9,0.2222222222222222,,,neutral
 ind_reitdiversified,2026-02-18,2,9,0.2222222222222222,,,neutral
@@ -1820,6 +1925,7 @@ ind_reitdiversified,2026-02-25,3,8,0.375,,,neutral
 ind_reitdiversified,2026-02-26,3,8,0.375,,,neutral
 ind_reitdiversified,2026-02-27,3,8,0.375,0.2569444444444444,,neutral
 ind_reitdiversified,2026-03-02,4,8,0.5,0.2847222222222222,0.02777777777777779,up
+ind_reitdiversified,2026-03-03,3,8,0.375,0.3,0.015277777777777779,up
 ind_reithealthcarefacilities,2026-02-16,7,13,0.5384615384615384,,,neutral
 ind_reithealthcarefacilities,2026-02-17,9,13,0.6923076923076923,,,neutral
 ind_reithealthcarefacilities,2026-02-18,6,13,0.46153846153846156,,,neutral
@@ -1831,6 +1937,7 @@ ind_reithealthcarefacilities,2026-02-25,8,12,0.6666666666666666,,,neutral
 ind_reithealthcarefacilities,2026-02-26,8,12,0.6666666666666666,,,neutral
 ind_reithealthcarefacilities,2026-02-27,7,12,0.5833333333333334,0.5865384615384615,,neutral
 ind_reithealthcarefacilities,2026-03-02,8,12,0.6666666666666666,0.5993589743589743,0.012820512820512886,up
+ind_reithealthcarefacilities,2026-03-03,6,13,0.46153846153846156,0.5762820512820512,-0.023076923076923106,down
 ind_reithotelmotel,2026-02-16,4,6,0.6666666666666666,,,neutral
 ind_reithotelmotel,2026-02-17,4,6,0.6666666666666666,,,neutral
 ind_reithotelmotel,2026-02-18,5,6,0.8333333333333334,,,neutral
@@ -1842,6 +1949,7 @@ ind_reithotelmotel,2026-02-25,4,7,0.5714285714285714,,,neutral
 ind_reithotelmotel,2026-02-26,6,7,0.8571428571428571,,,neutral
 ind_reithotelmotel,2026-02-27,2,7,0.2857142857142857,0.6761904761904762,,neutral
 ind_reithotelmotel,2026-03-02,2,6,0.3333333333333333,0.6428571428571428,-0.03333333333333344,down
+ind_reithotelmotel,2026-03-03,1,6,0.16666666666666666,0.5928571428571429,-0.04999999999999993,down
 ind_reitindustrial,2026-02-16,4,15,0.26666666666666666,,,neutral
 ind_reitindustrial,2026-02-17,5,15,0.3333333333333333,,,neutral
 ind_reitindustrial,2026-02-18,5,15,0.3333333333333333,,,neutral
@@ -1853,6 +1961,7 @@ ind_reitindustrial,2026-02-25,5,15,0.3333333333333333,,,neutral
 ind_reitindustrial,2026-02-26,6,15,0.4,,,neutral
 ind_reitindustrial,2026-02-27,6,15,0.4,0.33999999999999997,,neutral
 ind_reitindustrial,2026-03-02,5,15,0.3333333333333333,0.3466666666666667,0.00666666666666671,up
+ind_reitindustrial,2026-03-03,4,15,0.26666666666666666,0.33999999999999997,-0.00666666666666671,down
 ind_reitmortgage,2026-02-16,1,14,0.07142857142857142,,,neutral
 ind_reitmortgage,2026-02-17,1,14,0.07142857142857142,,,neutral
 ind_reitmortgage,2026-02-18,0,15,0.0,,,neutral
@@ -1864,6 +1973,7 @@ ind_reitmortgage,2026-02-25,0,14,0.0,,,neutral
 ind_reitmortgage,2026-02-26,2,15,0.13333333333333333,,,neutral
 ind_reitmortgage,2026-02-27,0,15,0.0,0.03428571428571429,,neutral
 ind_reitmortgage,2026-03-02,1,15,0.06666666666666667,0.03380952380952381,-0.0004761904761904773,down
+ind_reitmortgage,2026-03-03,2,14,0.14285714285714285,0.04095238095238095,0.007142857142857138,up
 ind_reitoffice,2026-02-16,3,14,0.21428571428571427,,,neutral
 ind_reitoffice,2026-02-17,3,13,0.23076923076923078,,,neutral
 ind_reitoffice,2026-02-18,3,13,0.23076923076923078,,,neutral
@@ -1875,6 +1985,7 @@ ind_reitoffice,2026-02-25,3,14,0.21428571428571427,,,neutral
 ind_reitoffice,2026-02-26,3,14,0.21428571428571427,,,neutral
 ind_reitoffice,2026-02-27,2,13,0.15384615384615385,0.21153846153846154,,neutral
 ind_reitoffice,2026-03-02,3,13,0.23076923076923078,0.21318681318681318,0.0016483516483516425,up
+ind_reitoffice,2026-03-03,3,14,0.21428571428571427,0.21153846153846154,-0.0016483516483516425,down
 ind_reitresidential,2026-02-16,0,16,0.0,,,neutral
 ind_reitresidential,2026-02-17,0,16,0.0,,,neutral
 ind_reitresidential,2026-02-18,0,16,0.0,,,neutral
@@ -1886,6 +1997,7 @@ ind_reitresidential,2026-02-25,1,16,0.0625,,,neutral
 ind_reitresidential,2026-02-26,1,16,0.0625,,,neutral
 ind_reitresidential,2026-02-27,1,16,0.0625,0.03125,,neutral
 ind_reitresidential,2026-03-02,1,16,0.0625,0.0375,0.006249999999999999,up
+ind_reitresidential,2026-03-03,1,16,0.0625,0.04375,0.006249999999999999,up
 ind_reitretail,2026-02-16,7,24,0.2916666666666667,,,neutral
 ind_reitretail,2026-02-17,11,24,0.4583333333333333,,,neutral
 ind_reitretail,2026-02-18,9,24,0.375,,,neutral
@@ -1897,6 +2009,7 @@ ind_reitretail,2026-02-25,14,24,0.5833333333333334,,,neutral
 ind_reitretail,2026-02-26,14,24,0.5833333333333334,,,neutral
 ind_reitretail,2026-02-27,13,24,0.5416666666666666,0.4875,,neutral
 ind_reitretail,2026-03-02,15,24,0.625,0.5208333333333333,0.03333333333333327,up
+ind_reitretail,2026-03-03,15,24,0.625,0.5375,0.01666666666666672,up
 ind_reitspecialty,2026-02-16,3,15,0.2,,,neutral
 ind_reitspecialty,2026-02-17,1,14,0.07142857142857142,,,neutral
 ind_reitspecialty,2026-02-18,2,14,0.14285714285714285,,,neutral
@@ -1908,6 +2021,7 @@ ind_reitspecialty,2026-02-25,5,15,0.3333333333333333,,,neutral
 ind_reitspecialty,2026-02-26,5,15,0.3333333333333333,,,neutral
 ind_reitspecialty,2026-02-27,5,14,0.35714285714285715,0.2342857142857143,,neutral
 ind_reitspecialty,2026-03-02,5,15,0.3333333333333333,0.24761904761904757,0.01333333333333328,up
+ind_reitspecialty,2026-03-03,5,14,0.35714285714285715,0.2761904761904762,0.028571428571428636,up
 ind_rentalleasingservices,2026-02-16,7,14,0.5,,,neutral
 ind_rentalleasingservices,2026-02-17,6,14,0.42857142857142855,,,neutral
 ind_rentalleasingservices,2026-02-18,6,14,0.42857142857142855,,,neutral
@@ -1919,6 +2033,7 @@ ind_rentalleasingservices,2026-02-25,5,14,0.35714285714285715,,,neutral
 ind_rentalleasingservices,2026-02-26,5,14,0.35714285714285715,,,neutral
 ind_rentalleasingservices,2026-02-27,4,14,0.2857142857142857,0.4,,neutral
 ind_rentalleasingservices,2026-03-02,3,14,0.21428571428571427,0.3714285714285714,-0.028571428571428636,down
+ind_rentalleasingservices,2026-03-03,0,15,0.0,0.32857142857142857,-0.042857142857142816,down
 ind_residentialconstruction,2026-02-16,10,18,0.5555555555555556,,,neutral
 ind_residentialconstruction,2026-02-17,9,18,0.5,,,neutral
 ind_residentialconstruction,2026-02-18,10,18,0.5555555555555556,,,neutral
@@ -1930,6 +2045,7 @@ ind_residentialconstruction,2026-02-25,4,18,0.2222222222222222,,,neutral
 ind_residentialconstruction,2026-02-26,6,18,0.3333333333333333,,,neutral
 ind_residentialconstruction,2026-02-27,8,18,0.4444444444444444,0.49444444444444446,,neutral
 ind_residentialconstruction,2026-03-02,3,18,0.16666666666666666,0.4555555555555556,-0.03888888888888886,down
+ind_residentialconstruction,2026-03-03,3,18,0.16666666666666666,0.4222222222222222,-0.03333333333333338,down
 ind_resortscasinos,2026-02-16,1,12,0.08333333333333333,,,neutral
 ind_resortscasinos,2026-02-17,1,12,0.08333333333333333,,,neutral
 ind_resortscasinos,2026-02-18,5,12,0.4166666666666667,,,neutral
@@ -1941,6 +2057,7 @@ ind_resortscasinos,2026-02-25,4,12,0.3333333333333333,,,neutral
 ind_resortscasinos,2026-02-26,4,12,0.3333333333333333,,,neutral
 ind_resortscasinos,2026-02-27,2,12,0.16666666666666666,0.275,,neutral
 ind_resortscasinos,2026-03-02,1,12,0.08333333333333333,0.275,0.0,down
+ind_resortscasinos,2026-03-03,1,11,0.09090909090909091,0.27575757575757576,0.0007575757575757347,up
 ind_restaurants,2026-02-16,1,27,0.037037037037037035,,,neutral
 ind_restaurants,2026-02-17,1,27,0.037037037037037035,,,neutral
 ind_restaurants,2026-02-18,1,27,0.037037037037037035,,,neutral
@@ -1952,6 +2069,7 @@ ind_restaurants,2026-02-25,3,26,0.11538461538461539,,,neutral
 ind_restaurants,2026-02-26,3,26,0.11538461538461539,,,neutral
 ind_restaurants,2026-02-27,3,26,0.11538461538461539,0.07193732193732194,,neutral
 ind_restaurants,2026-03-02,2,26,0.07692307692307693,0.07592592592592592,0.003988603988603984,up
+ind_restaurants,2026-03-03,2,26,0.07692307692307693,0.07991452991452992,0.0039886039886039976,up
 ind_scientifictechnicalinstruments,2026-02-16,10,17,0.5882352941176471,,,neutral
 ind_scientifictechnicalinstruments,2026-02-17,10,17,0.5882352941176471,,,neutral
 ind_scientifictechnicalinstruments,2026-02-18,10,17,0.5882352941176471,,,neutral
@@ -1963,6 +2081,7 @@ ind_scientifictechnicalinstruments,2026-02-25,8,16,0.5,,,neutral
 ind_scientifictechnicalinstruments,2026-02-26,8,16,0.5,,,neutral
 ind_scientifictechnicalinstruments,2026-02-27,8,16,0.5,0.5558823529411765,,neutral
 ind_scientifictechnicalinstruments,2026-03-02,8,16,0.5,0.5470588235294118,-0.008823529411764675,down
+ind_scientifictechnicalinstruments,2026-03-03,5,16,0.3125,0.519485294117647,-0.02757352941176483,down
 ind_securityprotectionservices,2026-02-16,6,8,0.75,,,neutral
 ind_securityprotectionservices,2026-02-17,5,8,0.625,,,neutral
 ind_securityprotectionservices,2026-02-18,5,8,0.625,,,neutral
@@ -1974,6 +2093,7 @@ ind_securityprotectionservices,2026-02-25,5,8,0.625,,,neutral
 ind_securityprotectionservices,2026-02-26,5,8,0.625,,,neutral
 ind_securityprotectionservices,2026-02-27,4,8,0.5,0.6,,neutral
 ind_securityprotectionservices,2026-03-02,3,8,0.375,0.5625,-0.03749999999999998,down
+ind_securityprotectionservices,2026-03-03,1,8,0.125,0.5125,-0.050000000000000044,down
 ind_semiconductorequipmentmaterials,2026-02-16,20,25,0.8,,,neutral
 ind_semiconductorequipmentmaterials,2026-02-17,19,25,0.76,,,neutral
 ind_semiconductorequipmentmaterials,2026-02-18,16,25,0.64,,,neutral
@@ -1985,6 +2105,7 @@ ind_semiconductorequipmentmaterials,2026-02-25,20,25,0.8,,,neutral
 ind_semiconductorequipmentmaterials,2026-02-26,17,25,0.68,,,neutral
 ind_semiconductorequipmentmaterials,2026-02-27,15,25,0.6,0.708,,neutral
 ind_semiconductorequipmentmaterials,2026-03-02,14,25,0.56,0.6839999999999999,-0.02400000000000002,down
+ind_semiconductorequipmentmaterials,2026-03-03,9,25,0.36,0.644,-0.039999999999999925,down
 ind_semiconductors,2026-02-16,22,48,0.4583333333333333,,,neutral
 ind_semiconductors,2026-02-17,21,48,0.4375,,,neutral
 ind_semiconductors,2026-02-18,22,48,0.4583333333333333,,,neutral
@@ -1996,6 +2117,7 @@ ind_semiconductors,2026-02-25,23,48,0.4791666666666667,,,neutral
 ind_semiconductors,2026-02-26,16,48,0.3333333333333333,,,neutral
 ind_semiconductors,2026-02-27,13,48,0.2708333333333333,0.4229166666666667,,neutral
 ind_semiconductors,2026-03-02,16,48,0.3333333333333333,0.4104166666666666,-0.012500000000000122,down
+ind_semiconductors,2026-03-03,7,47,0.14893617021276595,0.38156028368794326,-0.02885638297872334,down
 ind_shellcompanies,2026-02-16,1,71,0.014084507042253521,,,neutral
 ind_shellcompanies,2026-02-17,1,68,0.014705882352941176,,,neutral
 ind_shellcompanies,2026-02-18,1,72,0.013888888888888888,,,neutral
@@ -2007,6 +2129,7 @@ ind_shellcompanies,2026-02-25,0,61,0.0,,,neutral
 ind_shellcompanies,2026-02-26,0,60,0.0,,,neutral
 ind_shellcompanies,2026-02-27,0,62,0.0,0.004267927828408359,,neutral
 ind_shellcompanies,2026-03-02,0,61,0.0,0.002859477124183006,-0.0014084507042253528,down
+ind_shellcompanies,2026-03-03,0,59,0.0,0.0013888888888888887,-0.0014705882352941172,down
 ind_silver,2026-02-16,0,3,0.0,,,neutral
 ind_silver,2026-02-17,0,3,0.0,,,neutral
 ind_silver,2026-02-18,0,3,0.0,,,neutral
@@ -2018,6 +2141,7 @@ ind_silver,2026-02-25,2,3,0.6666666666666666,,,neutral
 ind_silver,2026-02-26,3,3,1.0,,,neutral
 ind_silver,2026-02-27,3,3,1.0,0.5,,neutral
 ind_silver,2026-03-02,2,3,0.6666666666666666,0.5666666666666667,0.06666666666666665,up
+ind_silver,2026-03-03,2,3,0.6666666666666666,0.6333333333333333,0.06666666666666665,up
 ind_softwareapplication,2026-02-16,8,91,0.08791208791208792,,,neutral
 ind_softwareapplication,2026-02-17,6,90,0.06666666666666667,,,neutral
 ind_softwareapplication,2026-02-18,7,91,0.07692307692307693,,,neutral
@@ -2029,6 +2153,7 @@ ind_softwareapplication,2026-02-25,10,89,0.11235955056179775,,,neutral
 ind_softwareapplication,2026-02-26,11,92,0.11956521739130435,,,neutral
 ind_softwareapplication,2026-02-27,10,91,0.10989010989010989,0.08976174086457428,,neutral
 ind_softwareapplication,2026-03-02,9,90,0.1,0.09097053207336549,0.0012087912087912073,up
+ind_softwareapplication,2026-03-03,11,90,0.12222222222222222,0.09652608762892104,0.00555555555555555,up
 ind_softwareinfrastructure,2026-02-16,8,92,0.08695652173913043,,,neutral
 ind_softwareinfrastructure,2026-02-17,9,90,0.1,,,neutral
 ind_softwareinfrastructure,2026-02-18,9,90,0.1,,,neutral
@@ -2040,6 +2165,7 @@ ind_softwareinfrastructure,2026-02-25,6,90,0.06666666666666667,,,neutral
 ind_softwareinfrastructure,2026-02-26,8,90,0.08888888888888889,,,neutral
 ind_softwareinfrastructure,2026-02-27,7,89,0.07865168539325842,0.0877055578479024,,neutral
 ind_softwareinfrastructure,2026-03-02,11,89,0.12359550561797752,0.0913694562357871,0.0036638983878846954,up
+ind_softwareinfrastructure,2026-03-03,12,89,0.1348314606741573,0.09485260230320285,0.003483146067415746,up
 ind_solar,2026-02-16,4,10,0.4,,,neutral
 ind_solar,2026-02-17,4,10,0.4,,,neutral
 ind_solar,2026-02-18,6,10,0.6,,,neutral
@@ -2051,6 +2177,7 @@ ind_solar,2026-02-25,2,9,0.2222222222222222,,,neutral
 ind_solar,2026-02-26,2,8,0.25,,,neutral
 ind_solar,2026-02-27,0,8,0.0,0.37722222222222224,,neutral
 ind_solar,2026-03-02,1,8,0.125,0.3497222222222222,-0.027500000000000024,down
+ind_solar,2026-03-03,1,8,0.125,0.32222222222222224,-0.02749999999999997,down
 ind_specialtybusinessservices,2026-02-16,2,22,0.09090909090909091,,,neutral
 ind_specialtybusinessservices,2026-02-17,2,22,0.09090909090909091,,,neutral
 ind_specialtybusinessservices,2026-02-18,2,22,0.09090909090909091,,,neutral
@@ -2062,6 +2189,7 @@ ind_specialtybusinessservices,2026-02-25,3,22,0.13636363636363635,,,neutral
 ind_specialtybusinessservices,2026-02-26,3,23,0.13043478260869565,,,neutral
 ind_specialtybusinessservices,2026-02-27,3,23,0.13043478260869565,0.12284020327498588,,neutral
 ind_specialtybusinessservices,2026-03-02,3,22,0.13636363636363635,0.12738565782044042,0.004545454545454547,up
+ind_specialtybusinessservices,2026-03-03,3,21,0.14285714285714285,0.13258046301524562,0.0051948051948051965,up
 ind_specialtychemicals,2026-02-16,17,36,0.4722222222222222,,,neutral
 ind_specialtychemicals,2026-02-17,18,36,0.5,,,neutral
 ind_specialtychemicals,2026-02-18,19,36,0.5277777777777778,,,neutral
@@ -2073,6 +2201,7 @@ ind_specialtychemicals,2026-02-25,12,36,0.3333333333333333,,,neutral
 ind_specialtychemicals,2026-02-26,13,36,0.3611111111111111,,,neutral
 ind_specialtychemicals,2026-02-27,11,36,0.3055555555555556,0.43611111111111106,,neutral
 ind_specialtychemicals,2026-03-02,10,36,0.2777777777777778,0.4166666666666667,-0.019444444444444375,down
+ind_specialtychemicals,2026-03-03,8,36,0.2222222222222222,0.3888888888888889,-0.02777777777777779,down
 ind_specialtyindustrialmachinery,2026-02-16,30,51,0.5882352941176471,,,neutral
 ind_specialtyindustrialmachinery,2026-02-17,31,51,0.6078431372549019,,,neutral
 ind_specialtyindustrialmachinery,2026-02-18,28,51,0.5490196078431373,,,neutral
@@ -2084,6 +2213,7 @@ ind_specialtyindustrialmachinery,2026-02-25,24,51,0.47058823529411764,,,neutral
 ind_specialtyindustrialmachinery,2026-02-26,26,51,0.5098039215686274,,,neutral
 ind_specialtyindustrialmachinery,2026-02-27,25,50,0.5,0.5463137254901961,,neutral
 ind_specialtyindustrialmachinery,2026-03-02,21,51,0.4117647058823529,0.5286666666666667,-0.01764705882352935,down
+ind_specialtyindustrialmachinery,2026-03-03,10,50,0.2,0.4878823529411765,-0.04078431372549024,down
 ind_specialtyretail,2026-02-16,7,20,0.35,,,neutral
 ind_specialtyretail,2026-02-17,6,20,0.3,,,neutral
 ind_specialtyretail,2026-02-18,6,20,0.3,,,neutral
@@ -2095,6 +2225,7 @@ ind_specialtyretail,2026-02-25,6,19,0.3157894736842105,,,neutral
 ind_specialtyretail,2026-02-26,6,19,0.3157894736842105,,,neutral
 ind_specialtyretail,2026-02-27,6,19,0.3157894736842105,0.2710526315789473,,neutral
 ind_specialtyretail,2026-03-02,5,19,0.2631578947368421,0.26236842105263153,-0.008684210526315794,down
+ind_specialtyretail,2026-03-03,5,20,0.25,0.2573684210526316,-0.004999999999999949,down
 ind_staffingemploymentservices,2026-02-16,0,7,0.0,,,neutral
 ind_staffingemploymentservices,2026-02-17,0,7,0.0,,,neutral
 ind_staffingemploymentservices,2026-02-18,0,7,0.0,,,neutral
@@ -2106,6 +2237,7 @@ ind_staffingemploymentservices,2026-02-25,0,7,0.0,,,neutral
 ind_staffingemploymentservices,2026-02-26,0,7,0.0,,,neutral
 ind_staffingemploymentservices,2026-02-27,0,7,0.0,0.0,,neutral
 ind_staffingemploymentservices,2026-03-02,0,7,0.0,0.0,0.0,down
+ind_staffingemploymentservices,2026-03-03,0,7,0.0,0.0,0.0,down
 ind_steel,2026-02-16,9,11,0.8181818181818182,,,neutral
 ind_steel,2026-02-17,7,11,0.6363636363636364,,,neutral
 ind_steel,2026-02-18,7,11,0.6363636363636364,,,neutral
@@ -2117,6 +2249,7 @@ ind_steel,2026-02-25,2,11,0.18181818181818182,,,neutral
 ind_steel,2026-02-26,2,11,0.18181818181818182,,,neutral
 ind_steel,2026-02-27,2,11,0.18181818181818182,0.38181818181818183,,neutral
 ind_steel,2026-03-02,3,10,0.3,0.32999999999999996,-0.051818181818181874,down
+ind_steel,2026-03-03,1,10,0.1,0.27636363636363637,-0.05363636363636359,down
 ind_telecomservices,2026-02-16,11,34,0.3235294117647059,,,neutral
 ind_telecomservices,2026-02-17,12,34,0.35294117647058826,,,neutral
 ind_telecomservices,2026-02-18,13,34,0.38235294117647056,,,neutral
@@ -2128,6 +2261,7 @@ ind_telecomservices,2026-02-25,14,34,0.4117647058823529,,,neutral
 ind_telecomservices,2026-02-26,12,34,0.35294117647058826,,,neutral
 ind_telecomservices,2026-02-27,13,34,0.38235294117647056,0.3676470588235294,,neutral
 ind_telecomservices,2026-03-02,12,34,0.35294117647058826,0.3705882352941176,0.002941176470588225,up
+ind_telecomservices,2026-03-03,9,34,0.2647058823529412,0.3617647058823529,-0.00882352941176473,down
 ind_textilemanufacturing,2026-02-16,0,1,0.0,,,neutral
 ind_textilemanufacturing,2026-02-17,0,1,0.0,,,neutral
 ind_textilemanufacturing,2026-02-18,0,1,0.0,,,neutral
@@ -2139,6 +2273,7 @@ ind_textilemanufacturing,2026-02-25,0,1,0.0,,,neutral
 ind_textilemanufacturing,2026-02-26,0,1,0.0,,,neutral
 ind_textilemanufacturing,2026-02-27,0,1,0.0,0.0,,neutral
 ind_textilemanufacturing,2026-03-02,0,1,0.0,0.0,0.0,down
+ind_textilemanufacturing,2026-03-03,0,1,0.0,0.0,0.0,down
 ind_thermalcoal,2026-02-16,1,4,0.25,,,neutral
 ind_thermalcoal,2026-02-17,0,4,0.0,,,neutral
 ind_thermalcoal,2026-02-18,0,4,0.0,,,neutral
@@ -2150,6 +2285,7 @@ ind_thermalcoal,2026-02-25,0,4,0.0,,,neutral
 ind_thermalcoal,2026-02-26,0,4,0.0,,,neutral
 ind_thermalcoal,2026-02-27,0,4,0.0,0.025,,neutral
 ind_thermalcoal,2026-03-02,0,4,0.0,0.0,-0.025,down
+ind_thermalcoal,2026-03-03,0,4,0.0,0.0,0.0,down
 ind_tobacco,2026-02-16,1,5,0.2,,,neutral
 ind_tobacco,2026-02-17,1,5,0.2,,,neutral
 ind_tobacco,2026-02-18,1,5,0.2,,,neutral
@@ -2161,6 +2297,7 @@ ind_tobacco,2026-02-25,4,5,0.8,,,neutral
 ind_tobacco,2026-02-26,4,5,0.8,,,neutral
 ind_tobacco,2026-02-27,4,5,0.8,0.5,,neutral
 ind_tobacco,2026-03-02,2,5,0.4,0.52,0.020000000000000018,up
+ind_tobacco,2026-03-03,1,5,0.2,0.52,0.0,down
 ind_toolsaccessories,2026-02-16,8,8,1.0,,,neutral
 ind_toolsaccessories,2026-02-17,7,7,1.0,,,neutral
 ind_toolsaccessories,2026-02-18,7,7,1.0,,,neutral
@@ -2172,6 +2309,7 @@ ind_toolsaccessories,2026-02-25,6,7,0.8571428571428571,,,neutral
 ind_toolsaccessories,2026-02-26,7,7,1.0,,,neutral
 ind_toolsaccessories,2026-02-27,6,7,0.8571428571428571,0.9714285714285713,,neutral
 ind_toolsaccessories,2026-03-02,5,7,0.7142857142857143,0.9428571428571428,-0.02857142857142847,down
+ind_toolsaccessories,2026-03-03,4,7,0.5714285714285714,0.9,-0.042857142857142816,down
 ind_travelservices,2026-02-16,5,13,0.38461538461538464,,,neutral
 ind_travelservices,2026-02-17,6,14,0.42857142857142855,,,neutral
 ind_travelservices,2026-02-18,7,14,0.5,,,neutral
@@ -2183,6 +2321,7 @@ ind_travelservices,2026-02-25,5,14,0.35714285714285715,,,neutral
 ind_travelservices,2026-02-26,7,14,0.5,,,neutral
 ind_travelservices,2026-02-27,5,14,0.35714285714285715,0.41703296703296705,,neutral
 ind_travelservices,2026-03-02,1,13,0.07692307692307693,0.3862637362637363,-0.03076923076923077,down
+ind_travelservices,2026-03-03,3,13,0.23076923076923078,0.3664835164835165,-0.019780219780219765,down
 ind_trucking,2026-02-16,9,12,0.75,,,neutral
 ind_trucking,2026-02-17,9,12,0.75,,,neutral
 ind_trucking,2026-02-18,9,12,0.75,,,neutral
@@ -2194,6 +2333,7 @@ ind_trucking,2026-02-25,1,12,0.08333333333333333,,,neutral
 ind_trucking,2026-02-26,7,12,0.5833333333333334,,,neutral
 ind_trucking,2026-02-27,8,12,0.6666666666666666,0.5916666666666667,,neutral
 ind_trucking,2026-03-02,7,12,0.5833333333333334,0.575,-0.01666666666666672,down
+ind_trucking,2026-03-03,7,12,0.5833333333333334,0.5583333333333333,-0.016666666666666607,down
 ind_uranium,2026-02-16,0,5,0.0,,,neutral
 ind_uranium,2026-02-17,0,5,0.0,,,neutral
 ind_uranium,2026-02-18,0,5,0.0,,,neutral
@@ -2205,6 +2345,7 @@ ind_uranium,2026-02-25,1,5,0.2,,,neutral
 ind_uranium,2026-02-26,0,5,0.0,,,neutral
 ind_uranium,2026-02-27,0,6,0.0,0.08,,neutral
 ind_uranium,2026-03-02,0,6,0.0,0.08,0.0,down
+ind_uranium,2026-03-03,0,6,0.0,0.08,0.0,down
 ind_utilitiesdiversified,2026-02-16,3,5,0.6,,,neutral
 ind_utilitiesdiversified,2026-02-17,3,5,0.6,,,neutral
 ind_utilitiesdiversified,2026-02-18,2,5,0.4,,,neutral
@@ -2216,6 +2357,7 @@ ind_utilitiesdiversified,2026-02-25,4,6,0.6666666666666666,,,neutral
 ind_utilitiesdiversified,2026-02-26,4,6,0.6666666666666666,,,neutral
 ind_utilitiesdiversified,2026-02-27,4,6,0.6666666666666666,0.5966666666666667,,neutral
 ind_utilitiesdiversified,2026-03-02,3,6,0.5,0.5866666666666667,-0.010000000000000009,down
+ind_utilitiesdiversified,2026-03-03,2,6,0.3333333333333333,0.5599999999999999,-0.026666666666666727,down
 ind_utilitiesindependentpowerproducers,2026-02-16,2,7,0.2857142857142857,,,neutral
 ind_utilitiesindependentpowerproducers,2026-02-17,1,7,0.14285714285714285,,,neutral
 ind_utilitiesindependentpowerproducers,2026-02-18,2,7,0.2857142857142857,,,neutral
@@ -2227,6 +2369,7 @@ ind_utilitiesindependentpowerproducers,2026-02-25,1,7,0.14285714285714285,,,neut
 ind_utilitiesindependentpowerproducers,2026-02-26,1,7,0.14285714285714285,,,neutral
 ind_utilitiesindependentpowerproducers,2026-02-27,1,7,0.14285714285714285,0.1857142857142857,,neutral
 ind_utilitiesindependentpowerproducers,2026-03-02,0,7,0.0,0.1571428571428571,-0.02857142857142858,down
+ind_utilitiesindependentpowerproducers,2026-03-03,0,7,0.0,0.14285714285714285,-0.014285714285714263,down
 ind_utilitiesregulatedelectric,2026-02-16,18,36,0.5,,,neutral
 ind_utilitiesregulatedelectric,2026-02-17,17,36,0.4722222222222222,,,neutral
 ind_utilitiesregulatedelectric,2026-02-18,14,36,0.3888888888888889,,,neutral
@@ -2238,6 +2381,7 @@ ind_utilitiesregulatedelectric,2026-02-25,16,36,0.4444444444444444,,,neutral
 ind_utilitiesregulatedelectric,2026-02-26,14,36,0.3888888888888889,,,neutral
 ind_utilitiesregulatedelectric,2026-02-27,15,36,0.4166666666666667,0.42777777777777776,,neutral
 ind_utilitiesregulatedelectric,2026-03-02,15,36,0.4166666666666667,0.41944444444444445,-0.008333333333333304,down
+ind_utilitiesregulatedelectric,2026-03-03,15,36,0.4166666666666667,0.4138888888888889,-0.005555555555555536,down
 ind_utilitiesregulatedgas,2026-02-16,7,14,0.5,,,neutral
 ind_utilitiesregulatedgas,2026-02-17,6,14,0.42857142857142855,,,neutral
 ind_utilitiesregulatedgas,2026-02-18,3,14,0.21428571428571427,,,neutral
@@ -2249,6 +2393,7 @@ ind_utilitiesregulatedgas,2026-02-25,5,14,0.35714285714285715,,,neutral
 ind_utilitiesregulatedgas,2026-02-26,5,14,0.35714285714285715,,,neutral
 ind_utilitiesregulatedgas,2026-02-27,9,14,0.6428571428571429,0.3571428571428571,,neutral
 ind_utilitiesregulatedgas,2026-03-02,9,14,0.6428571428571429,0.37142857142857144,0.014285714285714346,up
+ind_utilitiesregulatedgas,2026-03-03,7,14,0.5,0.3785714285714286,0.007142857142857173,up
 ind_utilitiesregulatedwater,2026-02-16,1,7,0.14285714285714285,,,neutral
 ind_utilitiesregulatedwater,2026-02-17,1,7,0.14285714285714285,,,neutral
 ind_utilitiesregulatedwater,2026-02-18,1,7,0.14285714285714285,,,neutral
@@ -2260,6 +2405,7 @@ ind_utilitiesregulatedwater,2026-02-25,1,7,0.14285714285714285,,,neutral
 ind_utilitiesregulatedwater,2026-02-26,1,7,0.14285714285714285,,,neutral
 ind_utilitiesregulatedwater,2026-02-27,1,7,0.14285714285714285,0.14285714285714285,,neutral
 ind_utilitiesregulatedwater,2026-03-02,1,7,0.14285714285714285,0.14285714285714285,0.0,down
+ind_utilitiesregulatedwater,2026-03-03,0,7,0.0,0.12857142857142856,-0.01428571428571429,down
 ind_utilitiesrenewable,2026-02-16,6,9,0.6666666666666666,,,neutral
 ind_utilitiesrenewable,2026-02-17,7,9,0.7777777777777778,,,neutral
 ind_utilitiesrenewable,2026-02-18,6,9,0.6666666666666666,,,neutral
@@ -2271,6 +2417,7 @@ ind_utilitiesrenewable,2026-02-25,6,9,0.6666666666666666,,,neutral
 ind_utilitiesrenewable,2026-02-26,4,9,0.4444444444444444,,,neutral
 ind_utilitiesrenewable,2026-02-27,3,9,0.3333333333333333,0.6222222222222222,,neutral
 ind_utilitiesrenewable,2026-03-02,3,9,0.3333333333333333,0.5888888888888888,-0.03333333333333344,down
+ind_utilitiesrenewable,2026-03-03,0,8,0.0,0.5111111111111111,-0.07777777777777772,down
 ind_wastemanagement,2026-02-16,1,9,0.1111111111111111,,,neutral
 ind_wastemanagement,2026-02-17,2,9,0.2222222222222222,,,neutral
 ind_wastemanagement,2026-02-18,2,9,0.2222222222222222,,,neutral
@@ -2282,6 +2429,7 @@ ind_wastemanagement,2026-02-25,1,9,0.1111111111111111,,,neutral
 ind_wastemanagement,2026-02-26,1,9,0.1111111111111111,,,neutral
 ind_wastemanagement,2026-02-27,1,9,0.1111111111111111,0.16666666666666666,,neutral
 ind_wastemanagement,2026-03-02,1,9,0.1111111111111111,0.16666666666666666,0.0,down
+ind_wastemanagement,2026-03-03,1,9,0.1111111111111111,0.15555555555555556,-0.0111111111111111,down
 sec_basicmaterials,2024-07-21,40,114,0.3508771929824561,,,neutral
 sec_basicmaterials,2024-07-22,47,114,0.41228070175438597,,,neutral
 sec_basicmaterials,2024-07-23,50,114,0.43859649122807015,,,neutral
@@ -2709,6 +2857,7 @@ sec_basicmaterials,2026-02-25,66,154,0.42857142857142855,0.45048553198861585,-0.
 sec_basicmaterials,2026-02-26,74,153,0.48366013071895425,0.4592542296242696,0.008768697635653744,up
 sec_basicmaterials,2026-02-27,69,153,0.45098039215686275,0.4520032755513652,-0.007250954072904381,down
 sec_basicmaterials,2026-03-02,76,156,0.48717948717948717,0.4483722309807233,-0.003631044570641895,down
+sec_basicmaterials,2026-03-03,60,150,0.4,0.45170556431405673,0.0033333333333334103,up
 sec_communicationservices,2024-07-21,27,106,0.25471698113207547,,,neutral
 sec_communicationservices,2024-07-22,29,107,0.27102803738317754,,,neutral
 sec_communicationservices,2024-07-23,31,108,0.28703703703703703,,,neutral
@@ -3136,6 +3285,7 @@ sec_communicationservices,2026-02-25,23,107,0.21495327102803738,0.18972720117712
 sec_communicationservices,2026-02-26,24,106,0.22641509433962265,0.1980829963253698,0.008355795148247969,up
 sec_communicationservices,2026-02-27,25,107,0.2336448598130841,0.20446635023120652,0.0063833539058367195,up
 sec_communicationservices,2026-03-02,23,108,0.21296296296296297,0.20878151445203114,0.004315164220824619,up
+sec_communicationservices,2026-03-03,20,109,0.1834862385321101,0.20693783061293444,-0.0018436838390966936,down
 sec_consumercyclical,2024-07-21,91,304,0.2993421052631579,,,neutral
 sec_consumercyclical,2024-07-22,102,304,0.3355263157894737,,,neutral
 sec_consumercyclical,2024-07-23,103,304,0.33881578947368424,,,neutral
@@ -3561,6 +3711,7 @@ sec_consumercyclical,2026-02-25,73,286,0.25524475524475526,0.3032216800638714,-0
 sec_consumercyclical,2026-02-26,84,286,0.2937062937062937,0.30698677310232086,0.003765093038449463,up
 sec_consumercyclical,2026-02-27,67,286,0.23426573426573427,0.2985794364942922,-0.00840733660802867,down
 sec_consumercyclical,2026-03-02,45,284,0.15845070422535212,0.2825905968822253,-0.015988839612066874,down
+sec_consumercyclical,2026-03-03,33,283,0.1166077738515901,0.26345552651651927,-0.019135070365706053,down
 sec_consumerdefensive,2024-07-21,24,110,0.21818181818181817,,,neutral
 sec_consumerdefensive,2024-07-22,27,111,0.24324324324324326,,,neutral
 sec_consumerdefensive,2024-07-23,28,111,0.25225225225225223,,,neutral
@@ -3984,6 +4135,7 @@ sec_consumerdefensive,2026-02-25,35,118,0.2966101694915254,0.2746974925283182,0.
 sec_consumerdefensive,2026-02-26,38,118,0.3220338983050847,0.2796281550860994,0.004930662557781185,up
 sec_consumerdefensive,2026-02-27,37,118,0.3135593220338983,0.2851507539561559,0.0055225988700565165,up
 sec_consumerdefensive,2026-03-02,32,118,0.2711864406779661,0.2864360646906192,0.0012853107344633075,up
+sec_consumerdefensive,2026-03-03,19,118,0.16101694915254236,0.27732767557226,-0.009108389118359206,down
 sec_energy,2024-07-21,53,152,0.34868421052631576,,,neutral
 sec_energy,2024-07-22,59,152,0.3881578947368421,,,neutral
 sec_energy,2024-07-23,51,151,0.33774834437086093,,,neutral
@@ -4405,6 +4557,7 @@ sec_energy,2026-02-25,91,153,0.5947712418300654,0.6096517525601703,-0.0022111875
 sec_energy,2026-02-26,91,153,0.5947712418300654,0.61386571884844,0.004213966288269644,up
 sec_energy,2026-02-27,102,154,0.6623376623376623,0.6194543237918836,0.005588604943443598,up
 sec_energy,2026-03-02,107,157,0.6815286624203821,0.6265682289949608,0.007113905203077198,up
+sec_energy,2026-03-03,98,157,0.6242038216560509,0.6293859621539434,0.002817733158982594,up
 sec_financial,2024-07-21,215,470,0.4574468085106383,,,neutral
 sec_financial,2024-07-22,228,477,0.4779874213836478,,,neutral
 sec_financial,2024-07-23,238,476,0.5,,,neutral
@@ -4825,6 +4978,7 @@ sec_financial,2026-02-25,97,606,0.16006600660066006,0.22109498699508365,-0.01342
 sec_financial,2026-02-26,101,605,0.1669421487603306,0.2122228588290455,-0.008872128166038135,down
 sec_financial,2026-02-27,64,603,0.10613598673300166,0.19682676444903388,-0.015396094380011632,down
 sec_financial,2026-03-02,70,603,0.11608623548922056,0.18221388962662047,-0.014612874822413413,down
+sec_financial,2026-03-03,51,601,0.08485856905158069,0.16365056620390966,-0.018563323422710803,down
 sec_healthcare,2024-07-21,125,361,0.3462603878116344,,,neutral
 sec_healthcare,2024-07-22,143,364,0.39285714285714285,,,neutral
 sec_healthcare,2024-07-23,144,368,0.391304347826087,,,neutral
@@ -5237,6 +5391,7 @@ sec_healthcare,2026-02-25,139,405,0.3432098765432099,0.28945823035298834,0.00564
 sec_healthcare,2026-02-26,131,406,0.3226600985221675,0.2989742402052051,0.009516009852216734,up
 sec_healthcare,2026-02-27,142,406,0.3497536945812808,0.3103315192110718,0.01135727900586675,up
 sec_healthcare,2026-03-02,134,403,0.3325062034739454,0.32015644686325223,0.009824927652180404,up
+sec_healthcare,2026-03-03,105,399,0.2631578947368421,0.31890331403117206,-0.0012531328320801727,down
 sec_industrials,2024-07-21,135,342,0.39473684210526316,,,neutral
 sec_industrials,2024-07-22,169,343,0.49271137026239065,,,neutral
 sec_industrials,2024-07-23,181,344,0.5261627906976745,,,neutral
@@ -5645,6 +5800,7 @@ sec_industrials,2026-02-25,149,369,0.4037940379403794,0.465075142835096,-0.01002
 sec_industrials,2026-02-26,165,369,0.44715447154471544,0.4641149143138918,-0.0009602285212041983,down
 sec_industrials,2026-02-27,148,367,0.4032697547683924,0.45620340740590726,-0.007911506907984533,down
 sec_industrials,2026-03-02,140,367,0.3814713896457766,0.4458491839726647,-0.010354223433242549,down
+sec_industrials,2026-03-03,100,366,0.273224043715847,0.42576014420256003,-0.020089039770104677,down
 sec_realestate,2024-07-21,62,147,0.4217687074829932,,,neutral
 sec_realestate,2024-07-22,69,147,0.46938775510204084,,,neutral
 sec_realestate,2024-07-23,66,147,0.4489795918367347,,,neutral
@@ -6036,6 +6192,7 @@ sec_realestate,2026-02-25,45,142,0.31690140845070425,0.27333707251859785,0.00252
 sec_realestate,2026-02-26,50,144,0.3472222222222222,0.2860734791379832,0.012736406619385354,up
 sec_realestate,2026-02-27,41,141,0.2907801418439716,0.29067596884685587,0.00460248970887267,up
 sec_realestate,2026-03-02,46,142,0.323943661971831,0.2984224477200953,0.007746478873239426,up
+sec_realestate,2026-03-03,42,141,0.2978723404255319,0.29984088743640736,0.0014184397163120588,up
 sec_technology,2024-07-21,114,377,0.30238726790450926,,,neutral
 sec_technology,2024-07-22,136,377,0.36074270557029176,,,neutral
 sec_technology,2024-07-23,143,379,0.37730870712401055,,,neutral
@@ -6423,6 +6580,7 @@ sec_technology,2026-02-25,109,386,0.2823834196891192,0.27163570859809893,-0.0016
 sec_technology,2026-02-26,97,389,0.2493573264781491,0.26978572696019953,-0.0018499816378994005,down
 sec_technology,2026-02-27,84,389,0.2159383033419023,0.262591678506511,-0.00719404845368854,down
 sec_technology,2026-03-02,87,388,0.22422680412371135,0.2566980323882699,-0.005893646118241114,down
+sec_technology,2026-03-03,67,386,0.17357512953367876,0.24732032683264035,-0.009377705555629529,down
 sec_utilities,2024-07-21,15,77,0.19480519480519481,,,neutral
 sec_utilities,2024-07-22,21,77,0.2727272727272727,,,neutral
 sec_utilities,2024-07-23,18,77,0.23376623376623376,,,neutral
@@ -6806,3 +6964,4 @@ sec_utilities,2026-02-25,33,79,0.4177215189873418,0.4125770853618955,0.004592664
 sec_utilities,2026-02-26,29,79,0.3670886075949367,0.4082603050957482,-0.0043167802661473464,down
 sec_utilities,2026-02-27,33,79,0.4177215189873418,0.40259655955858487,-0.005663745537163312,down
 sec_utilities,2026-03-02,31,79,0.3924050632911392,0.39440116845180134,-0.008195391106783523,down
+sec_utilities,2026-03-03,24,78,0.3076923076923077,0.3802986043492373,-0.014102564102564052,down
