@@ -63,6 +63,23 @@ if summary.empty:
     st.warning("No industry data available.")
     st.stop()
 
+# KPI metrics
+total_count = len(summary)
+status_counts = summary["Status"].value_counts()
+trend_counts = summary["Trend"].value_counts()
+
+kpi_cols = st.columns(5)
+with kpi_cols[0]:
+    st.metric("Oversold", f"{status_counts.get('Oversold', 0) / total_count:.1%}")
+with kpi_cols[1]:
+    st.metric("Normal", f"{status_counts.get('Normal', 0) / total_count:.1%}")
+with kpi_cols[2]:
+    st.metric("Overbought", f"{status_counts.get('Overbought', 0) / total_count:.1%}")
+with kpi_cols[3]:
+    st.metric("Trend Up", f"{trend_counts.get('Up', 0) / total_count:.1%}")
+with kpi_cols[4]:
+    st.metric("Trend Down", f"{trend_counts.get('Down', 0) / total_count:.1%}")
+
 # Treemap (display only)
 fig = build_industry_heatmap(summary, color_mode=color_mode_key, size_mode=size_mode_key)
 st.plotly_chart(fig, use_container_width=True)
