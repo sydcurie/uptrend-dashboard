@@ -2,15 +2,41 @@ name: Collect Finviz Data
 
 on:
   schedule:
-    # Mon-Fri at 21:30 UTC (= 16:30 ET winter / 17:30 ET summer)
-    - cron: '30 21 * * 1-5'
+    # 13:10 PDT (UTC-7, Mar-Nov) = 20:10 UTC
+    - cron: '10 20 * * 1-5'
+    # 13:10 PST (UTC-8, Nov-Mar) = 21:10 UTC
+    - cron: '10 21 * * 1-5'
   workflow_dispatch: # Allow manual trigger
 
 permissions:
   contents: write
 
 jobs:
+  check-time:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+    steps:
+      - name: Check DST offset matches fired schedule
+        id: check
+        run: |
+          SCHEDULE="${{ github.event.schedule }}"
+          TZ_OFFSET=$(TZ='America/Los_Angeles' date +%z)
+          echo "Fired schedule: ${SCHEDULE}, Pacific offset: ${TZ_OFFSET}"
+          if [ "$SCHEDULE" = "10 20 * * 1-5" ] && [ "$TZ_OFFSET" = "-0700" ]; then
+            echo "PDT schedule fired during PDT — running"
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          elif [ "$SCHEDULE" = "10 21 * * 1-5" ] && [ "$TZ_OFFSET" = "-0800" ]; then
+            echo "PST schedule fired during PST — running"
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "Schedule/offset mismatch — skipping"
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          fi
+
   collect:
+    needs: check-time
+    if: needs.check-time.outputs.should_run == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
 
     steps:
