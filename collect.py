@@ -111,6 +111,8 @@ def main():
                     elif len(result.industry_failed) > 0 and len(result.industry_succeeded) == 0:
                         logger.error("All industry collections failed")
                         sys.exit(2)
+                    elif result.industry_failed:
+                        sys.exit(2)
                 elif scope == CollectScope.SECTORS:
                     expected = len(SECTORS) + 1  # "all" + 11 sectors
                     if len(result.succeeded) == 0:
@@ -120,6 +122,8 @@ def main():
                 elif scope == CollectScope.INDUSTRIES:
                     if len(result.succeeded) == 0:
                         sys.exit(1)
+                    elif result.failed:
+                        sys.exit(2)
     finally:
         collector.close()
 

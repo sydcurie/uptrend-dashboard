@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.constants import SECTORS
-from src.db_client import cached_load_sector_data
+from src.data_loader import cached_load_sector_data
 from src.data_processor import get_sector_display_name, default_start_date, filter_by_date_range
 from src.chart_builder import build_sector_comparison_chart
 

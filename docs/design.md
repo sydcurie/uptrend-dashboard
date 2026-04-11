@@ -5,8 +5,8 @@
 | Document Type | Software Design Document |
 | Project Name | uptrend-dashboard |
 | Created | 2026-02-08 |
-| Revised | 2026-02-18 |
-| Status | v4.3 Default display period limit (2 years) |
+| Revised | 2026-04-11 |
+| Status | v4.4 Code quality improvements (CR/MJ fixes) |
 
 ---
 
@@ -19,6 +19,7 @@
 | 2026-02-08 | v2.1 | Removed signal logic (Long/Short Entry/Exit). Changed chart trend display to green/red/gray color coding |
 | 2026-02-08 | v2.2 | Code review fixes. Improved DB connection management, centralized constants, empty data handling, added logging, test improvements |
 | 2026-02-08 | v2.3 | Sector Comparison chart improvements. 10MA display, threshold lines, custom palette, latest value annotations, Y-axis % format, legend sorting |
+| 2026-04-11 | v4.4 | Code quality fixes: extracted `data_loader.py` (DIP fix), unified threshold constants, date validation, exit code gaps, CI concurrency guard |
 | 2026-02-18 | v4.3 | Default display period limit: date_input defaults to max 2 years via `default_start_date()`, `python-dateutil` dependency |
 | 2026-02-16 | v4.2 | Industry Heatmap: Treemap page for all 149 industries, grouped by sector with RdYlGn colorscale |
 | 2026-02-16 | v4.1 | Sector Detail: added Industry Summary CSV download button (2-column layout) |
@@ -38,7 +39,7 @@
 - **Sector Detail drilldown**: Industry summary chart + table with click-to-navigate to Industry Detail
 - **Chart functions**: `build_industry_summary_chart()`, `build_industry_comparison_chart()`, shared `_build_comparison_chart()` extracted from sector comparison
 - **Data processor**: `get_industry_display_name()`, `build_industry_summary()`, `get_sector_for_industry()`, `style_status_row()` shared across pages
-- **DB client**: `load_sector_data()`, `load_industry_data()`, `fetch_all_raw_data(worksheets=)` filter, `cached_load_sector_data()` / `cached_load_all_data()` cross-page cache
+- **Data loader**: `load_sector_data()`, `load_industry_data()`, `cached_load_sector_data()` / `cached_load_all_data()` cross-page cache (moved to `data_loader.py` in v4.4). DB client: `fetch_all_raw_data(worksheets=)` filter
 - **CSV export**: Added `industry_summary.csv` as 3rd export file
 - **Tests**: 132 → 187 tests (→ 204 after v4.2, → 210 after v4.3)
 
@@ -174,6 +175,11 @@ Data is read from raw data (Count, Total) stored in SQLite, derived indicators (
 │              ┌─────────▼────────────┐                         │
 │              │indicator_calculator  │  ← Derived indicator    │
 │              │         .py         │     (Ratio, 10MA, etc.) │
+│              └─────────┬────────────┘                         │
+│                        │                                      │
+│              ┌─────────▼────────────┐                         │
+│              │  data_loader.py      │  ← Load + cache +       │
+│              │                      │     CSV→DB bootstrap    │
 │              └─────────┬────────────┘                         │
 │                        │                                      │
 │              ┌─────────▼────────────┐                         │
@@ -467,13 +473,13 @@ ORDER BY date ASC
 
 **Caching:**
 
-| Function | TTL | Description |
-|----------|-----|-------------|
-| `load_all_data()` | — | Loads all 161 worksheets + `calculate_indicators()`. No direct caching |
-| `load_sector_data()` | — | Loads `["all"] + SECTORS` (12 worksheets) + `calculate_indicators()` (v4.0) |
-| `load_industry_data()` | — | Loads industries (optional sector filter) + `calculate_indicators()` (v4.0) |
-| `cached_load_all_data()` | 3600 sec | `@st.cache_data` wrapper for `load_all_data()`, cross-page shared (v4.0) |
-| `cached_load_sector_data()` | 3600 sec | `@st.cache_data` wrapper for `load_sector_data()`, cross-page shared (v4.0) |
+| Function | Module | TTL | Description |
+|----------|--------|-----|-------------|
+| `load_all_data()` | `data_loader.py` | — | Loads all 161 worksheets + `calculate_indicators()`. Auto-bootstraps DB from CSV if needed |
+| `load_sector_data()` | `data_loader.py` | — | Loads `["all"] + SECTORS` (12 worksheets) + `calculate_indicators()` |
+| `load_industry_data()` | `data_loader.py` | — | Loads industries (optional sector filter) + `calculate_indicators()` |
+| `cached_load_all_data()` | `data_loader.py` | 3600 sec | `@st.cache_data` wrapper for `load_all_data()`, cross-page shared |
+| `cached_load_sector_data()` | `data_loader.py` | 3600 sec | `@st.cache_data` wrapper for `load_sector_data()`, cross-page shared |
 
 ### 4.2 indicator_calculator.py — Derived Indicator Calculation Layer (new)
 

@@ -38,6 +38,8 @@ Processing (src/data_processor.py) — status aggregation, sector summaries
     ↓
 Calculation (src/indicator_calculator.py) — ratio, 10MA, slope, trend, peak/trough
     ↓
+Loading (src/data_loader.py) — load + cache + CSV→DB bootstrap
+    ↓
 Data Access (src/db_client.py) — SQLite CRUD, UPSERT via INSERT OR REPLACE
     ↓
 Storage (data/uptrend.db) — uptrend_raw table, PK: (date, worksheet)

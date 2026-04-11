@@ -257,17 +257,27 @@ class TestCollectWorkflow:
         assert df.iloc[0]["count"] == 3
         assert df.iloc[0]["total"] == 3
 
-    def test_collect_worksheet_skip_zero(self, collector, db_client, mocker):
+    def test_collect_worksheet_empty_raises(self, collector, db_client, mocker):
+        """total=0 from API should raise ValueError (not silently succeed)."""
         mocker.patch.object(
             collector._session, "get",
             side_effect=[_csv_response(EMPTY_CSV), _csv_response(EMPTY_CSV)],
         )
-        count, total = collector.collect_worksheet("all", date="2026-02-07")
-        assert count == 0
-        assert total == 0
-        # No data written when total is 0
+        with pytest.raises(ValueError, match="Empty data"):
+            collector.collect_worksheet("all", date="2026-02-07")
+        # No data written
         df = db_client.fetch_raw_data("all")
         assert len(df) == 0
+
+    def test_collect_worksheet_dry_run_total_zero(self, collector, db_client, mocker):
+        """dry_run + total=0 should succeed (no raise, no DB write)."""
+        mocker.patch.object(
+            collector._session, "get",
+            side_effect=[_csv_response(EMPTY_CSV), _csv_response(EMPTY_CSV)],
+        )
+        count, total = collector.collect_worksheet("all", date="2026-02-07", dry_run=True)
+        assert count == 0
+        assert total == 0
 
     def test_collect_all(self, collector, mocker):
         mocker.patch.object(
@@ -562,15 +572,15 @@ class TestCLI:
             main()
         assert exc_info.value.code == 2
 
-    def test_cli_scope_all_industry_partial_fail_exit0(self, tmp_db, mocker):
-        """Default scope: partial industry failure with all sectors OK should exit 0."""
+    def test_cli_scope_all_industry_partial_fail_exit2(self, tmp_db, mocker):
+        """Default scope: partial industry failure with all sectors OK should exit 2."""
         from src.constants import SECTORS
         mocker.patch("sys.argv", ["collect.py", "--db", tmp_db])
         mocker.patch.dict("os.environ", {"FINVIZ_API_KEY": "test_key"})
         sector_results = {"all": (100, 500)}
         for sec in SECTORS:
             sector_results[sec] = (50, 200)
-        # Some industries succeeded, some failed → partial failure → exit 0
+        # Some industries succeeded, some failed → partial failure → exit 2
         sector_results["ind_softwareapplication"] = (30, 100)
         mocker.patch(
             "src.data_collector.DataCollector.collect_all",
@@ -580,8 +590,9 @@ class TestCLI:
             ),
         )
         from collect import main
-        # Should NOT raise SystemExit (exit 0)
-        main()
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 2
 
     def test_cli_scope_all_industry_all_fail_exit2(self, tmp_db, mocker):
         """Default scope: all sectors OK but ALL industries failed should exit 2."""
@@ -596,6 +607,22 @@ class TestCLI:
             return_value=CollectResult(
                 succeeded=sector_results,
                 failed=list(INDUSTRIES),
+            ),
+        )
+        from collect import main
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 2
+
+    def test_cli_scope_industries_partial_fail_exit2(self, tmp_db, mocker):
+        """--scope industries: partial failure should exit 2."""
+        mocker.patch("sys.argv", ["collect.py", "--db", tmp_db, "--scope", "industries"])
+        mocker.patch.dict("os.environ", {"FINVIZ_API_KEY": "test_key"})
+        mocker.patch(
+            "src.data_collector.DataCollector.collect_all",
+            return_value=CollectResult(
+                succeeded={"ind_semiconductors": (30, 60)},
+                failed=["ind_banksregional"],
             ),
         )
         from collect import main

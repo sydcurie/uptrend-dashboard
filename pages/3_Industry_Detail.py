@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.constants import INDUSTRIES, SECTORS, SECTOR_INDUSTRIES
-from src.db_client import cached_load_all_data
+from src.data_loader import cached_load_all_data
 from src.data_processor import (
     get_current_status,
     get_industry_display_name,

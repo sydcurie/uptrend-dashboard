@@ -216,3 +216,22 @@ class TestNaNHandling:
         result = calculate_indicators(df)
         assert result["ratio"].iloc[0] == 0.2
         assert result["ratio"].iloc[1] == 0.0  # NaN total -> 0
+
+
+class TestSlicedDataFrame:
+    """Test that calculate_indicators handles non-RangeIndex input."""
+
+    def test_sliced_dataframe_peaks_correct(self):
+        """DataFrame with non-zero-based index should produce correct peak positions."""
+        df = _make_sine_raw_df(n=200, period=40, amplitude=0.1)
+        # Simulate a sliced DataFrame with non-contiguous index
+        sliced = df.iloc[50:150]
+        assert sliced.index[0] == 50  # verify non-zero index
+        result = calculate_indicators(sliced)
+        # Index should be reset
+        assert result.index[0] == 0
+        assert len(result) == 100
+        # Peaks should be within bounds
+        if result["is_peak"].any():
+            peak_indices = result.index[result["is_peak"]]
+            assert all(0 <= idx < 100 for idx in peak_indices)

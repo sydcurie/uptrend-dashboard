@@ -7,7 +7,8 @@ import sys
 import pandas as pd
 import pytest
 
-from src.db_client import DBClient, load_all_data
+from src.db_client import DBClient
+from src.data_loader import load_all_data
 from src.constants import VALID_WORKSHEETS
 
 

@@ -8,6 +8,14 @@ import numpy as np
 import pandas as pd
 from scipy.signal import find_peaks
 
+from src.constants import (
+    LOWER_THRESHOLD,
+    MA_PERIOD,
+    PEAK_DISTANCE,
+    PEAK_PROMINENCE,
+    UPPER_THRESHOLD,
+)
+
 logger = logging.getLogger(__name__)
 
 
@@ -15,11 +23,11 @@ logger = logging.getLogger(__name__)
 class IndicatorConfig:
     """Configuration for indicator calculations."""
 
-    ma_period: int = 10
-    upper_threshold: float = 0.37
-    lower_threshold: float = 0.097
-    peak_distance: int = 20
-    peak_prominence: float = 0.015
+    ma_period: int = MA_PERIOD
+    upper_threshold: float = UPPER_THRESHOLD
+    lower_threshold: float = LOWER_THRESHOLD
+    peak_distance: int = PEAK_DISTANCE
+    peak_prominence: float = PEAK_PROMINENCE
 
 
 def _calc_ratio(df: pd.DataFrame) -> pd.Series:
@@ -106,7 +114,7 @@ def calculate_indicators(
     if config is None:
         config = IndicatorConfig()
 
-    result = df.copy()
+    result = df.reset_index(drop=True).copy()
     ratio = pd.Series(_calc_ratio(result), index=result.index)
     result["ratio"] = ratio
     result["ma_10"] = _calc_ma(ratio, period=config.ma_period)

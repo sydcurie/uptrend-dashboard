@@ -2,14 +2,15 @@
 
 import logging
 import numbers
-import os
+import re
 import sqlite3
 from contextlib import contextmanager
+from datetime import datetime as _datetime
 from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
-from src.constants import INDUSTRIES, SECTORS, SECTOR_INDUSTRIES, VALID_WORKSHEETS
+from src.constants import VALID_WORKSHEETS
 
 
 logger = logging.getLogger(__name__)
@@ -18,9 +19,21 @@ logger = logging.getLogger(__name__)
 class DBClient:
     """Client for reading and writing uptrend data to SQLite."""
 
+    _DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
     def __init__(self, db_path: str = "data/uptrend.db"):
         self.db_path = db_path
         self._init_tables()
+
+    @staticmethod
+    def _validate_date(date_str: str) -> None:
+        """Validate date string is exactly YYYY-MM-DD and a real calendar date."""
+        if not isinstance(date_str, str) or not DBClient._DATE_RE.match(date_str):
+            raise ValueError(f"Invalid date format: '{date_str}'. Must be YYYY-MM-DD")
+        try:
+            _datetime.strptime(date_str, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError(f"Invalid date: '{date_str}'. Not a valid calendar date")
 
     @contextmanager
     def _connection(self):
@@ -76,6 +89,7 @@ class DBClient:
     def upsert_raw_data(self, date: str, worksheet: str, count: int, total: int) -> None:
         if worksheet not in VALID_WORKSHEETS:
             raise ValueError(f"Invalid worksheet: '{worksheet}'. Must be one of {VALID_WORKSHEETS}")
+        self._validate_date(date)
         count, total = self._validate_counts(count, total)
         with self._connection() as conn:
             conn.execute(
@@ -93,6 +107,16 @@ class DBClient:
         invalid = set(df["worksheet"].unique()) - set(VALID_WORKSHEETS)
         if invalid:
             raise ValueError(f"Invalid worksheet(s): {invalid}. Must be one of {VALID_WORKSHEETS}")
+
+        # Validate date format: must be exactly YYYY-MM-DD and real dates
+        date_strs = df["date"].astype(str)
+        bad_format = date_strs[~date_strs.str.match(r"^\d{4}-\d{2}-\d{2}$")]
+        if not bad_format.empty:
+            raise ValueError(f"date column contains non-YYYY-MM-DD values: {bad_format.tolist()[:5]}")
+        parsed = pd.to_datetime(date_strs, format="%Y-%m-%d", errors="coerce")
+        bad_dates = date_strs[parsed.isna()]
+        if not bad_dates.empty:
+            raise ValueError(f"date column contains invalid dates: {bad_dates.tolist()[:5]}")
 
         counts = pd.to_numeric(df["count"], errors="coerce")
         totals = pd.to_numeric(df["total"], errors="coerce")
@@ -171,48 +195,3 @@ class DBClient:
             row = cursor.fetchone()
         return (row[0], row[1])
 
-
-def _load_data_for_worksheets(db_path: str, worksheets: Optional[List[str]]) -> Dict[str, pd.DataFrame]:
-    """Shared loader: fetch raw data for given worksheets and calculate indicators."""
-    from src.indicator_calculator import calculate_indicators
-
-    if db_path is None:
-        db_path = os.environ.get("DB_PATH", "data/uptrend.db")
-    client = DBClient(db_path)
-    raw_data = client.fetch_all_raw_data(worksheets=worksheets)
-    return {name: calculate_indicators(df) for name, df in raw_data.items() if not df.empty}
-
-
-def load_all_data(db_path: str = None) -> Dict[str, pd.DataFrame]:
-    """Load all data from SQLite and calculate indicators."""
-    return _load_data_for_worksheets(db_path, worksheets=None)
-
-
-def load_sector_data(db_path: str = None) -> Dict[str, pd.DataFrame]:
-    """Load only 'all' + sector data (no industries)."""
-    return _load_data_for_worksheets(db_path, worksheets=["all"] + SECTORS)
-
-
-def load_industry_data(db_path: str = None, sector: str = None) -> Dict[str, pd.DataFrame]:
-    """Load industry data. If sector given, only its child industries."""
-    if sector is not None:
-        target = SECTOR_INDUSTRIES.get(sector, [])
-    else:
-        target = INDUSTRIES
-    return _load_data_for_worksheets(db_path, worksheets=target)
-
-
-# Streamlit cache wrappers — pages import these for cross-page cache sharing
-try:
-    import streamlit as st
-    _cache = st.cache_data(ttl=3600)
-except Exception:
-    _cache = lambda f: f
-
-@_cache
-def cached_load_sector_data(db_path=None):
-    return load_sector_data(db_path)
-
-@_cache
-def cached_load_all_data(db_path=None):
-    return load_all_data(db_path)

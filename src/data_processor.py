@@ -13,8 +13,10 @@ from src.constants import (
     DEFAULT_DISPLAY_YEARS,
     INDUSTRY_DISPLAY_NAMES,
     INDUSTRY_TO_SECTOR,
+    LOWER_THRESHOLD,
     SECTOR_DISPLAY_NAMES,
     SECTOR_INDUSTRIES,
+    UPPER_THRESHOLD,
 )
 
 logger = logging.getLogger(__name__)
@@ -74,8 +76,8 @@ def get_current_status(df: pd.DataFrame) -> MarketStatus:
         trend = "down"
 
     ratio = float(latest["ratio"])
-    upper = float(latest["upper"]) if pd.notna(latest.get("upper")) else 0.37
-    lower = float(latest["lower"]) if pd.notna(latest.get("lower")) else 0.097
+    upper = float(latest["upper"]) if pd.notna(latest.get("upper")) else UPPER_THRESHOLD
+    lower = float(latest["lower"]) if pd.notna(latest.get("lower")) else LOWER_THRESHOLD
 
     return MarketStatus(
         date=str(latest["date"].date()) if hasattr(latest["date"], "date") else str(latest["date"]),

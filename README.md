@@ -85,6 +85,7 @@ uptrend-dashboard/
 ├── src/
 │   ├── constants.py                # Sectors, thresholds, shared constants
 │   ├── db_client.py                # SQLite CRUD (UPSERT via INSERT OR REPLACE)
+│   ├── data_loader.py              # Data loading, caching, CSV→DB bootstrap
 │   ├── indicator_calculator.py     # Ratio, 10MA, slope, trend, peak/trough
 │   ├── data_processor.py           # Status aggregation, sector summaries
 │   ├── data_collector.py           # Finviz Elite CSV scraper

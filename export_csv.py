@@ -5,7 +5,8 @@ import logging
 import os
 import sys
 
-from src.db_client import DBClient, load_all_data
+from src.db_client import DBClient
+from src.data_loader import load_all_data
 from src.data_processor import (
     build_industry_summary,
     build_sector_summary,

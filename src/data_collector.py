@@ -199,7 +199,10 @@ class DataCollector:
             self._db.upsert_raw_data(date, worksheet, count, total)
             logger.info("Collected %s: count=%d, total=%d", worksheet, count, total)
         else:
-            logger.warning("Skipping %s: total=0", worksheet)
+            raise ValueError(
+                f"Empty data for {worksheet}: total=0 "
+                f"(API returned no stocks matching filters)"
+            )
 
         return count, total
 

@@ -343,7 +343,7 @@ class TestLoadFunctions:
     """Tests for module-level load functions."""
 
     def test_load_sector_data(self, tmp_db):
-        from src.db_client import load_sector_data
+        from src.data_loader import load_sector_data
         client = DBClient(tmp_db)
         client.upsert_raw_data("2024-01-02", "all", 150, 500)
         client.upsert_raw_data("2024-01-02", "sec_technology", 50, 100)
@@ -354,7 +354,7 @@ class TestLoadFunctions:
         assert "ind_semiconductors" not in result
 
     def test_load_industry_data_all(self, tmp_db):
-        from src.db_client import load_industry_data
+        from src.data_loader import load_industry_data
         client = DBClient(tmp_db)
         client.upsert_raw_data("2024-01-02", "ind_semiconductors", 30, 60)
         client.upsert_raw_data("2024-01-02", "ind_banksregional", 20, 50)
@@ -365,10 +365,52 @@ class TestLoadFunctions:
         assert "all" not in result
 
     def test_load_industry_data_sector_filter(self, tmp_db):
-        from src.db_client import load_industry_data
+        from src.data_loader import load_industry_data
         client = DBClient(tmp_db)
         client.upsert_raw_data("2024-01-02", "ind_semiconductors", 30, 60)
         client.upsert_raw_data("2024-01-02", "ind_banksregional", 20, 50)
         result = load_industry_data(db_path=tmp_db, sector="sec_technology")
         assert "ind_semiconductors" in result
         assert "ind_banksregional" not in result
+
+
+class TestDateValidation:
+    """Tests for date format validation in upsert methods."""
+
+    def test_upsert_rejects_non_iso_format(self, db_client):
+        with pytest.raises(ValueError, match="Invalid date format"):
+            db_client.upsert_raw_data("01/02/2024", "all", 150, 500)
+
+    def test_upsert_rejects_no_hyphens(self, db_client):
+        with pytest.raises(ValueError, match="Invalid date format"):
+            db_client.upsert_raw_data("20240102", "all", 150, 500)
+
+    def test_upsert_rejects_single_digit_month_day(self, db_client):
+        with pytest.raises(ValueError, match="Invalid date format"):
+            db_client.upsert_raw_data("2024-1-2", "all", 150, 500)
+
+    def test_upsert_rejects_invalid_calendar_date(self, db_client):
+        with pytest.raises(ValueError, match="Invalid date"):
+            db_client.upsert_raw_data("2026-99-99", "all", 150, 500)
+
+    def test_upsert_accepts_valid_iso_date(self, db_client):
+        db_client.upsert_raw_data("2024-01-02", "all", 150, 500)
+
+    def test_bulk_upsert_rejects_mixed_dates(self, db_client):
+        df = pd.DataFrame({
+            "date": ["2024-01-02", "01/03/2024"],
+            "worksheet": ["all", "all"],
+            "count": [150, 160],
+            "total": [500, 500],
+        })
+        with pytest.raises(ValueError, match="non-YYYY-MM-DD"):
+            db_client.upsert_bulk(df)
+
+    def test_bulk_upsert_accepts_valid_dates(self, db_client):
+        df = pd.DataFrame({
+            "date": ["2024-01-02", "2024-01-03"],
+            "worksheet": ["all", "all"],
+            "count": [150, 160],
+            "total": [500, 500],
+        })
+        db_client.upsert_bulk(df)
