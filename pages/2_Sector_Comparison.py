@@ -9,6 +9,7 @@ from src.constants import SECTORS
 from src.data_loader import cached_load_sector_data
 from src.data_processor import get_sector_display_name, default_start_date, filter_by_date_range
 from src.chart_builder import build_sector_comparison_chart
+from src.indicator_calculator import calculate_sector_dispersion
 
 st.set_page_config(page_title="Sector Comparison", page_icon="📊", layout="wide")
 st.title("Sector Comparison")
@@ -20,6 +21,8 @@ with st.sidebar:
         "Identify which sectors are leading or lagging the market."
     )
 
+    st.markdown("---")
+    st.page_link("pages/6_Dispersion_Monitor.py", label="📡 Dispersion Monitor")
     st.markdown("---")
     st.markdown(
         'Made with <img src="https://streamlit.io/images/brand/streamlit-mark-color.png" alt="Streamlit" height="16"> by <a href="https://github.com/tradermonty">@tradermonty</a>',
@@ -35,6 +38,24 @@ def load_data():
 
 
 all_data = load_data()
+
+# Dispersion gauge in sidebar
+with st.sidebar:
+    dispersion_df = calculate_sector_dispersion(all_data)
+    valid_disp = (
+        dispersion_df.dropna(subset=["regime", "level_regime"])
+        if not dispersion_df.empty
+        else dispersion_df
+    )
+    if not valid_disp.empty:
+        latest = valid_disp.iloc[-1]
+        regime_icons = {"converged": "🟢", "normal": "🔵", "diverged": "🔴"}
+        st.markdown(
+            f"**Dispersion**: σ={latest['dispersion']:.3f} "
+            f"{regime_icons.get(latest['regime'], '')}"
+        )
+    else:
+        st.markdown("**Dispersion**: N/A (insufficient data)")
 
 # Multi-select sectors
 sector_names = {get_sector_display_name(s): s for s in SECTORS}

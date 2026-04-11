@@ -88,3 +88,9 @@ def sample_industry_data(sample_raw_df):
 def sample_all_data_with_industries(sample_all_data, sample_industry_data):
     """sample_all_data extended with 3 industry entries."""
     return {**sample_all_data, **sample_industry_data}
+
+
+@pytest.fixture
+def sample_sector_only_data(sample_all_data):
+    """Dict with only sec_* keys (11 sectors), no 'all'."""
+    return {k: v for k, v in sample_all_data.items() if k.startswith("sec_")}

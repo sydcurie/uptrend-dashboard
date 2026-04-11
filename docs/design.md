@@ -6,7 +6,7 @@
 | Project Name | uptrend-dashboard |
 | Created | 2026-02-08 |
 | Revised | 2026-04-11 |
-| Status | v4.4 Code quality improvements (CR/MJ fixes) |
+| Status | v5.0 Sector Dispersion Analysis |
 
 ---
 
@@ -19,6 +19,7 @@
 | 2026-02-08 | v2.1 | Removed signal logic (Long/Short Entry/Exit). Changed chart trend display to green/red/gray color coding |
 | 2026-02-08 | v2.2 | Code review fixes. Improved DB connection management, centralized constants, empty data handling, added logging, test improvements |
 | 2026-02-08 | v2.3 | Sector Comparison chart improvements. 10MA display, threshold lines, custom palette, latest value annotations, Y-axis % format, legend sorting |
+| 2026-04-11 | v5.0 | Sector Dispersion Analysis: cross-sectional dispersion indicator, regime classification, signal detection, forward return stats, new Dispersion Monitor page, CSV export |
 | 2026-04-11 | v4.4 | Code quality fixes: extracted `data_loader.py` (DIP fix), unified threshold constants, date validation, exit code gaps, CI concurrency guard |
 | 2026-02-18 | v4.3 | Default display period limit: date_input defaults to max 2 years via `default_start_date()`, `python-dateutil` dependency |
 | 2026-02-16 | v4.2 | Industry Heatmap: Treemap page for all 149 industries, grouped by sector with RdYlGn colorscale |
@@ -28,6 +29,21 @@
 | 2026-02-14 | v3.4 | CSV download buttons on main page for LLM data analysis |
 | 2026-02-11 | v3.3 | Sector summary bar chart click → Sector Detail page navigation |
 | 2026-02-11 | v3.2 | Data validation hardening, secret masking, CI test workflow. DB CHECK constraints, Python-level count/total validation, import_excel row filtering, mask_secrets/safe_http_error, GitHub Actions pytest |
+
+### v5.0 Key Changes (Sector Dispersion Analysis)
+
+- **Cross-sectional dispersion indicator**: `calculate_sector_dispersion()` computes std dev across 11 sectors' 10MA values per day, with expanding-window adaptive thresholds (p25/p75/p90/median)
+- **Regime classification**: `converged` (σ < expanding p25), `normal`, `diverged` (σ > expanding p75), with `level_regime` based on mean ratio (`low`/`mid`/`high`)
+- **Signal detection**: `detect_dispersion_signals()` with 3 signals: CAPITULATION (converged+low), DIVERGENCE_WARNING (diverged), BREAKOUT_VELOCITY (velocity > p90 & dispersion < median)
+- **Forward returns**: `calculate_forward_returns()` using composite state transition events (not daily samples) to avoid overlapping-sample bias
+- **Sector edge**: `calculate_sector_edge()` computes per-sector performance after regime transitions, keyed by (regime, level_regime) for CAPITULATION-specific ranking
+- **New page**: `pages/6_Dispersion_Monitor.py` — Signal banner, dual-axis dispersion chart, regime timeline, regime-aware sector ranking, historical stats
+- **Sector Comparison integration**: Sidebar dispersion gauge with regime badge and link to Dispersion Monitor
+- **New data processor functions**: `build_sector_ranking_table()` (regime-aware sort), `prepare_dispersion_csv()`
+- **New chart functions**: `build_dispersion_chart()` (dual-axis with time-series p25/p75 traces), `build_regime_timeline_chart()` (horizontal bar regime visualization)
+- **CSV export**: `data/sector_dispersion.csv` always regenerated (stale-file prevention); empty CSV with headers if insufficient sectors
+- **New constants**: `DISPERSION_CONVERGED_FALLBACK`, `DISPERSION_DIVERGED_FALLBACK`, `MEAN_RATIO_LOW/HIGH`, `DISPERSION_VELOCITY_WINDOW`, `DISPERSION_MIN_HISTORY`, `CHART_HEIGHT_DISPERSION/REGIME_TIMELINE`
+- **Data guard**: All pages handle insufficient dispersion data gracefully (st.warning + st.stop or N/A display)
 
 ### v4.0 Key Changes (Industry-Level Analysis)
 

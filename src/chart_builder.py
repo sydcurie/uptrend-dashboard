@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 
+from plotly.subplots import make_subplots
+
 from src.constants import (
     UPPER_THRESHOLD,
     LOWER_THRESHOLD,
@@ -14,6 +16,8 @@ from src.constants import (
     CHART_HEIGHT_SUMMARY,
     CHART_HEIGHT_COMPARISON,
     CHART_HEIGHT_HEATMAP,
+    CHART_HEIGHT_DISPERSION,
+    CHART_HEIGHT_REGIME_TIMELINE,
     CHART_Y_MAX_MIN,
     CHART_Y_MAX_MULTIPLIER,
 )
@@ -603,6 +607,196 @@ def build_industry_heatmap(
         height=CHART_HEIGHT_HEATMAP,
         template="plotly_white",
         margin=dict(t=50, l=10, r=10, b=10),
+    )
+
+    return fig
+
+
+# --- Dispersion Charts ---
+
+REGIME_COLORS = {
+    "converged": "#2ca02c",
+    "normal": "#1f77b4",
+    "diverged": "#d62728",
+}
+
+REGIME_BG_COLORS = {
+    "converged": "rgba(0,255,0,0.05)",
+    "diverged": "rgba(255,0,0,0.05)",
+}
+
+
+def build_dispersion_chart(dispersion_df: pd.DataFrame) -> go.Figure:
+    """Build a dual-axis dispersion chart with regime background bands.
+
+    Left Y: Dispersion (σ) + MA10 + p25/p75 time-series traces.
+    Right Y: Mean Ratio.
+    """
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+    if dispersion_df.empty:
+        fig.update_layout(
+            height=CHART_HEIGHT_DISPERSION,
+            template="plotly_white",
+        )
+        return fig
+
+    dates = dispersion_df["date"]
+
+    # Dispersion line (primary)
+    fig.add_trace(
+        go.Scatter(
+            x=dates, y=dispersion_df["dispersion"],
+            name="Dispersion (σ)",
+            line=dict(color="#1f77b4", width=2),
+        ),
+        secondary_y=False,
+    )
+
+    # Dispersion MA10 (dashed)
+    fig.add_trace(
+        go.Scatter(
+            x=dates, y=dispersion_df["dispersion_ma10"],
+            name="Dispersion MA10",
+            line=dict(color="#1f77b4", width=1, dash="dash"),
+        ),
+        secondary_y=False,
+    )
+
+    # p25 / p75 time-series thresholds
+    fig.add_trace(
+        go.Scatter(
+            x=dates, y=dispersion_df["p25"],
+            name="P25 Threshold",
+            line=dict(color="#2ca02c", width=1, dash="dot"),
+        ),
+        secondary_y=False,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=dates, y=dispersion_df["p75"],
+            name="P75 Threshold",
+            line=dict(color="#d62728", width=1, dash="dot"),
+        ),
+        secondary_y=False,
+    )
+
+    # Mean Ratio (secondary axis)
+    fig.add_trace(
+        go.Scatter(
+            x=dates, y=dispersion_df["mean_ratio"],
+            name="Mean Ratio",
+            line=dict(color="#ff7f0e", width=1.5, dash="dot"),
+        ),
+        secondary_y=True,
+    )
+
+    # Regime background bands — only draw segments lasting >= 5 days
+    # to avoid noisy flickering of thin colored bands
+    _MIN_REGIME_BAND_DAYS = 5
+    valid = dispersion_df.dropna(subset=["regime"])
+    if not valid.empty:
+        segments = []
+        prev_regime = None
+        start_date = None
+        for _, row in valid.iterrows():
+            regime = row["regime"]
+            if regime != prev_regime:
+                if prev_regime is not None:
+                    segments.append((start_date, row["date"], prev_regime))
+                start_date = row["date"]
+                prev_regime = regime
+        if prev_regime is not None:
+            segments.append((start_date, valid.iloc[-1]["date"], prev_regime))
+
+        for seg_start, seg_end, seg_regime in segments:
+            if seg_regime not in REGIME_BG_COLORS:
+                continue
+            duration = (pd.Timestamp(seg_end) - pd.Timestamp(seg_start)).days
+            if duration >= _MIN_REGIME_BAND_DAYS:
+                fig.add_vrect(
+                    x0=seg_start, x1=seg_end,
+                    fillcolor=REGIME_BG_COLORS[seg_regime],
+                    layer="below", line_width=0,
+                )
+
+    fig.update_layout(
+        height=CHART_HEIGHT_DISPERSION,
+        template="plotly_white",
+        hovermode="x unified",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(t=60),
+    )
+    fig.update_yaxes(title_text="Dispersion (σ)", secondary_y=False)
+    fig.update_yaxes(title_text="Mean Ratio", tickformat=".0%", secondary_y=True)
+
+    return fig
+
+
+def build_regime_timeline_chart(dispersion_df: pd.DataFrame) -> go.Figure:
+    """Build a horizontal bar chart showing regime transitions over time."""
+    fig = go.Figure()
+
+    if dispersion_df.empty:
+        fig.update_layout(
+            height=CHART_HEIGHT_REGIME_TIMELINE,
+            template="plotly_white",
+        )
+        return fig
+
+    valid = dispersion_df.dropna(subset=["regime"])
+    if valid.empty:
+        fig.update_layout(
+            height=CHART_HEIGHT_REGIME_TIMELINE,
+            template="plotly_white",
+        )
+        return fig
+
+    # Run-length encoding of regime
+    segments = []
+    prev_regime = None
+    start_date = None
+    for _, row in valid.iterrows():
+        regime = row["regime"]
+        if regime != prev_regime:
+            if prev_regime is not None:
+                segments.append((start_date, row["date"], prev_regime))
+            start_date = row["date"]
+            prev_regime = regime
+    if prev_regime is not None:
+        segments.append((start_date, valid.iloc[-1]["date"], prev_regime))
+
+    # Add a Bar trace per regime type for legend.
+    # On a Plotly date axis, bar widths must be in milliseconds.
+    MS_PER_DAY = 86_400_000
+    added_legend = set()
+    for start, end, regime in segments:
+        duration_days = (pd.Timestamp(end) - pd.Timestamp(start)).days + 1
+        duration_ms = duration_days * MS_PER_DAY
+        show_legend = regime not in added_legend
+        added_legend.add(regime)
+        fig.add_trace(
+            go.Bar(
+                x=[duration_ms],
+                y=["Regime"],
+                orientation="h",
+                base=[pd.Timestamp(start)],
+                marker_color=REGIME_COLORS.get(regime, "#7f7f7f"),
+                name=regime.title(),
+                showlegend=show_legend,
+                hovertext=f"{regime}: {start} → {end} ({duration_days}d)",
+                hoverinfo="text",
+            )
+        )
+
+    fig.update_layout(
+        height=CHART_HEIGHT_REGIME_TIMELINE,
+        template="plotly_white",
+        barmode="stack",
+        showlegend=True,
+        xaxis=dict(type="date"),
+        yaxis=dict(visible=False),
+        margin=dict(t=10, b=20, l=10, r=10),
     )
 
     return fig

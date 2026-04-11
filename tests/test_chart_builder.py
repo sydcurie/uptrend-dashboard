@@ -12,6 +12,8 @@ from src.chart_builder import (
     build_industry_summary_chart,
     build_industry_comparison_chart,
     build_industry_heatmap,
+    build_dispersion_chart,
+    build_regime_timeline_chart,
 )
 
 
@@ -401,4 +403,95 @@ class TestBuildIndustryHeatmap:
             "Industry", "Ratio", "10MA", "Trend", "Slope", "Status", "_key", "Sector", "Total",
         ])
         fig = build_industry_heatmap(empty_df)
+        assert isinstance(fig, go.Figure)
+
+
+def _make_dispersion_df(n=30):
+    """Create a sample dispersion DataFrame for chart testing."""
+    dates = pd.bdate_range("2024-01-01", periods=n, freq="B")
+    regimes = ["converged"] * 10 + ["normal"] * 10 + ["diverged"] * 10
+    return pd.DataFrame({
+        "date": dates,
+        "dispersion": np.linspace(0.04, 0.14, n),
+        "mean_ratio": np.linspace(0.15, 0.40, n),
+        "range": np.linspace(0.05, 0.20, n),
+        "dispersion_ma10": np.linspace(0.04, 0.14, n),
+        "dispersion_velocity": [0.005] * n,
+        "regime": regimes,
+        "level_regime": ["low"] * 10 + ["mid"] * 10 + ["high"] * 10,
+        "p25": [0.06] * n,
+        "p75": [0.11] * n,
+        "velocity_p90": [0.02] * n,
+        "dispersion_median": [0.08] * n,
+    })
+
+
+class TestBuildDispersionChart:
+    """Tests for build_dispersion_chart()."""
+
+    def test_returns_figure(self):
+        """Should return a Plotly Figure."""
+        df = _make_dispersion_df()
+        fig = build_dispersion_chart(df)
+        assert isinstance(fig, go.Figure)
+
+    def test_has_dispersion_trace(self):
+        """Should have a trace for dispersion line."""
+        df = _make_dispersion_df()
+        fig = build_dispersion_chart(df)
+        trace_names = [t.name for t in fig.data if t.name]
+        assert any("Dispersion" in n for n in trace_names)
+
+    def test_has_p25_p75_traces(self):
+        """p25/p75 should be time-series traces, not hlines."""
+        df = _make_dispersion_df()
+        fig = build_dispersion_chart(df)
+        trace_names = [t.name for t in fig.data if t.name]
+        assert any("p25" in n.lower() or "P25" in n for n in trace_names)
+        assert any("p75" in n.lower() or "P75" in n for n in trace_names)
+
+    def test_has_mean_ratio_trace(self):
+        """Should have a secondary-axis trace for mean ratio."""
+        df = _make_dispersion_df()
+        fig = build_dispersion_chart(df)
+        trace_names = [t.name for t in fig.data if t.name]
+        assert any("Mean" in n or "mean" in n for n in trace_names)
+
+    def test_empty_df_returns_figure(self):
+        """Empty DataFrame should return a valid Figure."""
+        df = pd.DataFrame(columns=[
+            "date", "dispersion", "mean_ratio", "range",
+            "dispersion_ma10", "dispersion_velocity",
+            "regime", "level_regime",
+            "p25", "p75", "velocity_p90", "dispersion_median",
+        ])
+        fig = build_dispersion_chart(df)
+        assert isinstance(fig, go.Figure)
+
+
+class TestBuildRegimeTimelineChart:
+    """Tests for build_regime_timeline_chart()."""
+
+    def test_returns_figure(self):
+        """Should return a Plotly Figure."""
+        df = _make_dispersion_df()
+        fig = build_regime_timeline_chart(df)
+        assert isinstance(fig, go.Figure)
+
+    def test_has_bar_traces(self):
+        """Should have Bar traces for regime segments."""
+        df = _make_dispersion_df()
+        fig = build_regime_timeline_chart(df)
+        bar_traces = [t for t in fig.data if isinstance(t, go.Bar)]
+        assert len(bar_traces) > 0
+
+    def test_empty_df_returns_figure(self):
+        """Empty DataFrame should return a valid Figure."""
+        df = pd.DataFrame(columns=[
+            "date", "dispersion", "mean_ratio", "range",
+            "dispersion_ma10", "dispersion_velocity",
+            "regime", "level_regime",
+            "p25", "p75", "velocity_p90", "dispersion_median",
+        ])
+        fig = build_regime_timeline_chart(df)
         assert isinstance(fig, go.Figure)

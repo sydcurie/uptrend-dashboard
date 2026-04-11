@@ -127,6 +127,45 @@ class TestExportCsv:
         assert result == {}
 
 
+    def test_creates_dispersion_csv(self, populated_db, tmp_path):
+        """Dispersion CSV should always be created."""
+        from export_csv import export_csv
+
+        output_dir = str(tmp_path / "output")
+        os.makedirs(output_dir)
+        result = export_csv(populated_db, output_dir)
+        assert "dispersion" in result
+        assert os.path.isfile(result["dispersion"]["path"])
+        df = pd.read_csv(result["dispersion"]["path"])
+        expected_cols = {"date", "dispersion", "mean_ratio", "range", "regime", "level_regime"}
+        assert expected_cols == set(df.columns)
+
+    def test_dispersion_empty_on_insufficient_sectors(self, tmp_path):
+        """With <2 sectors, dispersion CSV should have headers only."""
+        from export_csv import export_csv
+
+        db_path = str(tmp_path / "sparse.db")
+        client = DBClient(db_path)
+        dates = pd.bdate_range("2024-01-02", periods=20, freq="B")
+        # Only 'all' and 1 sector
+        for ws in ["all", "sec_technology"]:
+            data = pd.DataFrame({
+                "date": dates.strftime("%Y-%m-%d"),
+                "worksheet": ws,
+                "count": range(100, 120),
+                "total": [500] * 20,
+            })
+            client.upsert_bulk(data)
+
+        output_dir = str(tmp_path / "output")
+        os.makedirs(output_dir)
+        result = export_csv(db_path, output_dir)
+        assert "dispersion" in result
+        df = pd.read_csv(result["dispersion"]["path"])
+        assert len(df) == 0
+        assert set(df.columns) == {"date", "dispersion", "mean_ratio", "range", "regime", "level_regime"}
+
+
 class TestExportCsvCli:
     """Tests for export_csv CLI entry point."""
 

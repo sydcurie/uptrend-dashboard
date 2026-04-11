@@ -282,6 +282,74 @@ def prepare_all_timeseries_csv(all_data: Dict[str, pd.DataFrame]) -> pd.DataFram
     return pd.concat(frames, ignore_index=True)
 
 
+def build_sector_ranking_table(
+    sector_data: Dict[str, pd.DataFrame],
+    regime: str,
+    level_regime: str,
+    sector_edge_df: pd.DataFrame,
+) -> pd.DataFrame:
+    """Build a regime-aware sector ranking table.
+
+    Sort order depends on (regime, level_regime):
+    - converged or diverged with edge data: by Historical Edge descending
+    - normal or no edge data: by Current Ratio descending
+    """
+    expected_cols = ["Sector", "Current Ratio", "10MA", "Trend", "Historical Edge"]
+
+    rows = []
+    for name, df in sector_data.items():
+        if not name.startswith("sec_") or df.empty:
+            continue
+        status = get_current_status(df)
+        rows.append({
+            "Sector": get_sector_display_name(name),
+            "Current Ratio": status["ratio"],
+            "10MA": status["ratio_10ma"],
+            "Trend": _trend_label(status["trend"]),
+            "Historical Edge": None,
+            "_key": name,
+        })
+
+    if not rows:
+        return pd.DataFrame(columns=expected_cols)
+
+    result = pd.DataFrame(rows)
+
+    edge_matched = False
+    if not sector_edge_df.empty:
+        bucket = sector_edge_df[
+            (sector_edge_df["regime"] == regime) &
+            (sector_edge_df["level_regime"] == level_regime)
+        ]
+        if not bucket.empty:
+            edge_map = dict(zip(bucket["sector_key"], bucket["mean_change"]))
+            result["Historical Edge"] = result["_key"].map(edge_map)
+            edge_matched = result["Historical Edge"].notna().any()
+
+    if edge_matched and regime in ("converged", "diverged"):
+        result = result.sort_values("Historical Edge", ascending=False, na_position="last")
+    else:
+        result = result.sort_values("Current Ratio", ascending=False)
+
+    result = result.drop(columns=["_key"]).reset_index(drop=True)
+    return result
+
+
+def prepare_dispersion_csv(dispersion_df: pd.DataFrame) -> pd.DataFrame:
+    """Select and format columns for dispersion CSV export."""
+    output_cols = ["date", "dispersion", "mean_ratio", "range", "regime", "level_regime"]
+
+    if dispersion_df.empty:
+        return pd.DataFrame(columns=output_cols)
+
+    result = dispersion_df[output_cols].copy()
+    if len(result) > 0 and hasattr(result["date"].iloc[0], "strftime"):
+        result["date"] = result["date"].apply(
+            lambda d: d.strftime("%Y-%m-%d") if hasattr(d, "strftime") else str(d)
+        )
+    return result
+
+
 def filter_by_date_range(df: pd.DataFrame, start, end) -> pd.DataFrame:
     """Filter a DataFrame by date range (inclusive).
 

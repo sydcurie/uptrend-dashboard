@@ -12,12 +12,14 @@ from src.data_processor import (
     build_sector_summary,
     build_industry_summary,
     build_industry_summary_with_sector,
+    build_sector_ranking_table,
     get_sector_display_name,
     get_industry_display_name,
     get_sector_for_industry,
     style_status_row,
     prepare_timeseries_csv,
     prepare_all_timeseries_csv,
+    prepare_dispersion_csv,
     default_start_date,
 )
 
@@ -530,3 +532,116 @@ class TestDefaultStartDate:
         """When min_date == max_date, return that date."""
         d = datetime.date(2025, 3, 1)
         assert default_start_date(d, d) == d
+
+
+class TestBuildSectorRankingTable:
+    """Tests for build_sector_ranking_table()."""
+
+    def _make_sector_edge_df(self):
+        """Create a sector edge DataFrame with known values."""
+        from src.constants import SECTORS
+        rows = []
+        for i, sec in enumerate(SECTORS):
+            rows.append({
+                "sector_key": sec,
+                "regime": "converged",
+                "level_regime": "low",
+                "mean_change": 0.06 - i * 0.005,
+                "win_rate": 0.7,
+                "count": 5,
+            })
+            rows.append({
+                "sector_key": sec,
+                "regime": "diverged",
+                "level_regime": "high",
+                "mean_change": -0.02 + i * 0.003 if i < 5 else -0.05,
+                "win_rate": 0.4,
+                "count": 3,
+            })
+        return pd.DataFrame(rows)
+
+    def test_output_columns(self, sample_all_data):
+        """Should return DataFrame with expected columns."""
+        edge_df = self._make_sector_edge_df()
+        result = build_sector_ranking_table(sample_all_data, "normal", "mid", edge_df)
+        expected = {"Sector", "Current Ratio", "10MA", "Trend", "Historical Edge"}
+        assert expected.issubset(set(result.columns))
+
+    def test_normal_regime_sorted_by_ratio(self, sample_all_data):
+        """In normal regime, sectors should be sorted by Current Ratio descending."""
+        edge_df = self._make_sector_edge_df()
+        result = build_sector_ranking_table(sample_all_data, "normal", "mid", edge_df)
+        if len(result) > 1:
+            ratios = result["Current Ratio"].tolist()
+            assert ratios == sorted(ratios, reverse=True)
+
+    def test_converged_low_sorted_by_edge(self, sample_all_data):
+        """In converged+low (CAPITULATION), should sort by Historical Edge."""
+        edge_df = self._make_sector_edge_df()
+        result = build_sector_ranking_table(sample_all_data, "converged", "low", edge_df)
+        if len(result) > 1 and "Historical Edge" in result.columns:
+            edges = result["Historical Edge"].tolist()
+            # Should be sorted descending by edge
+            assert edges == sorted(edges, reverse=True)
+
+    def test_missing_bucket_falls_back_to_ratio(self, sample_all_data):
+        """When no matching (regime, level_regime) in edge_df, fall back to Ratio sort."""
+        edge_df = pd.DataFrame(columns=["sector_key", "regime", "level_regime", "mean_change", "win_rate", "count"])
+        result = build_sector_ranking_table(sample_all_data, "converged", "low", edge_df)
+        if len(result) > 1:
+            ratios = result["Current Ratio"].tolist()
+            assert ratios == sorted(ratios, reverse=True)
+
+
+class TestPrepareDispersionCsv:
+    """Tests for prepare_dispersion_csv()."""
+
+    def test_output_columns(self):
+        """Should produce expected columns."""
+        df = pd.DataFrame({
+            "date": pd.bdate_range("2024-01-01", periods=5, freq="B"),
+            "dispersion": [0.05, 0.06, 0.07, 0.08, 0.09],
+            "mean_ratio": [0.2, 0.25, 0.3, 0.35, 0.4],
+            "range": [0.1] * 5,
+            "regime": ["converged", "normal", "normal", "diverged", "diverged"],
+            "level_regime": ["low", "mid", "mid", "high", "high"],
+            "dispersion_ma10": [np.nan] * 5,
+            "dispersion_velocity": [np.nan] * 5,
+            "p25": [0.04] * 5,
+            "p75": [0.10] * 5,
+            "velocity_p90": [np.nan] * 5,
+            "dispersion_median": [0.07] * 5,
+        })
+        result = prepare_dispersion_csv(df)
+        expected = {"date", "dispersion", "mean_ratio", "range", "regime", "level_regime"}
+        assert set(result.columns) == expected
+
+    def test_empty_dataframe(self):
+        """Empty input should produce empty output with correct columns."""
+        df = pd.DataFrame(columns=[
+            "date", "dispersion", "mean_ratio", "range",
+            "regime", "level_regime",
+        ])
+        result = prepare_dispersion_csv(df)
+        assert result.empty
+        expected = {"date", "dispersion", "mean_ratio", "range", "regime", "level_regime"}
+        assert set(result.columns) == expected
+
+    def test_date_format(self):
+        """Dates should be formatted as YYYY-MM-DD strings."""
+        df = pd.DataFrame({
+            "date": pd.bdate_range("2024-01-01", periods=2, freq="B"),
+            "dispersion": [0.05, 0.06],
+            "mean_ratio": [0.2, 0.25],
+            "range": [0.1, 0.1],
+            "regime": ["normal", "normal"],
+            "level_regime": ["mid", "mid"],
+            "dispersion_ma10": [np.nan, np.nan],
+            "dispersion_velocity": [np.nan, np.nan],
+            "p25": [0.04, 0.04],
+            "p75": [0.10, 0.10],
+            "velocity_p90": [np.nan, np.nan],
+            "dispersion_median": [0.07, 0.07],
+        })
+        result = prepare_dispersion_csv(df)
+        assert result["date"].iloc[0] == "2024-01-01"

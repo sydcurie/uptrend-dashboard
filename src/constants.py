@@ -535,6 +535,17 @@ CHART_HEIGHT_HEATMAP = 700
 # Date range display
 DEFAULT_DISPLAY_YEARS = 2
 
+# Dispersion analysis
+DISPERSION_CONVERGED_FALLBACK = 0.066  # ~p25 from historical data
+DISPERSION_DIVERGED_FALLBACK = 0.110  # ~p75 from historical data
+MEAN_RATIO_LOW = 0.20
+MEAN_RATIO_HIGH = 0.35
+DISPERSION_VELOCITY_WINDOW = 3
+DISPERSION_MIN_HISTORY = 60
+DISPERSION_MIN_REGIME_DAYS = 3  # minimum consecutive days to confirm regime change
+CHART_HEIGHT_DISPERSION = 600
+CHART_HEIGHT_REGIME_TIMELINE = 200
+
 
 def is_sector(worksheet: str) -> bool:
     """Check if a worksheet key is a sector."""

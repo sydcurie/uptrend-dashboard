@@ -68,7 +68,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/uptrend.db data/uptrend_ratio_timeseries.csv data/sector_summary.csv data/industry_summary.csv
+          git add data/uptrend.db data/uptrend_ratio_timeseries.csv data/sector_summary.csv data/industry_summary.csv data/sector_dispersion.csv
           if git diff --cached --quiet; then
             echo "No data changes to commit"
           else
