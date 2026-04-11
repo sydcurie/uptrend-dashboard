@@ -32,3 +32,4 @@ data/*.db
 !data/uptrend.db
 
 review/
+reviews/
