@@ -258,7 +258,7 @@ class TestCollectWorkflow:
         assert df.iloc[0]["total"] == 3
 
     def test_collect_worksheet_empty_raises(self, collector, db_client, mocker):
-        """total=0 from API should raise ValueError (not silently succeed)."""
+        """total=0 for 'all' or sec_* should raise ValueError (API failure indicator)."""
         mocker.patch.object(
             collector._session, "get",
             side_effect=[_csv_response(EMPTY_CSV), _csv_response(EMPTY_CSV)],
@@ -267,6 +267,25 @@ class TestCollectWorkflow:
             collector.collect_worksheet("all", date="2026-02-07")
         # No data written
         df = db_client.fetch_raw_data("all")
+        assert len(df) == 0
+
+    def test_collect_worksheet_industry_total_zero_skips_without_raise(
+        self, collector, db_client, mocker
+    ):
+        """total=0 for ind_* is legitimate (base filters may exclude all stocks in
+        small industries like ind_pharmaceuticalretailers). Should log warning, skip
+        DB write, and return (0, 0) without raising."""
+        mocker.patch.object(
+            collector._session, "get",
+            side_effect=[_csv_response(EMPTY_CSV), _csv_response(EMPTY_CSV)],
+        )
+        count, total = collector.collect_worksheet(
+            "ind_pharmaceuticalretailers", date="2026-02-07"
+        )
+        assert count == 0
+        assert total == 0
+        # No data written
+        df = db_client.fetch_raw_data("ind_pharmaceuticalretailers")
         assert len(df) == 0
 
     def test_collect_worksheet_dry_run_total_zero(self, collector, db_client, mocker):

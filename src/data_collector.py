@@ -198,7 +198,13 @@ class DataCollector:
         elif total > 0:
             self._db.upsert_raw_data(date, worksheet, count, total)
             logger.info("Collected %s: count=%d, total=%d", worksheet, count, total)
+        elif worksheet.startswith("ind_"):
+            # 小規模 industry ではベースフィルタ (cap/vol/price) 通過銘柄が 0 件と
+            # なり得る正当ケース。8c7f23d 以前の挙動に戻し warning + skip で継続。
+            # DB には書き込まない (0.0 ratio を描画するとチャートに偽の下落ピークが出るため)。
+            logger.warning("Skipping %s: total=0 (no stocks match base filters)", worksheet)
         else:
+            # "all" と sec_* は total=0 なら API 障害の強いシグナル（市場全体/大セクターに銘柄ゼロはあり得ない）
             raise ValueError(
                 f"Empty data for {worksheet}: total=0 "
                 f"(API returned no stocks matching filters)"

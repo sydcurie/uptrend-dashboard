@@ -14,6 +14,10 @@ from src.db_client import DBClient
 
 logger = logging.getLogger(__name__)
 
+# 閾値: industry 収集失敗率がこれ未満なら warning 扱いで exit 0
+# (Finviz 側のカテゴリ仕様変動で一部 industry が空データを返すケースを許容)
+INDUSTRY_FAIL_TOLERANCE = 0.05  # 5% まで許容
+
 
 def main():
     load_dotenv()
@@ -103,7 +107,7 @@ def main():
             # Exit code (skip for dry-run)
             if not args.dry_run:
                 if scope == CollectScope.ALL:
-                    # Judge by sector results
+                    # Sector は tier 1 データなので失敗は即 exit 2
                     if len(result.sector_succeeded) == 0:
                         sys.exit(1)
                     elif result.sector_failed:
@@ -112,7 +116,23 @@ def main():
                         logger.error("All industry collections failed")
                         sys.exit(2)
                     elif result.industry_failed:
-                        sys.exit(2)
+                        # Industry は閾値判定（Finviz 側の空データは tolerable）
+                        industry_total = len(result.industry_succeeded) + len(result.industry_failed)
+                        fail_ratio = len(result.industry_failed) / industry_total
+                        if fail_ratio >= INDUSTRY_FAIL_TOLERANCE:
+                            logger.error(
+                                "Industry failure ratio %.2f%% exceeds tolerance %.2f%% (%d/%d failed) -- exit 2",
+                                fail_ratio * 100, INDUSTRY_FAIL_TOLERANCE * 100,
+                                len(result.industry_failed), industry_total,
+                            )
+                            sys.exit(2)
+                        else:
+                            logger.warning(
+                                "Industry failure ratio %.2f%% within tolerance %.2f%% (%d/%d failed) -- continuing with exit 0",
+                                fail_ratio * 100, INDUSTRY_FAIL_TOLERANCE * 100,
+                                len(result.industry_failed), industry_total,
+                            )
+                            # exit 0 (fallthrough)
                 elif scope == CollectScope.SECTORS:
                     expected = len(SECTORS) + 1  # "all" + 11 sectors
                     if len(result.succeeded) == 0:
@@ -123,7 +143,22 @@ def main():
                     if len(result.succeeded) == 0:
                         sys.exit(1)
                     elif result.failed:
-                        sys.exit(2)
+                        industry_total = len(result.succeeded) + len(result.failed)
+                        fail_ratio = len(result.failed) / industry_total
+                        if fail_ratio >= INDUSTRY_FAIL_TOLERANCE:
+                            logger.error(
+                                "Industry failure ratio %.2f%% exceeds tolerance %.2f%% (%d/%d failed) -- exit 2",
+                                fail_ratio * 100, INDUSTRY_FAIL_TOLERANCE * 100,
+                                len(result.failed), industry_total,
+                            )
+                            sys.exit(2)
+                        else:
+                            logger.warning(
+                                "Industry failure ratio %.2f%% within tolerance %.2f%% (%d/%d failed) -- exit 0",
+                                fail_ratio * 100, INDUSTRY_FAIL_TOLERANCE * 100,
+                                len(result.failed), industry_total,
+                            )
+                            # exit 0 (fallthrough)
     finally:
         collector.close()
 
