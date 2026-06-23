@@ -12,12 +12,15 @@ from dateutil.relativedelta import relativedelta
 from src.constants import (
     DEFAULT_DISPLAY_YEARS,
     INDUSTRY_DISPLAY_NAMES,
+    INDUSTRY_DISPLAY_NAMES_ZH,
     INDUSTRY_TO_SECTOR,
     LOWER_THRESHOLD,
     SECTOR_DISPLAY_NAMES,
+    SECTOR_DISPLAY_NAMES_ZH,
     SECTOR_INDUSTRIES,
     UPPER_THRESHOLD,
 )
+from src.i18n import get_lang
 
 logger = logging.getLogger(__name__)
 
@@ -91,14 +94,26 @@ def get_current_status(df: pd.DataFrame) -> MarketStatus:
 
 
 def get_sector_display_name(worksheet_name: str) -> str:
-    """Convert worksheet name like 'sec_basicmaterials' to 'Basic Materials'."""
+    """Convert worksheet name like 'sec_basicmaterials' to a localized display name.
+
+    Returns the Simplified Chinese name when the current language is 'zh',
+    otherwise the English name. Defaults to English in non-Streamlit contexts.
+    """
     suffix = worksheet_name.replace("sec_", "", 1)
+    if get_lang() == "zh" and suffix in SECTOR_DISPLAY_NAMES_ZH:
+        return SECTOR_DISPLAY_NAMES_ZH[suffix]
     return SECTOR_DISPLAY_NAMES.get(suffix, suffix.title())
 
 
 def get_industry_display_name(worksheet_name: str) -> str:
-    """Convert worksheet name like 'ind_semiconductors' to 'Semiconductors'."""
+    """Convert worksheet name like 'ind_semiconductors' to a localized display name.
+
+    Returns the Simplified Chinese name when the current language is 'zh',
+    otherwise the English name. Defaults to English in non-Streamlit contexts.
+    """
     suffix = worksheet_name.replace("ind_", "", 1)
+    if get_lang() == "zh" and suffix in INDUSTRY_DISPLAY_NAMES_ZH:
+        return INDUSTRY_DISPLAY_NAMES_ZH[suffix]
     return INDUSTRY_DISPLAY_NAMES.get(suffix, suffix.title())
 
 
@@ -242,6 +257,38 @@ def style_status_row(row):
         else:
             styles.append("")
     return styles
+
+
+def localized_summary_styler(
+    df: pd.DataFrame,
+    numeric_formats: Optional[Dict[str, object]] = None,
+    localize_values=("Trend", "Status"),
+    style_rows: bool = True,
+):
+    """Return a pandas Styler with localized headers and categorical values.
+
+    Internal column names and values stay English (logic keys); only the
+    rendered output is localized. Numeric columns use the given format strings;
+    columns in ``localize_values`` have their categorical values mapped via val().
+
+    Args:
+        df: DataFrame whose columns are English logic keys (no helper columns).
+        numeric_formats: Optional {column: format-string-or-callable} for numerics.
+        localize_values: Columns whose string values should be localized.
+        style_rows: If True, apply style_status_row coloring (Trend/Status).
+    """
+    from src.i18n import col, val
+
+    fmt = dict(numeric_formats or {})
+    for c in localize_values:
+        if c in df.columns:
+            fmt[c] = lambda v: val(v) if isinstance(v, str) else v
+
+    styler = df.style.format(fmt, na_rep="N/A")
+    if style_rows:
+        styler = styler.apply(style_status_row, axis=1)
+    styler = styler.relabel_index([col(c) for c in df.columns], axis="columns")
+    return styler
 
 
 def prepare_timeseries_csv(df: pd.DataFrame) -> pd.DataFrame:

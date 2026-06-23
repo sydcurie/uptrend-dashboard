@@ -5,8 +5,8 @@
 | Document Type | Software Design Document |
 | Project Name | uptrend-dashboard |
 | Created | 2026-02-08 |
-| Revised | 2026-04-11 |
-| Status | v5.0 Sector Dispersion Analysis |
+| Revised | 2026-06-23 |
+| Status | v6.0 Internationalization (English / Simplified Chinese) |
 
 ---
 
@@ -14,6 +14,7 @@
 
 | Date | Version | Changes |
 |------|---------|---------|
+| 2026-06-23 | v6.0 | Internationalization: English / Simplified Chinese language toggle. New `src/i18n.py` (translation tables + `t()`/`col()`/`val()`/`get_lang()`/`render_language_selector()`), bilingual sector/industry name dictionaries, language-aware display-name helpers, localized charts/tables/pages, `localized_summary_styler()` (English logic keys preserved, localization at render boundary only) |
 | 2026-02-08 | v1 | Initial version (Google Sheets based) |
 | 2026-02-08 | v2 | Migrated data store from Google Sheets to SQLite. Ported derived data calculations to Python. Added Excel import functionality |
 | 2026-02-08 | v2.1 | Removed signal logic (Long/Short Entry/Exit). Changed chart trend display to green/red/gray color coding |
@@ -29,6 +30,17 @@
 | 2026-02-14 | v3.4 | CSV download buttons on main page for LLM data analysis |
 | 2026-02-11 | v3.3 | Sector summary bar chart click → Sector Detail page navigation |
 | 2026-02-11 | v3.2 | Data validation hardening, secret masking, CI test workflow. DB CHECK constraints, Python-level count/total validation, import_excel row filtering, mask_secrets/safe_http_error, GitHub Actions pytest |
+
+### v6.0 Key Changes (Internationalization)
+
+- **New module `src/i18n.py`**: Lightweight i18n with no external dependency. `TRANSLATIONS` dict (`en`/`zh`) keyed by semantic strings; `REGIME_ACTIONS` for the regime guide bullet lists. Public API: `t(key, **fmt)`, `col(name)` (column header), `val(name)` (categorical value), `actions(regime_key)`, `get_lang()`, `render_language_selector()`.
+- **Language resolution**: `get_lang()` reads the sidebar selector widget value from `st.session_state["_lang_radio"]` (label → code). Defaults to `en` when Streamlit is unavailable (unit tests) or no selection exists — so all existing tests are unaffected.
+- **Design principle — logic keys stay English**: Internal DataFrame column names (`Sector`, `Ratio`, `Status`, …) and categorical values (`Up`/`Down`, `Overbought`/`Oversold`/`Normal`, `converged`/`diverged`) are kept in English as logic keys (used by `style_status_row`, heatmap KPI counts, chart color maps, regime guide tuples). Localization happens **only at the rendering boundary**.
+- **`localized_summary_styler()` (data_processor)**: Returns a pandas `Styler` that keeps English data but relabels column headers via `Styler.relabel_index(..., axis="columns")` and maps categorical cell values via `val()`. Replaces the inline `.style.format(...).apply(style_status_row)` blocks across app.py, pages 1/5/6.
+- **Bilingual name dictionaries (constants)**: `SECTOR_DISPLAY_NAMES_ZH` (11) and `INDUSTRY_DISPLAY_NAMES_ZH` (149). `get_sector_display_name()` / `get_industry_display_name()` return the zh name when `get_lang() == "zh"`, else English.
+- **Localized charts (chart_builder)**: All titles, axis titles, legend names, threshold labels, treemap hover labels, and regime-timeline legend resolved via `t()` / `val()`. `build_ratio_chart` default `title` stays English (pages always pass a localized title).
+- **Localized pages**: app.py + pages 1–6 wrap all user-facing strings in `t()`; each sidebar calls `render_language_selector()` first. Option/radio comparisons (e.g. Display Mode, Compare Mode) compare against `t(...)` so they work in either language. Attribution/badge markdown (Streamlit credit, Buy Me A Coffee) left untranslated by design.
+- **Tests**: `tests/test_i18n.py` — zh/en key parity, regime-action parity, full sector/industry zh coverage, `t()`/`col()`/`val()` behavior + fallback, and zh display-name resolution. 274 → 289 tests.
 
 ### v5.0 Key Changes (Sector Dispersion Analysis)
 
@@ -744,6 +756,27 @@ python import_excel.py data/export.xlsx --dry-run
 
 ---
 
+### 4.6 i18n.py — Internationalization Layer (new in v6.0)
+
+**Purpose:** Provide English / Simplified Chinese localization at the UI rendering boundary without touching the data/calculation layers.
+
+**Public API:**
+
+| Function | Signature | Description |
+|----------|-----------|-------------|
+| `get_lang()` | `() -> str` | Current language code (`"en"`/`"zh"`); reads `st.session_state["_lang_radio"]`, defaults to `"en"` |
+| `t()` | `(key: str, **kwargs) -> str` | Translate key for current lang; `str.format(**kwargs)` interpolation; falls back en → key |
+| `col()` | `(name: str) -> str` | Localize an English column-name logic key (`t("col.<name>")`) |
+| `val()` | `(name: str) -> str` | Localize an English categorical value (`t("val.<name>")`) |
+| `actions()` | `(regime_key: str) -> List[str]` | Localized regime-guide bullet list |
+| `render_language_selector()` | `() -> None` | Render the sidebar language radio (`key="_lang_radio"`, persists across pages) |
+
+**Data:** `TRANSLATIONS = {"en": {...}, "zh": {...}}` keyed by semantic strings (namespaced `common.*`, `metric.*`, `col.*`, `val.*`, `chart.*`, `legend.*`, `hover.*`, `app.*`, `p1.*`–`p6.*`, `guide.*`); `REGIME_ACTIONS = {"en": {...}, "zh": {...}}`.
+
+**Design constraint:** Internal column names and categorical values stay English (logic keys). Localization is applied only when rendering (chart text via `t()`/`val()`, tables via `data_processor.localized_summary_styler()`, sector/industry names via the language-aware display-name helpers). This keeps `style_status_row`, heatmap KPI counts, chart color maps, and regime-guide tuple keys working unchanged, and keeps the default-`en` behavior identical for all non-Streamlit (test) callers.
+
+---
+
 ## 5. Screen Design
 
 Screen layout is unchanged from v1. Only the data source changes; UI remains the same.
@@ -988,6 +1021,7 @@ uptrend-dashboard/
 │   ├── indicator_calculator.py        # Derived indicator calculation (new)
 │   ├── data_processor.py             # Status aggregation
 │   ├── chart_builder.py              # Plotly chart generation
+│   ├── i18n.py                       # Internationalization en/zh (v6.0)
 │   └── data_collector.py             # Finviz data collection (Phase 3)
 ├── tests/
 │   ├── __init__.py
@@ -998,6 +1032,7 @@ uptrend-dashboard/
 │   ├── test_export_csv.py            # export_csv tests (v3.5)
 │   ├── test_chart_builder.py         # chart_builder tests
 │   ├── test_integration.py          # Integration tests (new in v2.2)
+│   ├── test_i18n.py                  # i18n / localization tests (v6.0)
 │   └── test_data_collector.py        # data_collector tests (Phase 3)
 ├── pages/
 │   ├── 1_Sector_Detail.py            # Sector detail page (+ industry drilldown v4.0)

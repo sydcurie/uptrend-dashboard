@@ -17,18 +17,17 @@ from src.data_processor import (
     build_sector_ranking_table,
     default_start_date,
     filter_by_date_range,
-    style_status_row,
+    localized_summary_styler,
 )
+from src.i18n import t, val, actions as regime_actions, render_language_selector
 
-st.set_page_config(page_title="Dispersion Monitor", page_icon="📡", layout="wide")
-st.title("Sector Dispersion Monitor")
+st.set_page_config(page_title=t("p6.page_title"), page_icon="📡", layout="wide")
+st.title(t("p6.title"))
 
 with st.sidebar:
+    render_language_selector()
     st.markdown("---")
-    st.markdown(
-        "Monitor cross-sectional dispersion of sector uptrend ratios. "
-        "Detect convergence (capitulation) and divergence signals."
-    )
+    st.markdown(t("p6.sidebar_desc"))
     st.markdown("---")
     st.markdown(
         'Made with <img src="https://streamlit.io/images/brand/streamlit-mark-color.png" '
@@ -52,10 +51,7 @@ valid_df = (
     else dispersion_df
 )
 if valid_df.empty:
-    st.warning(
-        "Insufficient dispersion data. "
-        "Monitoring features will become available once enough history accumulates."
-    )
+    st.warning(t("p6.insufficient"))
     st.stop()
 
 # === Valid data — normal processing ===
@@ -74,37 +70,27 @@ current_level = latest_valid["level_regime"]
 # --- 1. Signal Banner ---
 active_signals = [s for s in signals if s.active]
 if not active_signals:
-    st.success(f"NORMAL — Sector dispersion within normal range "
-               f"(σ={latest_valid['dispersion']:.3f}, mean={latest_valid['mean_ratio']:.1%})")
+    st.success(t("p6.signal_normal", disp=latest_valid["dispersion"], mean=latest_valid["mean_ratio"]))
 else:
     for sig in active_signals:
         if sig.signal_id == "CAPITULATION":
-            st.error(
-                f"CAPITULATION ACTIVE — All sectors converged at low levels "
-                f"(σ={sig.dispersion:.3f}, mean={sig.mean_ratio:.1%})"
-            )
+            st.error(t("p6.signal_capitulation", disp=sig.dispersion, mean=sig.mean_ratio))
         elif sig.signal_id == "DIVERGENCE_WARNING":
-            st.warning(
-                f"DIVERGENCE WARNING — Sector dispersion expanding "
-                f"(σ={sig.dispersion:.3f})"
-            )
+            st.warning(t("p6.signal_divergence", disp=sig.dispersion))
         elif sig.signal_id == "BREAKOUT_VELOCITY":
-            st.info(
-                f"BREAKOUT VELOCITY — Convergence breakout signal "
-                f"(σ={sig.dispersion:.3f})"
-            )
+            st.info(t("p6.signal_breakout", disp=sig.dispersion))
 
 # --- Status metrics ---
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    st.metric("Dispersion (σ)", f"{latest_valid['dispersion']:.4f}")
+    st.metric(t("metric.dispersion_sigma"), f"{latest_valid['dispersion']:.4f}")
 with col2:
-    st.metric("Mean Ratio", f"{latest_valid['mean_ratio']:.1%}")
+    st.metric(t("metric.mean_ratio"), f"{latest_valid['mean_ratio']:.1%}")
 with col3:
     regime_emoji = {"converged": "🟢", "normal": "🔵", "diverged": "🔴"}
-    st.metric("Regime", f"{regime_emoji.get(current_regime, '')} {current_regime.title()}")
+    st.metric(t("metric.regime"), f"{regime_emoji.get(current_regime, '')} {val(current_regime)}")
 with col4:
-    st.metric("Level", current_level.title())
+    st.metric(t("metric.level"), val(current_level))
 
 # === Date filter (chart/table display only) ===
 with st.sidebar:
@@ -116,7 +102,7 @@ with st.sidebar:
             max_date = max_date.date()
         default_start = default_start_date(min_date, max_date)
         date_range = st.date_input(
-            "Date Range",
+            t("common.date_range"),
             value=(default_start, max_date),
             min_value=min_date,
             max_value=max_date,
@@ -134,105 +120,74 @@ else:
     filtered_df = dispersion_df
 
 # --- 2. Dispersion Chart ---
-st.subheader("Dispersion Chart")
+st.subheader(t("p6.dispersion_chart"))
 fig = build_dispersion_chart(filtered_df)
 st.plotly_chart(fig, use_container_width=True)
 
 # --- 3. Regime Timeline ---
-st.subheader("Regime Timeline")
+st.subheader(t("p6.regime_timeline"))
 fig_timeline = build_regime_timeline_chart(filtered_df)
 st.plotly_chart(fig_timeline, use_container_width=True)
 
 # --- 4. Sector Ranking Table ---
-st.subheader("Sector Ranking")
+st.subheader(t("p6.sector_ranking"))
 if current_regime == "converged" and current_level == "low":
-    st.caption("CAPITULATION regime: Ranked by historical recovery leaders")
+    st.caption(t("p6.cap_caption"))
 elif current_regime == "diverged":
-    st.caption("DIVERGENCE regime: Ranked by historical defensive leaders")
+    st.caption(t("p6.div_caption"))
 else:
-    st.caption("NORMAL regime: Ranked by current ratio")
+    st.caption(t("p6.normal_caption"))
 
 ranking = build_sector_ranking_table(sector_data, current_regime, current_level, sector_edge)
 if not ranking.empty:
     st.dataframe(
-        ranking.style
-        .format({
-            "Current Ratio": "{:.1%}",
-            "10MA": "{:.1%}",
-            "Historical Edge": lambda x: f"{x:+.4f}" if x is not None and x == x else "N/A",
-        }),
+        localized_summary_styler(
+            ranking,
+            numeric_formats={
+                "Current Ratio": "{:.1%}",
+                "10MA": "{:.1%}",
+                "Historical Edge": lambda x: f"{x:+.4f}" if x is not None and x == x else "N/A",
+            },
+            localize_values=("Trend",),
+            style_rows=False,
+        ),
         use_container_width=True,
         hide_index=True,
     )
 
 # --- 5. Historical Stats (Expander) ---
-with st.expander("Historical Stats (Regime Transition Events)"):
+with st.expander(t("p6.hist_stats")):
     if forward_stats is not None and not forward_stats.empty:
-        st.caption("Samples are regime transition days only (consecutive same-regime days count as 1 event)")
+        st.caption(t("p6.hist_samples_caption"))
         st.dataframe(
-            forward_stats.style.format({
-                "mean_return": "{:+.4f}",
-                "win_rate": "{:.1%}",
-                "count": "{:.0f}",
-            }),
+            localized_summary_styler(
+                forward_stats,
+                numeric_formats={
+                    "mean_return": "{:+.4f}",
+                    "win_rate": "{:.1%}",
+                    "count": "{:.0f}",
+                },
+                localize_values=("regime", "level_regime"),
+                style_rows=False,
+            ),
             use_container_width=True,
             hide_index=True,
         )
     else:
-        st.info("Forward return stats will appear once enough data accumulates.")
+        st.info(t("p6.forward_stats_pending"))
 
 # --- 6. Regime Action Guide ---
-st.subheader("Regime Action Guide")
-st.caption("For decision support only — not investment advice. Always apply your own judgment.")
+st.subheader(t("p6.action_guide"))
+st.caption(t("p6.action_disclaimer"))
 
+# Maps (regime, level_regime) -> i18n guide key + Streamlit display style.
+# Labels and action bullets are resolved from i18n at render time.
 _REGIME_GUIDE = {
-    ("converged", "low"): {
-        "label": "Converged + Low (Capitulation)",
-        "type": "success",
-        "actions": [
-            "Watch for reversal candidates — historically strong bounce zone",
-            "Avoid initiating new short positions",
-            "Prioritize sector_edge top-ranked sectors for early entry",
-            "Position sizing: start small, scale in on confirmation",
-        ],
-    },
-    ("converged", "mid"): {
-        "label": "Converged + Mid",
-        "type": "success",
-        "actions": [
-            "Risk-on bias — sectors tightly grouped and rising",
-            "Favor trend-following in leading sectors",
-            "Standard position sizing",
-        ],
-    },
-    ("converged", "high"): {
-        "label": "Converged + High",
-        "type": "success",
-        "actions": [
-            "Risk-on bias — broad participation at elevated levels",
-            "Favor momentum in strongest sectors",
-            "Watch for divergence onset as a potential distribution signal",
-        ],
-    },
-    ("normal", None): {
-        "label": "Normal",
-        "type": "info",
-        "actions": [
-            "Standard operations — follow individual stock/sector signals",
-            "Standard position sizing, no regime-driven adjustment needed",
-            "Monitor for regime transitions at P25/P75 boundaries",
-        ],
-    },
-    ("diverged", None): {
-        "label": "Diverged",
-        "type": "error",
-        "actions": [
-            "Tighten new long entry criteria — selectivity over aggression",
-            "Reduce position sizes or add hedges",
-            "Favor defensive sectors and relative strength leaders",
-            "Energy & Utilities have historically tended to outperform in this regime",
-        ],
-    },
+    ("converged", "low"): {"key": "converged_low", "type": "success"},
+    ("converged", "mid"): {"key": "converged_mid", "type": "success"},
+    ("converged", "high"): {"key": "converged_high", "type": "success"},
+    ("normal", None): {"key": "normal", "type": "info"},
+    ("diverged", None): {"key": "diverged", "type": "error"},
 }
 
 # Current regime highlight
@@ -241,19 +196,21 @@ current_key = (current_regime, current_level)
 guide = _REGIME_GUIDE.get(current_key) or _REGIME_GUIDE.get((current_regime, None))
 
 if guide:
-    action_text = "\n".join(f"- {a}" for a in guide["actions"])
+    guide_label = t(f"guide.{guide['key']}")
+    action_text = "\n".join(f"- {a}" for a in regime_actions(guide["key"]))
     display_fn = {"error": st.error, "warning": st.warning, "info": st.info, "success": st.success}
     display_fn.get(guide["type"], st.info)(
-        f"**Current: {guide['label']}**\n\n{action_text}"
+        f"{t('p6.current_prefix', label=guide_label)}\n\n{action_text}"
     )
 
 # Full regime reference table
-with st.expander("All Regime Actions (Reference)"):
+with st.expander(t("p6.all_regime_actions")):
     for key, g in _REGIME_GUIDE.items():
         is_current = (key == current_key) or (
             key == (current_regime, None) and current_key not in _REGIME_GUIDE
         )
-        badge = " `CURRENT`" if is_current else ""
-        st.markdown(f"**{g['label']}**{badge}")
-        for a in g["actions"]:
+        badge = f" `{t('p6.current_badge')}`" if is_current else ""
+        ref_label = t("guide." + g["key"])
+        st.markdown(f"**{ref_label}**{badge}")
+        for a in regime_actions(g["key"]):
             st.markdown(f"- {a}")

@@ -14,20 +14,18 @@ from src.data_processor import (
     filter_by_date_range,
     prepare_timeseries_csv,
     build_industry_summary,
-    style_status_row,
+    localized_summary_styler,
 )
 from src.chart_builder import build_ratio_chart, build_industry_summary_chart
+from src.i18n import t, val, render_language_selector
 
-st.set_page_config(page_title="Sector Detail", page_icon="🔍", layout="wide")
-st.title("Sector Detail")
+st.set_page_config(page_title=t("p1.page_title"), page_icon="🔍", layout="wide")
+st.title(t("p1.title"))
 
 with st.sidebar:
+    render_language_selector()
     st.markdown("---")
-    st.markdown(
-        "Deep dive into individual sector uptrend ratios "
-        "with trend direction, 10-day moving average, "
-        "and overbought/oversold indicators."
-    )
+    st.markdown(t("p1.sidebar_desc"))
 
     st.markdown("---")
     st.markdown(
@@ -57,13 +55,13 @@ if preselected_key:
     if preselected_display in display_names:
         default_index = display_names.index(preselected_display)
 
-selected_display = st.selectbox("Select Sector", display_names, index=default_index)
+selected_display = st.selectbox(t("p1.select_sector"), display_names, index=default_index)
 selected_key = sector_names[selected_display]
 
 df = all_data.get(selected_key)
 
 if df is None or df.empty:
-    st.warning(f"No data available for {selected_display}.")
+    st.warning(t("p1.no_data_for", name=selected_display))
     st.stop()
 
 # Status indicators
@@ -71,28 +69,28 @@ status = get_current_status(df)
 
 col1, col2, col3, col4, col5 = st.columns(5)
 with col1:
-    st.metric("Ratio", f"{status['ratio']:.1%}")
+    st.metric(t("metric.ratio"), f"{status['ratio']:.1%}")
 with col2:
-    st.metric("10MA", f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] is not None else "N/A")
+    st.metric(t("metric.10ma"), f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] is not None else "N/A")
 with col3:
     trend_icons = {"up": "🔼", "down": "🔽", "neutral": "➖"}
-    st.metric("Trend", f"{trend_icons.get(status['trend'], '➖')} {status['trend'].title()}")
+    st.metric(t("metric.trend"), f"{trend_icons.get(status['trend'], '➖')} {val(status['trend'].title())}")
 with col4:
-    st.metric("Slope", f"{status['slope']:.4f}" if status["slope"] is not None else "N/A")
+    st.metric(t("metric.slope"), f"{status['slope']:.4f}" if status["slope"] is not None else "N/A")
 with col5:
     if status["is_overbought"]:
-        st.metric("Status", "⚠️ Overbought")
+        st.metric(t("metric.status"), f"⚠️ {val('Overbought')}")
     elif status["is_oversold"]:
-        st.metric("Status", "⚠️ Oversold")
+        st.metric(t("metric.status"), f"⚠️ {val('Oversold')}")
     else:
-        st.metric("Status", "Normal")
+        st.metric(t("metric.status"), val("Normal"))
 
 # Date filter
 min_date = df["date"].min().date()
 max_date = df["date"].max().date()
 default_start = default_start_date(min_date, max_date)
 date_range = st.date_input(
-    "Date Range",
+    t("common.date_range"),
     value=(default_start, max_date),
     min_value=min_date,
     max_value=max_date,
@@ -105,12 +103,12 @@ else:
     df_filtered = df
 
 # Chart
-fig = build_ratio_chart(df_filtered, title=f"{selected_display} Uptrend Ratio")
+fig = build_ratio_chart(df_filtered, title=t("chart.uptrend_ratio_for", name=selected_display))
 st.plotly_chart(fig, use_container_width=True)
 
 # Industries in this Sector
 st.markdown("---")
-st.subheader(f"Industries in {selected_display}")
+st.subheader(t("p1.industries_in", name=selected_display))
 
 industry_keys = SECTOR_INDUSTRIES.get(selected_key, [])
 has_industry_data = any(
@@ -133,9 +131,10 @@ if has_industry_data:
                 st.switch_page("pages/3_Industry_Detail.py")
 
         ind_table_event = st.dataframe(
-            ind_summary.drop(columns=["_key"]).style
-            .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"}, na_rep="N/A")
-            .apply(style_status_row, axis=1),
+            localized_summary_styler(
+                ind_summary.drop(columns=["_key"]),
+                numeric_formats={"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"},
+            ),
             use_container_width=True,
             hide_index=True,
             on_select="rerun",
@@ -149,16 +148,16 @@ if has_industry_data:
             st.session_state["selected_industry"] = selected_ind_key
             st.switch_page("pages/3_Industry_Detail.py")
 else:
-    st.info("No industry data available for this sector yet.")
+    st.info(t("p1.no_industry_data"))
 
 # Data Download
 st.markdown("---")
-st.subheader("Data Download")
+st.subheader(t("common.data_download"))
 col_dl1, col_dl2 = st.columns(2)
 with col_dl1:
     ts_csv = prepare_timeseries_csv(df_filtered)
     st.download_button(
-        f"Download {selected_display} Time Series",
+        t("dl.timeseries_for", name=selected_display),
         ts_csv.to_csv(index=False),
         f"{selected_key}_timeseries.csv",
         "text/csv",
@@ -166,7 +165,7 @@ with col_dl1:
 with col_dl2:
     if has_industry_data and not ind_summary.empty:
         st.download_button(
-            f"Download {selected_display} Industry Summary",
+            t("dl.industry_summary_for", name=selected_display),
             ind_summary.drop(columns=["_key"]).to_csv(index=False),
             f"{selected_key}_industry_summary.csv",
             "text/csv",

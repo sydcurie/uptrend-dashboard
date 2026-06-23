@@ -22,6 +22,7 @@ from src.constants import (
     CHART_Y_MAX_MULTIPLIER,
 )
 from src.data_processor import get_sector_display_name, get_industry_display_name
+from src.i18n import t, val
 
 logger = logging.getLogger(__name__)
 
@@ -102,10 +103,10 @@ def _trend_color(state: str) -> str:
 def _trend_legend_name(state: str) -> str:
     """Map trend state to legend name."""
     if state == "up":
-        return "Ratio (Up)"
+        return t("legend.ratio_up")
     elif state == "down":
-        return "Ratio (Down)"
-    return "Ratio (N/A)"
+        return t("legend.ratio_down")
+    return t("legend.ratio_na")
 
 
 def _add_ratio_segments(fig: go.Figure, df: pd.DataFrame) -> None:
@@ -151,7 +152,7 @@ def _add_moving_average(fig: go.Figure, df: pd.DataFrame) -> None:
             x=df["date"],
             y=df["ma_10"],
             mode="lines",
-            name="10MA",
+            name=t("legend.10ma"),
             line=dict(color=COLOR_MA, width=1.5),
             opacity=0.85,
         )
@@ -168,7 +169,7 @@ def _add_peaks_and_troughs(fig: go.Figure, df: pd.DataFrame) -> None:
                     x=peak_df["date"],
                     y=peak_df["ma_10"],
                     mode="markers",
-                    name="10MA Peak",
+                    name=t("legend.10ma_peak"),
                     marker=dict(symbol="triangle-down", size=10, color=COLOR_PEAK),
                 )
             )
@@ -181,7 +182,7 @@ def _add_peaks_and_troughs(fig: go.Figure, df: pd.DataFrame) -> None:
                     x=trough_df["date"],
                     y=trough_df["ma_10"],
                     mode="markers",
-                    name="10MA Trough",
+                    name=t("legend.10ma_trough"),
                     marker=dict(symbol="triangle-up", size=10, color=COLOR_TROUGH),
                 )
             )
@@ -195,7 +196,7 @@ def _add_threshold_lines(fig: go.Figure, df: pd.DataFrame) -> None:
             x=df["date"],
             y=[upper_val] * len(df),
             mode="lines",
-            name="Upper",
+            name=t("legend.upper"),
             line=dict(color=COLOR_UPPER, width=1, dash="dot"),
         )
     )
@@ -206,7 +207,7 @@ def _add_threshold_lines(fig: go.Figure, df: pd.DataFrame) -> None:
             x=df["date"],
             y=[lower_val] * len(df),
             mode="lines",
-            name="Lower",
+            name=t("legend.lower"),
             line=dict(color=COLOR_LOWER, width=1, dash="dot"),
         )
     )
@@ -216,8 +217,8 @@ def _apply_chart_layout(fig: go.Figure, df: pd.DataFrame, title: str) -> None:
     """Apply standard layout settings to the ratio chart."""
     fig.update_layout(
         title=title,
-        xaxis_title="Date",
-        yaxis_title="Ratio",
+        xaxis_title=t("chart.date"),
+        yaxis_title=t("chart.ratio"),
         template="plotly_white",
         height=CHART_HEIGHT_RATIO,
         yaxis=dict(range=[0, max(CHART_Y_MAX_MIN, df["ratio"].max() * CHART_Y_MAX_MULTIPLIER)]),
@@ -254,14 +255,14 @@ def build_sector_summary_chart(summary_df: pd.DataFrame) -> go.Figure:
         )
     )
 
-    fig.add_vline(x=UPPER_THRESHOLD, line_dash="dash", line_color=COLOR_UPPER, annotation_text="Upper")
-    fig.add_vline(x=LOWER_THRESHOLD, line_dash="dash", line_color=COLOR_LOWER, annotation_text="Lower")
+    fig.add_vline(x=UPPER_THRESHOLD, line_dash="dash", line_color=COLOR_UPPER, annotation_text=t("legend.upper"))
+    fig.add_vline(x=LOWER_THRESHOLD, line_dash="dash", line_color=COLOR_LOWER, annotation_text=t("legend.lower"))
 
     fig.update_layout(
-        title="Sector Ratio Summary",
+        title=t("chart.sector_ratio_summary"),
         template="plotly_white",
         height=CHART_HEIGHT_SUMMARY,
-        xaxis_title="Ratio",
+        xaxis_title=t("chart.ratio"),
         yaxis=dict(autorange="reversed"),
     )
 
@@ -293,17 +294,21 @@ def build_industry_summary_chart(
         )
     )
 
-    fig.add_vline(x=UPPER_THRESHOLD, line_dash="dash", line_color=COLOR_UPPER, annotation_text="Upper")
-    fig.add_vline(x=LOWER_THRESHOLD, line_dash="dash", line_color=COLOR_LOWER, annotation_text="Lower")
+    fig.add_vline(x=UPPER_THRESHOLD, line_dash="dash", line_color=COLOR_UPPER, annotation_text=t("legend.upper"))
+    fig.add_vline(x=LOWER_THRESHOLD, line_dash="dash", line_color=COLOR_LOWER, annotation_text=t("legend.lower"))
 
-    title = f"Industry Ratio Summary — {sector_name}" if sector_name else "Industry Ratio Summary"
+    title = (
+        t("chart.industry_ratio_summary_for", name=sector_name)
+        if sector_name
+        else t("chart.industry_ratio_summary")
+    )
     height = max(300, len(summary_df) * 35 + 100)
 
     fig.update_layout(
         title=title,
         template="plotly_white",
         height=height,
-        xaxis_title="Ratio",
+        xaxis_title=t("chart.ratio"),
         yaxis=dict(autorange="reversed"),
     )
 
@@ -381,7 +386,7 @@ def _build_comparison_chart(
             x=[],
             y=[],
             mode="lines",
-            name="Upper",
+            name=t("legend.upper"),
             line=dict(color=COLOR_UPPER, width=1, dash="dash"),
             showlegend=True,
         )
@@ -398,7 +403,7 @@ def _build_comparison_chart(
             x=[],
             y=[],
             mode="lines",
-            name="Lower",
+            name=t("legend.lower"),
             line=dict(color=COLOR_LOWER, width=1, dash="dash"),
             showlegend=True,
         )
@@ -410,11 +415,11 @@ def _build_comparison_chart(
         line_width=1,
     )
 
-    title_suffix = " (10MA)" if use_ma else " (Raw Ratio)"
+    title_suffix = t("chart.suffix_ma") if use_ma else t("chart.suffix_raw")
     fig.update_layout(
         title=title_prefix + title_suffix,
-        xaxis_title="Date",
-        yaxis_title="Ratio",
+        xaxis_title=t("chart.date"),
+        yaxis_title=t("chart.ratio"),
         yaxis=dict(tickformat=".0%"),
         template="plotly_white",
         height=CHART_HEIGHT_COMPARISON,
@@ -444,7 +449,7 @@ def build_sector_comparison_chart(
         display_name_fn=get_sector_display_name,
         palette=SECTOR_PALETTE,
         use_ma=use_ma,
-        title_prefix="Sector Comparison",
+        title_prefix=t("chart.sector_comparison"),
     )
 
 
@@ -467,7 +472,7 @@ def build_industry_comparison_chart(
         display_name_fn=get_industry_display_name,
         palette=INDUSTRY_PALETTE,
         use_ma=use_ma,
-        title_prefix="Industry Comparison",
+        title_prefix=t("chart.industry_comparison"),
     )
 
 
@@ -492,7 +497,7 @@ def build_industry_heatmap(
     if summary_df.empty:
         fig.add_trace(go.Treemap(labels=[], parents=[], values=[]))
         fig.update_layout(
-            title="Industry Heatmap",
+            title=t("chart.industry_heatmap"),
             height=CHART_HEIGHT_HEATMAP,
             template="plotly_white",
         )
@@ -545,11 +550,11 @@ def build_industry_heatmap(
         slope_str = f"{row['Slope']:.4f}" if pd.notna(row["Slope"]) else "N/A"
         hovertext.append(
             f"<b>{row['Industry']}</b><br>"
-            f"Ratio: {ratio_pct}<br>"
-            f"10MA: {ma_str}<br>"
-            f"Trend: {row['Trend']}<br>"
-            f"Slope: {slope_str}<br>"
-            f"Status: {row['Status']}"
+            f"{t('hover.ratio')}: {ratio_pct}<br>"
+            f"{t('hover.10ma')}: {ma_str}<br>"
+            f"{t('hover.trend')}: {val(row['Trend'])}<br>"
+            f"{t('hover.slope')}: {slope_str}<br>"
+            f"{t('hover.status')}: {val(row['Status'])}"
         )
 
     if color_mode == "ratio":
@@ -578,7 +583,7 @@ def build_industry_heatmap(
                     cmin=cmin,
                     cmax=cmax,
                     showscale=True,
-                    colorbar=dict(title="Ratio"),
+                    colorbar=dict(title=t("chart.ratio")),
                 ),
                 customdata=customdata,
                 text=text,
@@ -647,7 +652,7 @@ def build_dispersion_chart(dispersion_df: pd.DataFrame) -> go.Figure:
     fig.add_trace(
         go.Scatter(
             x=dates, y=dispersion_df["dispersion"],
-            name="Dispersion (σ)",
+            name=t("legend.dispersion_sigma"),
             line=dict(color="#1f77b4", width=2),
         ),
         secondary_y=False,
@@ -657,7 +662,7 @@ def build_dispersion_chart(dispersion_df: pd.DataFrame) -> go.Figure:
     fig.add_trace(
         go.Scatter(
             x=dates, y=dispersion_df["dispersion_ma10"],
-            name="Dispersion MA10",
+            name=t("legend.dispersion_ma10"),
             line=dict(color="#1f77b4", width=1, dash="dash"),
         ),
         secondary_y=False,
@@ -667,7 +672,7 @@ def build_dispersion_chart(dispersion_df: pd.DataFrame) -> go.Figure:
     fig.add_trace(
         go.Scatter(
             x=dates, y=dispersion_df["p25"],
-            name="P25 Threshold",
+            name=t("legend.p25"),
             line=dict(color="#2ca02c", width=1, dash="dot"),
         ),
         secondary_y=False,
@@ -675,7 +680,7 @@ def build_dispersion_chart(dispersion_df: pd.DataFrame) -> go.Figure:
     fig.add_trace(
         go.Scatter(
             x=dates, y=dispersion_df["p75"],
-            name="P75 Threshold",
+            name=t("legend.p75"),
             line=dict(color="#d62728", width=1, dash="dot"),
         ),
         secondary_y=False,
@@ -685,7 +690,7 @@ def build_dispersion_chart(dispersion_df: pd.DataFrame) -> go.Figure:
     fig.add_trace(
         go.Scatter(
             x=dates, y=dispersion_df["mean_ratio"],
-            name="Mean Ratio",
+            name=t("legend.mean_ratio"),
             line=dict(color="#ff7f0e", width=1.5, dash="dot"),
         ),
         secondary_y=True,
@@ -727,8 +732,8 @@ def build_dispersion_chart(dispersion_df: pd.DataFrame) -> go.Figure:
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=60),
     )
-    fig.update_yaxes(title_text="Dispersion (σ)", secondary_y=False)
-    fig.update_yaxes(title_text="Mean Ratio", tickformat=".0%", secondary_y=True)
+    fig.update_yaxes(title_text=t("legend.dispersion_sigma"), secondary_y=False)
+    fig.update_yaxes(title_text=t("legend.mean_ratio"), tickformat=".0%", secondary_y=True)
 
     return fig
 
@@ -782,7 +787,7 @@ def build_regime_timeline_chart(dispersion_df: pd.DataFrame) -> go.Figure:
                 orientation="h",
                 base=[pd.Timestamp(start)],
                 marker_color=REGIME_COLORS.get(regime, "#7f7f7f"),
-                name=regime.title(),
+                name=val(regime),
                 showlegend=show_legend,
                 hovertext=f"{regime}: {start} → {end} ({duration_days}d)",
                 hoverinfo="text",

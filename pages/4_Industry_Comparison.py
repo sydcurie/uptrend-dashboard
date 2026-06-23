@@ -14,16 +14,15 @@ from src.data_processor import (
     filter_by_date_range,
 )
 from src.chart_builder import build_industry_comparison_chart
+from src.i18n import t, render_language_selector
 
-st.set_page_config(page_title="Industry Comparison", page_icon="📊", layout="wide")
-st.title("Industry Comparison")
+st.set_page_config(page_title=t("p4.page_title"), page_icon="📊", layout="wide")
+st.title(t("p4.title"))
 
 with st.sidebar:
+    render_language_selector()
     st.markdown("---")
-    st.markdown(
-        "Compare uptrend ratios across multiple industries side by side. "
-        "Use Within Sector mode for focused analysis or Cross-Sector for broader comparison."
-    )
+    st.markdown(t("p4.sidebar_desc"))
 
     st.markdown("---")
     st.markdown(
@@ -43,22 +42,22 @@ all_data = load_data()
 
 # Compare mode
 compare_mode = st.radio(
-    "Compare Mode",
-    ["Within Sector", "Cross-Sector"],
+    t("p4.compare_mode"),
+    [t("p4.within_sector"), t("p4.cross_sector")],
     horizontal=True,
 )
 
-if compare_mode == "Within Sector":
+if compare_mode == t("p4.within_sector"):
     # Select sector, then show all its industries
     sector_names = {get_sector_display_name(s): s for s in SECTORS}
-    selected_sector_display = st.selectbox("Select Sector", list(sector_names.keys()))
+    selected_sector_display = st.selectbox(t("p4.select_sector"), list(sector_names.keys()))
     sector_key = sector_names[selected_sector_display]
 
     industry_keys = SECTOR_INDUSTRIES.get(sector_key, [])
     industry_names = {get_industry_display_name(k): k for k in industry_keys}
 
     selected_display = st.multiselect(
-        "Select Industries",
+        t("p4.select_industries"),
         options=sorted(industry_names.keys()),
         default=sorted(industry_names.keys()),
     )
@@ -75,14 +74,14 @@ else:
             industry_options[label] = ind
 
     selected_labels = st.multiselect(
-        f"Select Industries (max {MAX_INDUSTRY_COMPARISON})",
+        t("p4.select_industries_max", n=MAX_INDUSTRY_COMPARISON),
         options=sorted(industry_options.keys()),
         max_selections=MAX_INDUSTRY_COMPARISON,
     )
     selected_keys = [industry_options[label] for label in selected_labels]
 
 if not selected_keys:
-    st.warning("Please select at least one industry.")
+    st.warning(t("p4.select_one_industry"))
     st.stop()
 
 # Date filter
@@ -92,7 +91,7 @@ if first_df is not None:
     max_date = first_df["date"].max().date()
     default_start = default_start_date(min_date, max_date)
     date_range = st.date_input(
-        "Date Range",
+        t("common.date_range"),
         value=(default_start, max_date),
         min_value=min_date,
         max_value=max_date,
@@ -111,16 +110,16 @@ else:
     filtered_data = {k: all_data[k] for k in selected_keys if k in all_data}
 
 if not filtered_data:
-    st.warning("No data available for the selected industries.")
+    st.warning(t("p4.no_data_selected"))
     st.stop()
 
 # Display mode toggle
 display_mode = st.radio(
-    "Display Mode",
-    options=["Smoothed (10MA)", "Raw Ratio"],
+    t("common.display_mode"),
+    options=[t("opt.smoothed"), t("opt.raw")],
     horizontal=True,
 )
-use_ma = display_mode == "Smoothed (10MA)"
+use_ma = display_mode == t("opt.smoothed")
 
 # Chart
 fig = build_industry_comparison_chart(filtered_data, selected_industries=selected_keys, use_ma=use_ma)

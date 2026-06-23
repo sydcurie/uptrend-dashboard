@@ -12,17 +12,18 @@ from src.data_processor import (
     default_start_date,
     filter_by_date_range,
     prepare_timeseries_csv,
-    style_status_row,
+    localized_summary_styler,
 )
 from src.chart_builder import build_ratio_chart, build_sector_summary_chart
+from src.i18n import t, val, render_language_selector
 
 st.set_page_config(
-    page_title="US Market Uptrend Ratio",
+    page_title=t("app.page_title"),
     page_icon="📈",
     layout="wide",
 )
 
-st.title("US Market Uptrend Stock Ratio")
+st.title(t("app.title"))
 
 
 def load_data():
@@ -32,8 +33,9 @@ def load_data():
 
 # Sidebar
 with st.sidebar:
-    st.header("Settings")
-    if st.button("Refresh Data"):
+    render_language_selector()
+    st.header(t("common.settings"))
+    if st.button(t("common.refresh")):
         st.cache_data.clear()
         st.rerun()
 
@@ -45,7 +47,7 @@ with st.sidebar:
         max_date = df_all["date"].max().date()
         default_start = default_start_date(min_date, max_date)
         date_range = st.date_input(
-            "Date Range",
+            t("common.date_range"),
             value=(default_start, max_date),
             min_value=min_date,
             max_value=max_date,
@@ -55,9 +57,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown(
-        "Tracks the percentage of US stocks in an uptrend "
-        "across the full market and 11 sectors. "
-        'Data is collected daily from <a href="https://finviz.com/?affilId=279192576" target="_blank" rel="noopener noreferrer">Finviz</a>.',
+        t("app.sidebar_desc"),
         unsafe_allow_html=True,
     )
 
@@ -75,7 +75,7 @@ all_data = load_data()
 df_all = all_data.get("all")
 
 if df_all is None or df_all.empty:
-    st.warning("No data available. Import data using import_excel.py first.")
+    st.warning(t("common.no_data_import"))
     st.stop()
 
 # Apply date filter
@@ -90,29 +90,29 @@ status = get_current_status(df_all)
 
 col1, col2, col3, col4 = st.columns(4)
 with col1:
-    st.metric("Current Ratio", f"{status['ratio']:.1%}")
+    st.metric(t("metric.current_ratio"), f"{status['ratio']:.1%}")
 with col2:
-    st.metric("10MA", f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] is not None else "N/A")
+    st.metric(t("metric.10ma"), f"{status['ratio_10ma']:.1%}" if status["ratio_10ma"] is not None else "N/A")
 with col3:
     trend_icons = {"up": "🔼", "down": "🔽", "neutral": "➖"}
-    st.metric("Trend", f"{trend_icons.get(status['trend'], '➖')} {status['trend'].title()}")
+    st.metric(t("metric.trend"), f"{trend_icons.get(status['trend'], '➖')} {val(status['trend'].title())}")
 with col4:
     if status["is_overbought"]:
-        st.metric("Status", "⚠️ Overbought")
+        st.metric(t("metric.status"), f"⚠️ {val('Overbought')}")
     elif status["is_oversold"]:
-        st.metric("Status", "⚠️ Oversold")
+        st.metric(t("metric.status"), f"⚠️ {val('Oversold')}")
     else:
-        st.metric("Status", "Normal")
+        st.metric(t("metric.status"), val("Normal"))
 
-st.markdown(f"**Last updated:** {status['date']}")
+st.markdown(t("metric.last_updated", date=status["date"]))
 
 # Full market ratio chart
-st.subheader("Full Market Ratio")
-fig = build_ratio_chart(df_filtered, title="US Market Uptrend Ratio")
+st.subheader(t("app.full_market_ratio"))
+fig = build_ratio_chart(df_filtered, title=t("app.chart_title"))
 st.plotly_chart(fig, use_container_width=True)
 
 # Sector summary
-st.subheader("Sector Summary")
+st.subheader(t("app.sector_summary"))
 summary = build_sector_summary(all_data)
 
 fig_summary = build_sector_summary_chart(summary)
@@ -126,9 +126,10 @@ if event and event.selection and event.selection.points:
         st.switch_page("pages/1_Sector_Detail.py")
 
 table_event = st.dataframe(
-    summary.drop(columns=["_key"]).style
-    .format({"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"})
-    .apply(style_status_row, axis=1),
+    localized_summary_styler(
+        summary.drop(columns=["_key"]),
+        numeric_formats={"Ratio": "{:.1%}", "10MA": "{:.1%}", "Slope": "{:.4f}"},
+    ),
     use_container_width=True,
     hide_index=True,
     on_select="rerun",
@@ -144,20 +145,20 @@ if table_event and table_event.selection and table_event.selection.rows:
 
 # Data Download
 st.markdown("---")
-st.subheader("Data Download")
+st.subheader(t("common.data_download"))
 
 col_dl1, col_dl2 = st.columns(2)
 with col_dl1:
     ts_csv = prepare_timeseries_csv(df_filtered)
     st.download_button(
-        "Download Ratio Time Series",
+        t("dl.ratio_timeseries"),
         ts_csv.to_csv(index=False),
         "uptrend_ratio_timeseries.csv",
         "text/csv",
     )
 with col_dl2:
     st.download_button(
-        "Download Sector Summary",
+        t("dl.sector_summary"),
         summary.drop(columns=["_key"]).to_csv(index=False),
         "sector_summary.csv",
         "text/csv",
